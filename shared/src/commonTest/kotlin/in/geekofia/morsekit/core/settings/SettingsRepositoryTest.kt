@@ -88,6 +88,26 @@ class SettingsRepositoryTest {
     }
 
     @Test
+    fun resetRestoresDefaultsAndPersists() {
+        repository().apply {
+            setThemeMode(ThemeMode.Dark)
+            setWordsPerMinute(35)
+            setToneFrequencyHz(900)
+            resetToDefaults()
+        }
+        assertEquals(AppSettings(), repository().settings.value)
+    }
+
+    @Test
+    fun resetKeepsTheFlashWarningAcknowledgement() {
+        val repository = repository()
+        repository.acknowledgeFlashWarning()
+        repository.setWordsPerMinute(35)
+        repository.resetToDefaults()
+        assertEquals(AppSettings(flashWarningAcknowledged = true), repository.settings.value)
+    }
+
+    @Test
     fun appSettingsRejectsOutOfRangeValues() {
         assertFailsWith<IllegalArgumentException> { AppSettings(wordsPerMinute = 0) }
         assertFailsWith<IllegalArgumentException> { AppSettings(toneFrequencyHz = 20_000) }

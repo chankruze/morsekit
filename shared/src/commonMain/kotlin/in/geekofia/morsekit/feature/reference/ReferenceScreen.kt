@@ -13,13 +13,24 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -31,6 +42,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import `in`.geekofia.morsekit.core.morse.MorseCategory
 import `in`.geekofia.morsekit.ui.components.MorseDisplay
 import `in`.geekofia.morsekit.ui.components.PlaceholderContent
+import `in`.geekofia.morsekit.ui.components.ScreenScaffold
+import morsekit.shared.generated.resources.Res
+import morsekit.shared.generated.resources.ic_arrow_back
+import morsekit.shared.generated.resources.ic_close
+import morsekit.shared.generated.resources.ic_search
+import org.jetbrains.compose.resources.painterResource
 
 /** Wires [ReferenceViewModel] to the stateless [ReferenceScreen]. */
 @Composable
@@ -45,51 +62,79 @@ fun ReferenceRoute(
     )
 }
 
+/**
+ * The header shows "Reference" and a search action. Searching turns the header into the search
+ * field; closing search clears the query, so the full chart comes back.
+ */
 @Composable
 fun ReferenceScreen(
     state: ReferenceUiState,
     onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier = modifier.fillMaxSize()) {
-        SearchField(
-            query = state.query,
-            onQueryChange = onQueryChange,
-            modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 8.dp),
-        )
+    // Starts open if a query survived (e.g. returning to this tab while the ViewModel kept it).
+    var searching by rememberSaveable { mutableStateOf(state.query.isNotEmpty()) }
+    val closeSearch = {
+        searching = false
+        onQueryChange("")
+    }
 
-        if (state.hasResults) {
-            ReferenceGrid(sections = state.sections)
-        } else {
-            PlaceholderContent(
-                title = "No matches",
-                message = "Nothing matches “${state.query.trim()}”. Try a character (A), a code (.-) or a name (comma).",
-            )
+    ScreenScaffold(
+        modifier = modifier,
+        title = {
+            if (searching) HeaderSearchField(query = state.query, onQueryChange = onQueryChange) else Text("Reference")
+        },
+        navigationIcon = {
+            if (searching) {
+                IconButton(onClick = closeSearch) {
+                    Icon(painterResource(Res.drawable.ic_arrow_back), contentDescription = "Close search")
+                }
+            }
+        },
+        actions = {
+            when {
+                !searching -> IconButton(onClick = { searching = true }) {
+                    Icon(painterResource(Res.drawable.ic_search), contentDescription = "Search")
+                }
+                state.query.isNotEmpty() -> IconButton(onClick = { onQueryChange("") }) {
+                    Icon(painterResource(Res.drawable.ic_close), contentDescription = "Clear search")
+                }
+            }
+        },
+    ) { contentModifier ->
+        Column(modifier = contentModifier.fillMaxSize()) {
+            if (state.hasResults) {
+                ReferenceGrid(sections = state.sections)
+            } else {
+                PlaceholderContent(
+                    title = "No matches",
+                    message = "Nothing matches “${state.query.trim()}”. Try a character (A), a code (.-) or a name (comma).",
+                )
+            }
         }
     }
 }
 
+/** A borderless search field for the header; focuses itself when shown. */
 @Composable
-private fun SearchField(
-    query: String,
-    onQueryChange: (String) -> Unit,
-    modifier: Modifier = Modifier,
-) {
+private fun HeaderSearchField(query: String, onQueryChange: (String) -> Unit) {
     val focusManager = LocalFocusManager.current
-    OutlinedTextField(
+    val focusRequester = remember { FocusRequester() }
+    LaunchedEffect(Unit) { focusRequester.requestFocus() }
+    TextField(
         value = query,
         onValueChange = onQueryChange,
-        modifier = modifier,
+        modifier = Modifier.fillMaxWidth().focusRequester(focusRequester),
         singleLine = true,
-        label = { Text("Search") },
         placeholder = { Text("A, 7, .-, comma") },
-        trailingIcon = if (query.isNotEmpty()) {
-            { TextButton(onClick = { onQueryChange("") }) { Text("Clear") } }
-        } else {
-            null
-        },
         keyboardOptions = KeyboardOptions(autoCorrectEnabled = false, imeAction = ImeAction.Search),
         keyboardActions = KeyboardActions(onSearch = { focusManager.clearFocus() }),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color.Transparent,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+        ),
     )
 }
 

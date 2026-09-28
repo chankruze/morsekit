@@ -1,9 +1,9 @@
 package `in`.geekofia.morsekit
 
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -16,38 +16,44 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.luminance
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import `in`.geekofia.morsekit.feature.reference.ReferenceRoute
 import `in`.geekofia.morsekit.feature.settings.SettingsRoute
 import `in`.geekofia.morsekit.feature.translator.TranslatorRoute
 import `in`.geekofia.morsekit.navigation.TopLevelDestination
 import `in`.geekofia.morsekit.ui.theme.MorseKitTheme
-import `in`.geekofia.morsekit.ui.theme.isDark
 import org.jetbrains.compose.resources.painterResource
 
 /**
  * Shared entry point, hosted by `MainActivity` on Android and `MainViewController` on iOS.
  *
- * [onDarkThemeChange] reports the resolved theme so the host can style system bars to match.
+ * [onSystemBarAppearanceChange] reports which icon colours the system bars need over the app's
+ * header and bottom bar, so the host can style them (Android: `enableEdgeToEdge`).
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun App(
     container: AppContainer,
-    onDarkThemeChange: (Boolean) -> Unit = {},
+    onSystemBarAppearanceChange: (SystemBarAppearance) -> Unit = {},
 ) {
     val settings by container.settingsRepository.settings.collectAsStateWithLifecycle()
-    val darkTheme = settings.themeMode.isDark()
-    val currentOnDarkThemeChange by rememberUpdatedState(onDarkThemeChange)
-    LaunchedEffect(darkTheme) { currentOnDarkThemeChange(darkTheme) }
+    val currentOnAppearanceChange by rememberUpdatedState(onSystemBarAppearanceChange)
 
     MorseKitTheme(themeMode = settings.themeMode) {
+        val colors = MaterialTheme.colorScheme
+        // Status bar icons sit on the (surface-coloured) header, navigation bar icons on the bottom bar.
+        val appearance = SystemBarAppearance(
+            lightStatusBarIcons = colors.surface.luminance() < 0.5f,
+            lightNavigationBarIcons = colors.surfaceContainer.luminance() < 0.5f,
+        )
+        LaunchedEffect(appearance) { currentOnAppearanceChange(appearance) }
+
         var destination by rememberSaveable { mutableStateOf(TopLevelDestination.Translator) }
 
+        // Each screen draws its own top bar (ScreenScaffold), so this Scaffold only owns the bottom
+        // bar and applies no insets itself: NavigationBar pads for the system navigation bar.
         Scaffold(
-            topBar = {
-                CenterAlignedTopAppBar(title = { Text(destination.label) })
-            },
+            contentWindowInsets = WindowInsets(0),
             bottomBar = {
                 NavigationBar {
                     TopLevelDestination.entries.forEach { item ->

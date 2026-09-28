@@ -29,6 +29,13 @@ class SettingsRepository(private val store: KeyValueStore) {
 
     fun acknowledgeFlashWarning() = update { it.copy(flashWarningAcknowledged = true) }
 
+    /**
+     * Restores the user-facing settings (theme, speed, tone) to their defaults. The flash-warning
+     * acknowledgement isn't a setting shown on screen, so it's kept: resetting shouldn't make the
+     * user accept the warning again.
+     */
+    fun resetToDefaults() = update { AppSettings(flashWarningAcknowledged = it.flashWarningAcknowledged) }
+
     private fun update(transform: (AppSettings) -> AppSettings) {
         val updated = state.updateAndGet(transform)
         store.putString(KEY_THEME_MODE, updated.themeMode.name)

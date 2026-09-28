@@ -1,6 +1,7 @@
 package `in`.geekofia.morsekit.feature.translator
 
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
@@ -56,12 +59,14 @@ import `in`.geekofia.morsekit.feature.playback.TransmitOutput
 import `in`.geekofia.morsekit.platform.PlatformServices
 import `in`.geekofia.morsekit.ui.components.MorseDisplay
 import `in`.geekofia.morsekit.ui.components.MorseTextField
+import `in`.geekofia.morsekit.ui.components.ScreenScaffold
 import kotlinx.coroutines.launch
 import morsekit.shared.generated.resources.Res
 import morsekit.shared.generated.resources.ic_close
 import morsekit.shared.generated.resources.ic_copy
 import morsekit.shared.generated.resources.ic_share
 import morsekit.shared.generated.resources.ic_translate
+import morsekit.shared.generated.resources.morsekit_logo
 import org.jetbrains.compose.resources.painterResource
 
 /**
@@ -143,42 +148,55 @@ fun TranslatorRoute(
         )
     }
 
-    TranslatorScreen(
-        state = state,
-        snackbarHostState = snackbarHostState,
-        onInputChange = { stopTransmitting(); viewModel.onInputChange(it) },
-        onSwap = { stopTransmitting(); viewModel.swapDirection() },
-        onClear = { stopTransmitting(); viewModel.onClear() },
-        onCopy = { text ->
-            clipboard.copyText(text)
-            if (!clipboard.showsSystemConfirmation) {
-                scope.launch {
-                    snackbarHostState.currentSnackbarData?.dismiss()
-                    snackbarHostState.showSnackbar("Copied to clipboard")
-                }
-            }
-        },
-        onShare = platformServices.share::shareText,
-        modifier = modifier,
-        transmitFab = {
-            TransmitFab(
-                activeOutput = activeOutput,
-                canTransmit = !state.message.isEmpty,
-                isFlashAvailable = torchViewModel.isTorchAvailable,
-                isVibrationAvailable = vibrationViewModel.isVibrationAvailable,
-                wordsPerMinute = settings.wordsPerMinute,
-                onWordsPerMinuteChange = settingsRepository::setWordsPerMinute,
-                onStart = { output ->
-                    if (output == TransmitOutput.Flash && !settings.flashWarningAcknowledged) {
-                        showFlashWarning = true
-                    } else {
-                        start(output)
+    ScreenScaffold(title = { AppTitle() }, modifier = modifier, centerTitle = true) { contentModifier ->
+        TranslatorScreen(
+            state = state,
+            snackbarHostState = snackbarHostState,
+            onInputChange = { stopTransmitting(); viewModel.onInputChange(it) },
+            onSwap = { stopTransmitting(); viewModel.swapDirection() },
+            onClear = { stopTransmitting(); viewModel.onClear() },
+            onCopy = { text ->
+                clipboard.copyText(text)
+                if (!clipboard.showsSystemConfirmation) {
+                    scope.launch {
+                        snackbarHostState.currentSnackbarData?.dismiss()
+                        snackbarHostState.showSnackbar("Copied to clipboard")
                     }
-                },
-                onStop = stopTransmitting,
-            )
-        },
-    )
+                }
+            },
+            onShare = platformServices.share::shareText,
+            modifier = contentModifier,
+            transmitFab = {
+                TransmitFab(
+                    activeOutput = activeOutput,
+                    canTransmit = !state.message.isEmpty,
+                    isFlashAvailable = torchViewModel.isTorchAvailable,
+                    isVibrationAvailable = vibrationViewModel.isVibrationAvailable,
+                    wordsPerMinute = settings.wordsPerMinute,
+                    onWordsPerMinuteChange = settingsRepository::setWordsPerMinute,
+                    onStart = { output ->
+                        if (output == TransmitOutput.Flash && !settings.flashWarningAcknowledged) {
+                            showFlashWarning = true
+                        } else {
+                            start(output)
+                        }
+                    },
+                    onStop = stopTransmitting,
+                )
+            },
+        )
+    }
+}
+
+/** The home screen's title: the app icon and name. */
+@Composable
+private fun AppTitle() {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        // Decorative: the name next to it already identifies the app to screen readers.
+        Image(painterResource(Res.drawable.morsekit_logo), contentDescription = null, modifier = Modifier.size(32.dp))
+        Spacer(Modifier.width(12.dp))
+        Text("MorseKit")
+    }
 }
 
 @Composable
@@ -298,6 +316,8 @@ private fun InputCard(
             isMorse = isMorseInput,
             borderless = true,
         )
+        // TextField puts no space under its supporting text, so the hint would sit on the card edge.
+        Spacer(Modifier.height(8.dp))
     }
 }
 

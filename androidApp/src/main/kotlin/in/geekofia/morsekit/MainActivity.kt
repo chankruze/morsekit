@@ -22,15 +22,26 @@ class MainActivity : ComponentActivity() {
 
         val container = (application as MorseKitApplication).container
         setContent {
-            App(container, onDarkThemeChange = ::applySystemBarStyle)
+            App(container, onSystemBarAppearanceChange = ::applySystemBarStyle)
         }
     }
 
-    /** Keeps status/navigation bar icons readable when the app theme differs from the system's. */
-    private fun applySystemBarStyle(darkTheme: Boolean) {
+    /**
+     * Keeps status/navigation bar icons readable over the app's own colours (which follow the
+     * in-app theme, not necessarily the system's): both bars are transparent over app content.
+     */
+    private fun applySystemBarStyle(appearance: SystemBarAppearance) {
         enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT) { darkTheme },
-            navigationBarStyle = SystemBarStyle.auto(LIGHT_SCRIM, DARK_SCRIM) { darkTheme },
+            statusBarStyle = if (appearance.lightStatusBarIcons) {
+                SystemBarStyle.dark(Color.TRANSPARENT)
+            } else {
+                SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
+            },
+            navigationBarStyle = if (appearance.lightNavigationBarIcons) {
+                SystemBarStyle.dark(DARK_SCRIM)
+            } else {
+                SystemBarStyle.light(LIGHT_SCRIM, DARK_SCRIM)
+            },
         )
     }
 

@@ -1,6 +1,7 @@
 package `in`.geekofia.morsekit.feature.settings
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,16 +9,25 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
@@ -28,7 +38,11 @@ import `in`.geekofia.morsekit.core.settings.SettingsRepository
 import `in`.geekofia.morsekit.core.settings.ThemeMode
 import `in`.geekofia.morsekit.core.timing.MorseTiming
 import `in`.geekofia.morsekit.platform.AppInfo
+import `in`.geekofia.morsekit.ui.components.ScreenScaffold
 import `in`.geekofia.morsekit.ui.components.SectionCard
+import morsekit.shared.generated.resources.Res
+import morsekit.shared.generated.resources.ic_more_vert
+import org.jetbrains.compose.resources.painterResource
 import kotlin.math.roundToInt
 
 /**
@@ -48,12 +62,73 @@ fun SettingsRoute(
         onThemeModeChange = settingsRepository::setThemeMode,
         onWordsPerMinuteChange = settingsRepository::setWordsPerMinute,
         onToneFrequencyChange = settingsRepository::setToneFrequencyHz,
+        onResetToDefaults = settingsRepository::resetToDefaults,
         modifier = modifier,
     )
 }
 
+/** Header with an overflow menu (Reset to defaults, confirmed first) above the settings. */
 @Composable
 fun SettingsScreen(
+    settings: AppSettings,
+    appInfo: AppInfo,
+    onThemeModeChange: (ThemeMode) -> Unit,
+    onWordsPerMinuteChange: (Int) -> Unit,
+    onToneFrequencyChange: (Int) -> Unit,
+    onResetToDefaults: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var menuOpen by remember { mutableStateOf(false) }
+    var confirmReset by remember { mutableStateOf(false) }
+
+    if (confirmReset) {
+        AlertDialog(
+            onDismissRequest = { confirmReset = false },
+            title = { Text("Reset settings?") },
+            text = { Text("Theme, speed and tone go back to their default values.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    confirmReset = false
+                    onResetToDefaults()
+                }) { Text("Reset") }
+            },
+            dismissButton = { TextButton(onClick = { confirmReset = false }) { Text("Cancel") } },
+        )
+    }
+
+    ScreenScaffold(
+        modifier = modifier,
+        title = { Text("Settings") },
+        actions = {
+            Box {
+                IconButton(onClick = { menuOpen = true }) {
+                    Icon(painterResource(Res.drawable.ic_more_vert), contentDescription = "More options")
+                }
+                DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+                    DropdownMenuItem(
+                        text = { Text("Reset to defaults") },
+                        onClick = {
+                            menuOpen = false
+                            confirmReset = true
+                        },
+                    )
+                }
+            }
+        },
+    ) { contentModifier ->
+        SettingsContent(
+            settings = settings,
+            appInfo = appInfo,
+            onThemeModeChange = onThemeModeChange,
+            onWordsPerMinuteChange = onWordsPerMinuteChange,
+            onToneFrequencyChange = onToneFrequencyChange,
+            modifier = contentModifier,
+        )
+    }
+}
+
+@Composable
+private fun SettingsContent(
     settings: AppSettings,
     appInfo: AppInfo,
     onThemeModeChange: (ThemeMode) -> Unit,
