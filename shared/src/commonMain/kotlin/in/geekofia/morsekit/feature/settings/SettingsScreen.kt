@@ -21,6 +21,7 @@ import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -233,6 +234,11 @@ private fun SliderSetting(
             valueRange = range.first.toFloat()..range.last.toFloat(),
             // Tick marks only when snapping; a 1-step slider would draw dozens of them.
             steps = if (step > 1) (range.last - range.first) / step - 1 else 0,
+            // The default inactive track (secondaryContainer) is the same brightness as the card in
+            // the light theme (1.00:1). Outline at 85% reaches >= 3:1 against the card in both themes.
+            colors = SliderDefaults.colors(
+                inactiveTrackColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.85f),
+            ),
             modifier = Modifier.semantics { stateDescription = valueText },
         )
         Text(
