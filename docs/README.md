@@ -15,6 +15,7 @@ open the file and follow along.
 | 5 | [Platform services](05-platform-services.md) | Calling Android and iOS APIs from shared code: interfaces vs `expect`/`actual`, Kotlin/Native interop |
 | 6 | [Testing](06-testing.md) | `commonTest`, which platforms run which tests, how the engine tests are organized |
 | 7 | [Versioning and builds](07-versioning-and-builds.md) | SemVer from one file for both platforms, the bump script, named APK/AAB outputs, the AGP Variant API |
+| 8 | [Audio playback](08-audio-playback.md) | Rendering Morse to PCM in shared code, drift-free frame timing, click-free tones, AudioTrack and AVAudioEngine, main-thread contracts |
 
 ## The whole app on one page
 
@@ -69,6 +70,7 @@ iOS exist, which is why it's easy to test and reuse.
 | `core.morse` | Engine | `core.model` | Pure Kotlin, no Compose |
 | `core.timing` | Engine | `core.model` | Pure Kotlin, uses `kotlin.time.Duration` |
 | `core.settings` | Preferences | `core.timing`, `platform` | `AppSettings`, `ThemeMode`, `SettingsRepository` (StateFlow + persistence) |
+| `core.audio` | Engine | `core.timing`, `platform` | Tone schedule, PCM renderer, playback state machine |
 | `platform` | Abstractions | nothing | Interfaces only in `commonMain` |
 | `ui.theme`, `ui.components` | Design system | Compose, `core.model` | Reusable, feature-agnostic |
 | `feature.*` | Features | everything above | Screen + ViewModel + UI state |

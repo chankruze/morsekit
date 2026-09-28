@@ -119,6 +119,6 @@ signals for `PARIS` add up to 43 units, and the 7-unit trailing word gap (not em
 | Pure function on `MorseMessage` | Trivial to unit test, with no clocks, coroutines or devices involved |
 | Output-agnostic | Torch, vibration and audio differ only in *what* they switch, not *when* |
 
-Future work (not built yet): a player that walks the signals with coroutine `delay`s and drives
-a `TorchController`, `HapticController` or audio player, plus Farnsworth timing (letters at full
-speed, longer gaps between them, for learners).
+**Audio** consumes these signals today: they're converted to exact audio frames and rendered
+as a tone (see [Audio playback](08-audio-playback.md)). Still to come: torch and vibration
+output, and Farnsworth timing (letters at full speed, longer gaps between them, for learners).

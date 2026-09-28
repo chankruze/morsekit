@@ -205,12 +205,16 @@ fun MainViewController(): UIViewController {
 
 The lambda reads `controller` only when the user taps Share, by which time it's been assigned.
 
+## Audio
+
+`PcmAudioPlayer` is the audio abstraction: it only plays rendered samples, and all Morse timing
+lives in shared code. It's covered in [Audio playback](08-audio-playback.md).
+
 ## Planned services (not built yet)
 
-These will follow the same pattern when playback is implemented:
+These will follow the same pattern when their features are implemented:
 
 | Interface | Android | iOS | Consumes |
 | --- | --- | --- | --- |
 | `TorchController` | `CameraManager.setTorchMode` | `AVCaptureDevice.torchMode` | `List<MorseSignal>` |
 | `HapticController` | `Vibrator` / `VibrationEffect` (+ `VIBRATE` permission) | Core Haptics (`CHHapticEngine`) | `List<MorseSignal>` |
-| `MorseAudioPlayer` | `AudioTrack` sine tone | `AVAudioEngine` | `List<MorseSignal>` |

@@ -39,7 +39,7 @@ the KMP concepts used), see the [learning notes in `docs/`](docs/README.md).
 
 Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ Todo.
 
-**26 done · 6 in progress · 25 todo** (57 tasks)
+**30 done · 6 in progress · 21 todo** (57 tasks)
 
 | Feature | Done | In Progress | Todo |
 | --- | --- | --- | --- |
@@ -47,7 +47,7 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Morse Engine | 6 | 0 | 0 |
 | Translator | 6 | 0 | 0 |
 | Morse Reference | 3 | 1 | 0 |
-| Audio | 0 | 0 | 4 |
+| Audio | 4 | 0 | 0 |
 | Flashlight | 0 | 1 | 3 |
 | Vibration | 0 | 1 | 2 |
 | Morse Trainer | 0 | 0 | 5 |
@@ -83,10 +83,10 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Morse Reference | Numbers | Display 0-9 Morse codes | P1 | ✅ Done |
 | Morse Reference | Punctuation | Display common punctuation and prosigns | P1 | 🚧 In Progress |
 | Morse Reference | Search | Search/filter Morse characters | P2 | ✅ Done |
-| Audio | Morse audio | Convert Morse symbols into audible tones | P1 | ⬜ Todo |
-| Audio | WPM | Add adjustable Morse transmission speed | P1 | ⬜ Todo |
-| Audio | Frequency | Allow tone frequency adjustment | P2 | ⬜ Todo |
-| Audio | Playback controls | Play, pause, stop, and replay Morse audio | P1 | ⬜ Todo |
+| Audio | Morse audio | Convert Morse symbols into audible tones | P1 | ✅ Done |
+| Audio | WPM | Add adjustable Morse transmission speed | P1 | ✅ Done |
+| Audio | Frequency | Allow tone frequency adjustment | P2 | ✅ Done |
+| Audio | Playback controls | Play, pause, stop, and replay Morse audio | P1 | ✅ Done |
 | Flashlight | Transmission | Transmit Morse using device flashlight/torch | P1 | ⬜ Todo |
 | Flashlight | Timing | Implement correct dot/dash and gap timing | P1 | 🚧 In Progress |
 | Flashlight | WPM | Use configurable transmission speed | P1 | ⬜ Todo |

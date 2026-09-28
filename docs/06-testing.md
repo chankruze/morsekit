@@ -35,18 +35,21 @@ The test packages mirror the main packages:
 | --- | --- | --- |
 | `MorseAlphabetTest` | 10 | All letters/digits/punctuation present, upper case only, unique codes, reversible lookups, categories, rejects duplicates, `MorseLetter` validation |
 | `MorseEncodeTest` | 22 | SOS, A–Z, a–z, digits, punctuation, sentences, word separation, whitespace collapsing (tab/newline/NBSP), empty input, unsupported characters, `ı`, emoji as one character, lone surrogates, smart quotes, `encodeChar` |
-| `MorseDecodeTest` | 17 | SOS, every code, word separators (`/`, `\|`, newline, 2+ spaces), trimming, empty words, typographic dots/dashes, unknown vs malformed codes, `decodeSymbol` |
+| `MorseDecodeTest` | 20 | SOS, every code, word separators (`/`, `\|`, newline, 2+ spaces), trimming, empty words, typographic dots/dashes, unknown vs malformed codes, `decodeSymbol`, `parse()` for playback |
 | `MorseRoundTripTest` | 6 | text → Morse → text for every character and several sentences; Morse → text → canonical Morse |
 | `MorseNormalizerTest` | 7 | Character folding and canonical `normalizeText` / `normalizeMorse` |
 | `MorseTokenizerTest` | 6 | Word/letter splitting rules in isolation |
 | `MorseTimingTest` | 8 | Unit length vs WPM, bounds, gap rules, PARIS = 50 units, durations |
-| `TranslatorViewModelTest` | 11 | Live conversion, issues, swap (including dropping `�` placeholders), direction selection, clear |
+| `TranslatorViewModelTest` | 12 | Live conversion, issues, swap (including dropping `�` placeholders), direction selection, clear |
 | `TranslatorUiStateTest` | 9 | Empty / Invalid / Partial / Complete status, `hasOutput`, grouped and truncated issue messages, invisible characters |
 | `ReferenceEntryTest` | 7 | Chart built from the alphabet in order, codes vs the independent table, A–Z/0–9/punctuation coverage, every punctuation mark has a name, accessibility labels |
 | `ReferenceSearchTest` | 11 | Character, code-prefix (incl. `·−`) and name search, ambiguous `.`/`-`, ordering, no matches |
 | `ReferenceViewModelTest` | 5 | Initial sections, filtering hides empty sections, clearing restores all 54 |
 | `SettingsRepositoryTest` | 7 | Defaults, immediate updates, persistence across instances, independent keys, clamping, corrupt stored values, `AppSettings` invariants |
-| **Total** | **126** | |
+| `ToneScheduleTest` | 7 | Units → frames at 16 kHz, gaps, speed scaling, no rounding drift at 13 WPM |
+| `MorseAudioRendererTest` | 10 | Length and duration, exact silence, amplitude, fade in/out, measured pitch, speed, limits |
+| `MorseAudioPlayerTest` | 8 | Play/pause/resume/stop, completion, replay, invalid transitions, stale completions (fake output) |
+| **Total** | **155** | |
 
 ## Testing techniques used
 
