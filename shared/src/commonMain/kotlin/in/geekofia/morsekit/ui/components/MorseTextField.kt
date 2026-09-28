@@ -4,9 +4,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import `in`.geekofia.morsekit.ui.theme.toMorseStyle
@@ -16,6 +19,9 @@ import `in`.geekofia.morsekit.ui.theme.toMorseStyle
  *
  * With [isMorse], the field uses a monospace style and disables auto-correct so the keyboard
  * doesn't rewrite dots and dashes (e.g. iOS turning `--` into `—`).
+ *
+ * [borderless] drops the outline, underline and background, for fields that sit inside a card
+ * that already provides the frame. It then has no floating label; the card should title it.
  */
 @Composable
 fun MorseTextField(
@@ -28,7 +34,32 @@ fun MorseTextField(
     supportingText: String? = null,
     isError: Boolean = false,
     minLines: Int = 3,
+    borderless: Boolean = false,
 ) {
+    val textStyle = if (isMorse) LocalTextStyle.current.toMorseStyle() else LocalTextStyle.current
+    val keyboardOptions = keyboardOptionsFor(isMorse)
+    if (borderless) {
+        TextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = modifier.fillMaxWidth(),
+            placeholder = placeholder?.let { { Text(it) } },
+            supportingText = supportingText?.let { { Text(it) } },
+            isError = isError,
+            minLines = minLines,
+            textStyle = textStyle,
+            keyboardOptions = keyboardOptions,
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                errorContainerColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                errorIndicatorColor = Color.Transparent,
+            ),
+        )
+        return
+    }
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
@@ -38,18 +69,21 @@ fun MorseTextField(
         supportingText = supportingText?.let { { Text(it) } },
         isError = isError,
         minLines = minLines,
-        textStyle = if (isMorse) LocalTextStyle.current.toMorseStyle() else LocalTextStyle.current,
-        keyboardOptions = if (isMorse) {
-            KeyboardOptions(
-                capitalization = KeyboardCapitalization.None,
-                autoCorrectEnabled = false,
-                keyboardType = KeyboardType.Ascii,
-            )
-        } else {
-            KeyboardOptions(
-                capitalization = KeyboardCapitalization.Sentences,
-                autoCorrectEnabled = false,
-            )
-        },
+        textStyle = textStyle,
+        keyboardOptions = keyboardOptions,
     )
 }
+
+private fun keyboardOptionsFor(isMorse: Boolean): KeyboardOptions =
+    if (isMorse) {
+        KeyboardOptions(
+            capitalization = KeyboardCapitalization.None,
+            autoCorrectEnabled = false,
+            keyboardType = KeyboardType.Ascii,
+        )
+    } else {
+        KeyboardOptions(
+            capitalization = KeyboardCapitalization.Sentences,
+            autoCorrectEnabled = false,
+        )
+    }

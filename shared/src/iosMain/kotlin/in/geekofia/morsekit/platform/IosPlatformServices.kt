@@ -37,6 +37,13 @@ private class IosKeyValueStore : KeyValueStore {
     override fun putInt(key: String, value: Int) {
         defaults.setInteger(value.toLong(), forKey = key)
     }
+
+    override fun getBoolean(key: String): Boolean? =
+        if (defaults.objectForKey(key) != null) defaults.boolForKey(key) else null
+
+    override fun putBoolean(key: String, value: Boolean) {
+        defaults.setBool(value, forKey = key)
+    }
 }
 
 private fun iosAppInfo(): AppInfo {

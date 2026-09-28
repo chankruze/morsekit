@@ -37,6 +37,13 @@ private class AndroidKeyValueStore(context: Context) : KeyValueStore {
     override fun putInt(key: String, value: Int) {
         preferences.edit { putInt(key, value) }
     }
+
+    override fun getBoolean(key: String): Boolean? =
+        if (preferences.contains(key)) preferences.getBoolean(key, false) else null
+
+    override fun putBoolean(key: String, value: Boolean) {
+        preferences.edit { putBoolean(key, value) }
+    }
 }
 
 private fun androidAppInfo(context: Context): AppInfo {

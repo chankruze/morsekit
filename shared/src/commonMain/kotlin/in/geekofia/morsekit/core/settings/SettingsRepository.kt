@@ -27,11 +27,14 @@ class SettingsRepository(private val store: KeyValueStore) {
     /** Values outside [AppSettings.MIN_TONE_HZ]..[AppSettings.MAX_TONE_HZ] are clamped. */
     fun setToneFrequencyHz(hz: Int) = update { it.copy(toneFrequencyHz = hz.clampTone()) }
 
+    fun acknowledgeFlashWarning() = update { it.copy(flashWarningAcknowledged = true) }
+
     private fun update(transform: (AppSettings) -> AppSettings) {
         val updated = state.updateAndGet(transform)
         store.putString(KEY_THEME_MODE, updated.themeMode.name)
         store.putInt(KEY_WPM, updated.wordsPerMinute)
         store.putInt(KEY_TONE_HZ, updated.toneFrequencyHz)
+        store.putBoolean(KEY_FLASH_WARNING_ACKNOWLEDGED, updated.flashWarningAcknowledged)
     }
 
     /** Missing, unknown or out-of-range stored values fall back to defaults or are clamped. */
@@ -43,6 +46,8 @@ class SettingsRepository(private val store: KeyValueStore) {
                 ?: defaults.themeMode,
             wordsPerMinute = store.getInt(KEY_WPM)?.clampWpm() ?: defaults.wordsPerMinute,
             toneFrequencyHz = store.getInt(KEY_TONE_HZ)?.clampTone() ?: defaults.toneFrequencyHz,
+            flashWarningAcknowledged = store.getBoolean(KEY_FLASH_WARNING_ACKNOWLEDGED)
+                ?: defaults.flashWarningAcknowledged,
         )
     }
 
@@ -54,5 +59,6 @@ class SettingsRepository(private val store: KeyValueStore) {
         const val KEY_THEME_MODE = "settings.themeMode"
         const val KEY_WPM = "settings.wordsPerMinute"
         const val KEY_TONE_HZ = "settings.toneFrequencyHz"
+        const val KEY_FLASH_WARNING_ACKNOWLEDGED = "settings.flashWarningAcknowledged"
     }
 }

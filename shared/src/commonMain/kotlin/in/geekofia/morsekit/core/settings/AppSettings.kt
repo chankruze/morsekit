@@ -9,6 +9,8 @@ data class AppSettings(
     val wordsPerMinute: Int = MorseTiming.DEFAULT_WPM,
     /** Default pitch of the audio tone. */
     val toneFrequencyHz: Int = DEFAULT_TONE_HZ,
+    /** The user has seen and accepted the flashing-light warning (asked once, before the first flash). */
+    val flashWarningAcknowledged: Boolean = false,
 ) {
     init {
         require(wordsPerMinute in MorseTiming.MIN_WPM..MorseTiming.MAX_WPM) { "WPM out of range: $wordsPerMinute" }

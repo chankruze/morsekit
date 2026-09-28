@@ -73,6 +73,21 @@ class SettingsRepositoryTest {
     }
 
     @Test
+    fun flashWarningIsUnacknowledgedUntilAcceptedAndThenRemembered() {
+        assertEquals(false, repository().settings.value.flashWarningAcknowledged)
+        repository().acknowledgeFlashWarning()
+        assertEquals(true, repository().settings.value.flashWarningAcknowledged)
+    }
+
+    @Test
+    fun acknowledgingTheWarningKeepsOtherSettings() {
+        val repository = repository()
+        repository.setWordsPerMinute(30)
+        repository.acknowledgeFlashWarning()
+        assertEquals(AppSettings(wordsPerMinute = 30, flashWarningAcknowledged = true), repository.settings.value)
+    }
+
+    @Test
     fun appSettingsRejectsOutOfRangeValues() {
         assertFailsWith<IllegalArgumentException> { AppSettings(wordsPerMinute = 0) }
         assertFailsWith<IllegalArgumentException> { AppSettings(toneFrequencyHz = 20_000) }

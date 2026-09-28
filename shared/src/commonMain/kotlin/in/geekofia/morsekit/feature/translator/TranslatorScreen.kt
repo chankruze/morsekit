@@ -1,34 +1,45 @@
 package `in`.geekofia.morsekit.feature.translator
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
@@ -40,23 +51,26 @@ import `in`.geekofia.morsekit.core.settings.SettingsRepository
 import `in`.geekofia.morsekit.feature.playback.MorsePlaybackViewModel
 import `in`.geekofia.morsekit.feature.playback.MorseTorchViewModel
 import `in`.geekofia.morsekit.feature.playback.MorseVibrationViewModel
-import `in`.geekofia.morsekit.feature.playback.SoundControls
-import `in`.geekofia.morsekit.feature.playback.SpeedControl
-import `in`.geekofia.morsekit.feature.playback.TorchControls
-import `in`.geekofia.morsekit.feature.playback.VibrationControls
+import `in`.geekofia.morsekit.feature.playback.TransmitFab
+import `in`.geekofia.morsekit.feature.playback.TransmitOutput
 import `in`.geekofia.morsekit.platform.PlatformServices
 import `in`.geekofia.morsekit.ui.components.MorseDisplay
 import `in`.geekofia.morsekit.ui.components.MorseTextField
-import `in`.geekofia.morsekit.ui.components.SecondaryButton
-import `in`.geekofia.morsekit.ui.components.SectionCard
 import kotlinx.coroutines.launch
+import morsekit.shared.generated.resources.Res
+import morsekit.shared.generated.resources.ic_close
+import morsekit.shared.generated.resources.ic_copy
+import morsekit.shared.generated.resources.ic_share
+import morsekit.shared.generated.resources.ic_translate
+import org.jetbrains.compose.resources.painterResource
 
 /**
  * Wires the ViewModels and platform services to the stateless [TranslatorScreen].
  *
- * Transmission stops whenever the content changes, so it never sends a stale message. The
- * flashlight and vibration also stop when this screen leaves composition (another tab) or the app
- * goes to the background, so they can never keep running unattended.
+ * Only one output transmits at a time. Transmission stops whenever the content changes, so it
+ * never sends a stale message. The flashlight and vibration also stop when this screen leaves
+ * composition (another tab) or the app goes to the background, so they can never keep running
+ * unattended.
  */
 @Composable
 fun TranslatorRoute(
@@ -80,6 +94,8 @@ fun TranslatorRoute(
     val state = viewModel.uiState
     val playbackStatus by playbackViewModel.status.collectAsStateWithLifecycle()
     val settings by settingsRepository.settings.collectAsStateWithLifecycle()
+    var showFlashWarning by remember { mutableStateOf(false) }
+
     val stopUnattendedOutputs = {
         torchViewModel.stop()
         vibrationViewModel.stop()
@@ -88,17 +104,49 @@ fun TranslatorRoute(
         playbackViewModel.stop()
         stopUnattendedOutputs()
     }
+    val start: (TransmitOutput) -> Unit = { output ->
+        stopTransmitting()
+        when (output) {
+            TransmitOutput.Sound -> playbackViewModel.play(state.message)
+            TransmitOutput.Flash -> torchViewModel.start(state.message)
+            TransmitOutput.Vibrate -> vibrationViewModel.start(state.message)
+        }
+    }
+    val activeOutput = when {
+        playbackStatus == PlaybackStatus.Playing || playbackViewModel.isPreparing -> TransmitOutput.Sound
+        torchViewModel.isTransmitting -> TransmitOutput.Flash
+        vibrationViewModel.isTransmitting -> TransmitOutput.Vibrate
+        else -> null
+    }
 
     DisposableEffect(torchViewModel, vibrationViewModel) {
         onDispose { stopUnattendedOutputs() }
     }
     LifecycleEventEffect(Lifecycle.Event.ON_STOP) { stopUnattendedOutputs() }
 
+    val transmitError = playbackViewModel.errorMessage ?: torchViewModel.errorMessage ?: vibrationViewModel.errorMessage
+    LaunchedEffect(transmitError) {
+        if (transmitError != null) {
+            snackbarHostState.currentSnackbarData?.dismiss()
+            snackbarHostState.showSnackbar(transmitError)
+        }
+    }
+
+    if (showFlashWarning) {
+        FlashWarningDialog(
+            onConfirm = {
+                showFlashWarning = false
+                settingsRepository.acknowledgeFlashWarning()
+                start(TransmitOutput.Flash)
+            },
+            onDismiss = { showFlashWarning = false },
+        )
+    }
+
     TranslatorScreen(
         state = state,
         snackbarHostState = snackbarHostState,
         onInputChange = { stopTransmitting(); viewModel.onInputChange(it) },
-        onDirectionSelected = { stopTransmitting(); viewModel.onDirectionSelected(it) },
         onSwap = { stopTransmitting(); viewModel.swapDirection() },
         onClear = { stopTransmitting(); viewModel.onClear() },
         onCopy = { text ->
@@ -112,42 +160,22 @@ fun TranslatorRoute(
         },
         onShare = platformServices.share::shareText,
         modifier = modifier,
-        transmitControls = {
-            val soundRunning = playbackStatus == PlaybackStatus.Playing || playbackViewModel.isPreparing
-            SpeedControl(
+        transmitFab = {
+            TransmitFab(
+                activeOutput = activeOutput,
+                canTransmit = !state.message.isEmpty,
+                isFlashAvailable = torchViewModel.isTorchAvailable,
+                isVibrationAvailable = vibrationViewModel.isVibrationAvailable,
                 wordsPerMinute = settings.wordsPerMinute,
                 onWordsPerMinuteChange = settingsRepository::setWordsPerMinute,
-                // Both outputs are timed at start, so speed only changes while nothing runs.
-                enabled = !soundRunning && !torchViewModel.isTransmitting && !vibrationViewModel.isTransmitting,
-            )
-            HorizontalDivider()
-            Text("Sound", style = MaterialTheme.typography.titleSmall)
-            SoundControls(
-                isRunning = soundRunning,
-                canTransmit = !state.message.isEmpty,
-                errorMessage = playbackViewModel.errorMessage,
-                onStart = { playbackViewModel.play(state.message) },
-                onStop = playbackViewModel::stop,
-            )
-            HorizontalDivider()
-            Text("Flashlight", style = MaterialTheme.typography.titleSmall)
-            TorchControls(
-                isAvailable = torchViewModel.isTorchAvailable,
-                isTransmitting = torchViewModel.isTransmitting,
-                canTransmit = !state.message.isEmpty,
-                errorMessage = torchViewModel.errorMessage,
-                onStart = { torchViewModel.start(state.message) },
-                onStop = torchViewModel::stop,
-            )
-            HorizontalDivider()
-            Text("Vibration", style = MaterialTheme.typography.titleSmall)
-            VibrationControls(
-                isAvailable = vibrationViewModel.isVibrationAvailable,
-                isTransmitting = vibrationViewModel.isTransmitting,
-                canTransmit = !state.message.isEmpty,
-                errorMessage = vibrationViewModel.errorMessage,
-                onStart = { vibrationViewModel.start(state.message) },
-                onStop = vibrationViewModel::stop,
+                onStart = { output ->
+                    if (output == TransmitOutput.Flash && !settings.flashWarningAcknowledged) {
+                        showFlashWarning = true
+                    } else {
+                        start(output)
+                    }
+                },
+                onStop = stopTransmitting,
             )
         },
     )
@@ -157,14 +185,13 @@ fun TranslatorRoute(
 fun TranslatorScreen(
     state: TranslatorUiState,
     onInputChange: (String) -> Unit,
-    onDirectionSelected: (TranslationDirection) -> Unit,
     onSwap: () -> Unit,
     onClear: () -> Unit,
     onCopy: (String) -> Unit,
     onShare: (String) -> Unit,
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
-    transmitControls: @Composable ColumnScope.() -> Unit = {},
+    transmitFab: @Composable () -> Unit = {},
 ) {
     val isMorseInput = state.direction == TranslationDirection.MorseToText
     val issueText = remember(state.issues) { issueMessages(state.issues).joinToString("\n") }
@@ -175,42 +202,150 @@ fun TranslatorScreen(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            DirectionSelector(selected = state.direction, onSelected = onDirectionSelected)
-
-            MorseTextField(
-                value = state.input,
-                onValueChange = onInputChange,
-                label = if (isMorseInput) "Morse" else "Text",
-                placeholder = if (isMorseInput) "... --- ..." else "SOS",
-                supportingText = issueText.ifEmpty {
-                    if (isMorseInput) "Separate letters with a space and words with /" else null
-                },
-                isError = issueText.isNotEmpty(),
-                isMorse = isMorseInput,
+            DirectionBar(direction = state.direction, onSwap = onSwap)
+            InputCard(
+                state = state,
+                isMorseInput = isMorseInput,
+                issueText = issueText,
+                onInputChange = onInputChange,
+                onClear = onClear,
             )
-
-            SectionCard(title = if (isMorseInput) "Text" else "Morse") {
-                TranslationOutput(state = state, isMorseInput = isMorseInput)
-            }
-
-            SectionCard(title = "Transmit") {
-                transmitControls()
-            }
-
-            ActionRow {
-                SecondaryButton("Copy", onClick = { onCopy(state.output) }, enabled = state.hasOutput)
-                SecondaryButton("Share", onClick = { onShare(state.output) }, enabled = state.hasOutput)
-                SecondaryButton("Swap", onClick = onSwap)
-                SecondaryButton("Clear", onClick = onClear, enabled = state.input.isNotEmpty())
-            }
+            OutputCard(state = state, isMorseInput = isMorseInput, onCopy = onCopy, onShare = onShare)
+            // Keeps the last card's actions clear of the floating Transmit button.
+            Spacer(Modifier.height(FAB_CLEARANCE))
         }
+
+        transmitFab()
 
         SnackbarHost(
             hostState = snackbarHostState,
-            modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp),
+            modifier = Modifier.align(Alignment.BottomCenter).padding(start = 16.dp, end = 16.dp, bottom = FAB_CLEARANCE),
         )
+    }
+}
+
+private val FAB_CLEARANCE = 88.dp
+
+/** `Text ⇄ Morse`: source on the left, target on the right, swap in between. */
+@Composable
+private fun DirectionBar(direction: TranslationDirection, onSwap: () -> Unit) {
+    val (from, to) = when (direction) {
+        TranslationDirection.TextToMorse -> "Text" to "Morse"
+        TranslationDirection.MorseToText -> "Morse" to "Text"
+    }
+    // Half a turn per swap, so the arrows visibly flip.
+    val rotation by animateFloatAsState(if (direction == TranslationDirection.TextToMorse) 0f else 180f)
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        DirectionPill(from, Modifier.weight(1f))
+        IconButton(onClick = onSwap) {
+            Icon(
+                painter = painterResource(Res.drawable.ic_translate),
+                contentDescription = "Swap to $to to $from",
+                modifier = Modifier.rotate(rotation),
+            )
+        }
+        DirectionPill(to, Modifier.weight(1f))
+    }
+}
+
+@Composable
+private fun DirectionPill(label: String, modifier: Modifier = Modifier) {
+    Surface(
+        modifier = modifier,
+        shape = MaterialTheme.shapes.extraLarge,
+        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+    ) {
+        Text(
+            text = label,
+            modifier = Modifier.padding(vertical = 12.dp),
+            style = MaterialTheme.typography.titleMedium,
+            textAlign = TextAlign.Center,
+        )
+    }
+}
+
+@Composable
+private fun InputCard(
+    state: TranslatorUiState,
+    isMorseInput: Boolean,
+    issueText: String,
+    onInputChange: (String) -> Unit,
+    onClear: () -> Unit,
+) {
+    Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)) {
+        CardHeader(label = if (isMorseInput) "Morse" else "Text") {
+            if (state.input.isNotEmpty()) {
+                IconButton(onClick = onClear) {
+                    Icon(painterResource(Res.drawable.ic_close), contentDescription = "Clear")
+                }
+            }
+        }
+        MorseTextField(
+            value = state.input,
+            onValueChange = onInputChange,
+            label = if (isMorseInput) "Morse" else "Text",
+            placeholder = if (isMorseInput) "... --- ..." else "Enter text",
+            supportingText = issueText.ifEmpty {
+                if (isMorseInput) "Separate letters with a space and words with /" else null
+            },
+            isError = issueText.isNotEmpty(),
+            isMorse = isMorseInput,
+            borderless = true,
+        )
+    }
+}
+
+@Composable
+private fun OutputCard(
+    state: TranslatorUiState,
+    isMorseInput: Boolean,
+    onCopy: (String) -> Unit,
+    onShare: (String) -> Unit,
+) {
+    Card(
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        ),
+    ) {
+        CardHeader(label = if (isMorseInput) "Text" else "Morse")
+        Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)) {
+            TranslationOutput(state = state, isMorseInput = isMorseInput)
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(end = 4.dp, bottom = 4.dp),
+            horizontalArrangement = Arrangement.End,
+        ) {
+            IconButton(onClick = { onCopy(state.output) }, enabled = state.hasOutput) {
+                Icon(painterResource(Res.drawable.ic_copy), contentDescription = "Copy")
+            }
+            IconButton(onClick = { onShare(state.output) }, enabled = state.hasOutput) {
+                Icon(painterResource(Res.drawable.ic_share), contentDescription = "Share")
+            }
+        }
+    }
+}
+
+/** Card title on the left, optional action on the right, at a constant height. */
+@Composable
+private fun CardHeader(label: String, action: @Composable () -> Unit = {}) {
+    Row(
+        modifier = Modifier.fillMaxWidth().height(48.dp).padding(start = 16.dp, end = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = label,
+            modifier = Modifier.weight(1f).semantics { heading() },
+            style = MaterialTheme.typography.labelLarge,
+            color = LocalContentColor.current.copy(alpha = 0.72f),
+        )
+        action()
     }
 }
 
@@ -218,7 +353,7 @@ fun TranslatorScreen(
 private fun TranslationOutput(state: TranslatorUiState, isMorseInput: Boolean) {
     when (state.status) {
         TranslationStatus.Empty -> OutputMessage(
-            text = if (isMorseInput) "Type Morse above to see it as text." else "Type text above to see it in Morse.",
+            text = if (isMorseInput) "The text appears here." else "The Morse code appears here.",
         )
         TranslationStatus.Invalid -> OutputMessage(
             text = "Nothing here could be translated.",
@@ -236,43 +371,22 @@ private fun TranslationOutput(state: TranslatorUiState, isMorseInput: Boolean) {
 }
 
 @Composable
-private fun OutputMessage(text: String, color: Color = MaterialTheme.colorScheme.onSurfaceVariant) {
+private fun OutputMessage(text: String, color: Color = LocalContentColor.current.copy(alpha = 0.72f)) {
     Text(text = text, style = MaterialTheme.typography.bodyLarge, color = color)
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun ActionRow(content: @Composable () -> Unit) {
-    FlowRow(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        content()
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun DirectionSelector(
-    selected: TranslationDirection,
-    onSelected: (TranslationDirection) -> Unit,
-) {
-    val options = TranslationDirection.entries
-    SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-        options.forEachIndexed { index, direction ->
-            SegmentedButton(
-                selected = direction == selected,
-                onClick = { onSelected(direction) },
-                shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size),
-                label = { Text(direction.label) },
+private fun FlashWarningDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Flashing light") },
+        text = {
+            Text(
+                "The flashlight will flash repeatedly. Don't use it near anyone sensitive to " +
+                    "flashing lights, including people with photosensitive epilepsy.",
             )
-        }
-    }
+        },
+        confirmButton = { TextButton(onClick = onConfirm) { Text("Flash") } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
+    )
 }
-
-private val TranslationDirection.label: String
-    get() = when (this) {
-        TranslationDirection.TextToMorse -> "Text → Morse"
-        TranslationDirection.MorseToText -> "Morse → Text"
-    }
