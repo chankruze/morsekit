@@ -17,6 +17,7 @@ fun iosPlatformServices(presenter: () -> UIViewController?): PlatformServices =
         share = IosShareService(presenter),
         keyValueStore = IosKeyValueStore(),
         appInfo = iosAppInfo(),
+        audioPlayer = IosPcmAudioPlayer(),
     )
 
 private class IosKeyValueStore : KeyValueStore {

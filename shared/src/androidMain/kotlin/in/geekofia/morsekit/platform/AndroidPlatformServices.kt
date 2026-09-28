@@ -16,6 +16,7 @@ fun androidPlatformServices(context: Context): PlatformServices {
         share = AndroidShareService(appContext),
         keyValueStore = AndroidKeyValueStore(appContext),
         appInfo = androidAppInfo(appContext),
+        audioPlayer = AndroidPcmAudioPlayer(),
     )
 }
 

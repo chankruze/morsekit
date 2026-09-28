@@ -26,4 +26,5 @@ class PlatformServices(
     val share: ShareService,
     val keyValueStore: KeyValueStore,
     val appInfo: AppInfo,
+    val audioPlayer: PcmAudioPlayer,
 )
