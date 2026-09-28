@@ -10,12 +10,13 @@ open the file and follow along.
 | --- | --- | --- |
 | 1 | [KMP project structure](01-kmp-project-structure.md) | Modules, targets, source sets, how Android and iOS consume `shared`, Gradle setup |
 | 2 | [Morse engine](02-morse-engine.md) | How text becomes Morse and back: alphabet, normalization, tokenizing, the codec, error reporting |
-| 3 | [Timing and signals](03-timing-and-signals.md) | How Morse is turned into on/off durations for future torch, vibration and audio playback |
+| 3 | [Timing and signals](03-timing-and-signals.md) | How Morse is turned into on/off durations, used by audio and flashlight (vibration next) |
 | 4 | [Compose UI and state](04-compose-ui-and-state.md) | Composables, state, recomposition, ViewModel, unidirectional data flow, theming, resources |
 | 5 | [Platform services](05-platform-services.md) | Calling Android and iOS APIs from shared code: interfaces vs `expect`/`actual`, Kotlin/Native interop |
 | 6 | [Testing](06-testing.md) | `commonTest`, which platforms run which tests, how the engine tests are organized |
 | 7 | [Versioning and builds](07-versioning-and-builds.md) | SemVer from one file for both platforms, the bump script, named APK/AAB outputs, the AGP Variant API |
 | 8 | [Audio playback](08-audio-playback.md) | Rendering Morse to PCM in shared code, drift-free frame timing, click-free tones, AudioTrack and AVAudioEngine, main-thread contracts |
+| 9 | [Flashlight transmission](09-flashlight.md) | Time-driven torch control without drift, testing suspend code with fake time, safety guards, torch availability |
 
 ## The whole app on one page
 
@@ -71,6 +72,7 @@ iOS exist, which is why it's easy to test and reuse.
 | `core.timing` | Engine | `core.model` | Pure Kotlin, uses `kotlin.time.Duration` |
 | `core.settings` | Preferences | `core.timing`, `platform` | `AppSettings`, `ThemeMode`, `SettingsRepository` (StateFlow + persistence) |
 | `core.audio` | Engine | `core.timing`, `platform` | Tone schedule, PCM renderer, playback state machine |
+| `core.torch` | Engine | `core.timing`, `platform` | `TorchPlan` (on/off at time t) and the drift-free torch runner |
 | `platform` | Abstractions | nothing | Interfaces only in `commonMain` |
 | `ui.theme`, `ui.components` | Design system | Compose, `core.model` | Reusable, feature-agnostic |
 | `feature.*` | Features | everything above | Screen + ViewModel + UI state |

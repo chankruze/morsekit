@@ -210,11 +210,19 @@ The lambda reads `controller` only when the user taps Share, by which time it's 
 `PcmAudioPlayer` is the audio abstraction: it only plays rendered samples, and all Morse timing
 lives in shared code. It's covered in [Audio playback](08-audio-playback.md).
 
-## Planned services (not built yet)
+## Flashlight
 
-These will follow the same pattern when their features are implemented:
+`TorchController` has just `isAvailable` and `setTorch(on)`: the platform only switches the LED,
+and the timing loop is shared. See [Flashlight transmission](09-flashlight.md).
+
+| | Android | iOS |
+| --- | --- | --- |
+| API | `CameraManager.setTorchMode(id, on)` (no permission needed) | `AVCaptureDevice.torchMode` inside `lockForConfiguration()` |
+| Availability | A camera with `FLASH_INFO_AVAILABLE`, preferring the back one | `hasTorch && torchAvailable` |
+| Failure | `CameraAccessException` → `false` | Checked up front (unsupported modes raise uncatchable Obj-C exceptions) |
+
+## Planned services (not built yet)
 
 | Interface | Android | iOS | Consumes |
 | --- | --- | --- | --- |
-| `TorchController` | `CameraManager.setTorchMode` | `AVCaptureDevice.torchMode` | `List<MorseSignal>` |
 | `HapticController` | `Vibrator` / `VibrationEffect` (+ `VIBRATE` permission) | Core Haptics (`CHHapticEngine`) | `List<MorseSignal>` |

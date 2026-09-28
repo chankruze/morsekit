@@ -21,7 +21,7 @@ flowchart LR
 | Android device tests | Emulator or device | `./gradlew :shared:connectedAndroidDeviceTest` | Code that needs real Android APIs (configured via `withDeviceTestBuilder`) |
 | `iosTest` | iOS simulator | `./gradlew :shared:iosSimulatorArm64Test` | iOS-only logic |
 
-Currently all tests are in `commonTest`; the platform-specific test folders are empty.
+Almost all tests are in `commonTest`. The exception is `TorchTransmitterTest` in `androidHostTest`: it tests a *shared* suspend function, and `runBlocking` is only available on the JVM (see [Flashlight](09-flashlight.md#testing-a-suspend-function-without-a-coroutine-test-library)).
 
 > **Concept: `kotlin.test`.** A multiplatform assertion library (`@Test`, `assertEquals`,
 > `assertFailsWith`, ...). On the JVM it runs on JUnit; on Kotlin/Native it uses a built-in
@@ -49,7 +49,9 @@ The test packages mirror the main packages:
 | `ToneScheduleTest` | 7 | Units → frames at 16 kHz, gaps, speed scaling, no rounding drift at 13 WPM |
 | `MorseAudioRendererTest` | 10 | Length and duration, exact silence, amplitude, fade in/out, measured pitch, speed, limits |
 | `MorseAudioPlayerTest` | 8 | Play/pause/resume/stop, completion, replay, invalid transitions, stale completions (fake output) |
-| **Total** | **155** | |
+| `TorchPlanTest` | 11 | On/off at any moment, boundaries, gaps, speed scaling, walking the steps reproduces the signals, limits |
+| `TorchTransmitterTest` (androidHostTest) | 6 | Exact switch times with fake time, late wake-ups don't accumulate, huge stalls, cancellation and failure leave the torch off |
+| **Total** | **172** | |
 
 ## Testing techniques used
 

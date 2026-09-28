@@ -39,7 +39,7 @@ the KMP concepts used), see the [learning notes in `docs/`](docs/README.md).
 
 Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ Todo.
 
-**30 done · 6 in progress · 21 todo** (57 tasks)
+**34 done · 5 in progress · 18 todo** (57 tasks)
 
 | Feature | Done | In Progress | Todo |
 | --- | --- | --- | --- |
@@ -48,7 +48,7 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Translator | 6 | 0 | 0 |
 | Morse Reference | 3 | 1 | 0 |
 | Audio | 4 | 0 | 0 |
-| Flashlight | 0 | 1 | 3 |
+| Flashlight | 4 | 0 | 0 |
 | Vibration | 0 | 1 | 2 |
 | Morse Trainer | 0 | 0 | 5 |
 | Tap Morse | 0 | 0 | 4 |
@@ -87,10 +87,10 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Audio | WPM | Add adjustable Morse transmission speed | P1 | ✅ Done |
 | Audio | Frequency | Allow tone frequency adjustment | P2 | ✅ Done |
 | Audio | Playback controls | Play, pause, stop, and replay Morse audio | P1 | ✅ Done |
-| Flashlight | Transmission | Transmit Morse using device flashlight/torch | P1 | ⬜ Todo |
-| Flashlight | Timing | Implement correct dot/dash and gap timing | P1 | 🚧 In Progress |
-| Flashlight | WPM | Use configurable transmission speed | P1 | ⬜ Todo |
-| Flashlight | Safety | Add clear controls and warning for flashing light | P1 | ⬜ Todo |
+| Flashlight | Transmission | Transmit Morse using device flashlight/torch | P1 | ✅ Done |
+| Flashlight | Timing | Implement correct dot/dash and gap timing | P1 | ✅ Done |
+| Flashlight | WPM | Use configurable transmission speed | P1 | ✅ Done |
+| Flashlight | Safety | Add clear controls and warning for flashing light | P1 | ✅ Done |
 | Vibration | Transmission | Transmit Morse using device vibration/haptics | P1 | ⬜ Todo |
 | Vibration | Timing | Implement Morse timing for vibration patterns | P1 | 🚧 In Progress |
 | Vibration | WPM | Use configurable transmission speed | P2 | ⬜ Todo |
