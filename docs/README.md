@@ -29,12 +29,12 @@ flowchart TB
 
     subgraph Shared["shared module (Kotlin Multiplatform)"]
         subgraph PlatformMain["androidMain / iosMain"]
-            APS["AndroidPlatformServices"]
-            IPS["IosPlatformServices"]
+            APS["androidPlatformServices()"]
+            IPS["iosPlatformServices()"]
             MVC["MainViewController()"]
         end
         subgraph Common["commonMain"]
-            App["App()"]
+            App["App(container)"]
             Nav["TopLevelDestination tabs"]
             TR["TranslatorRoute / Screen"]
             VM["TranslatorViewModel"]
@@ -68,11 +68,12 @@ iOS exist, which is why it's easy to test and reuse.
 | `core.model` | Domain models | nothing | Immutable data classes and enums |
 | `core.morse` | Engine | `core.model` | Pure Kotlin, no Compose |
 | `core.timing` | Engine | `core.model` | Pure Kotlin, uses `kotlin.time.Duration` |
+| `core.settings` | Preferences | `core.timing`, `platform` | `AppSettings`, `ThemeMode`, `SettingsRepository` (StateFlow + persistence) |
 | `platform` | Abstractions | nothing | Interfaces only in `commonMain` |
 | `ui.theme`, `ui.components` | Design system | Compose, `core.model` | Reusable, feature-agnostic |
 | `feature.*` | Features | everything above | Screen + ViewModel + UI state |
 | `navigation` | App shell | Compose resources | Bottom-bar destinations |
-| root (`App.kt`) | App shell | everything | Wires theme, navigation, features |
+| root (`App.kt`, `AppContainer.kt`) | App shell | everything | App-scoped objects, theme, navigation, features |
 
 ## Glossary
 

@@ -69,8 +69,8 @@ flowchart TB
 | Source set | Can use | In this project |
 | --- | --- | --- |
 | `commonMain` | Kotlin stdlib + multiplatform libraries (Compose, lifecycle) | Engine, UI, ViewModels, platform *interfaces* |
-| `androidMain` | Everything in common + Android SDK (`android.*`, `androidx.*`) | `AndroidPlatformServices` |
-| `iosMain` | Everything in common + Apple frameworks (`platform.*`) | `IosPlatformServices`, `MainViewController` |
+| `androidMain` | Everything in common + Android SDK (`android.*`, `androidx.*`) | `androidPlatformServices()` |
+| `iosMain` | Everything in common + Apple frameworks (`platform.*`) | `iosPlatformServices()`, `MainViewController` |
 | `commonTest` | `kotlin.test` + everything in `commonMain` | All current tests |
 
 **Rule of thumb:** write code in `commonMain` unless it *has* to touch a platform API.
@@ -103,11 +103,14 @@ shared/src/
 ```mermaid
 sequenceDiagram
     participant OS as Android OS
+    participant MKA as MorseKitApplication (androidApp)
     participant MA as MainActivity (androidApp)
     participant App as App() (commonMain)
+    OS->>MKA: process starts
     OS->>MA: onCreate()
-    MA->>MA: AndroidPlatformServices(this)
-    MA->>App: setContent, calling App(platformServices)
+    MA->>MKA: container (created lazily, once)
+    MA->>App: setContent, calling App(container)
+    App-->>MA: onDarkThemeChange, to restyle system bars
 ```
 
 ```mermaid
@@ -116,8 +119,8 @@ sequenceDiagram
     participant MVC as MainViewController() (iosMain)
     participant App as App() (commonMain)
     Swift->>MVC: MainViewControllerKt.MainViewController()
-    MVC->>MVC: IosPlatformServices(presenter)
-    MVC->>App: ComposeUIViewController, calling App(platformServices)
+    MVC->>MVC: AppContainer(iosPlatformServices(presenter))
+    MVC->>App: ComposeUIViewController, calling App(container)
     MVC-->>Swift: UIViewController
     Swift->>Swift: wrap in UIViewControllerRepresentable
 ```

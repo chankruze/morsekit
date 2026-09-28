@@ -77,12 +77,23 @@ API as unstable, which suits an app in early development.
 There are no product flavors (MorseKit is offline, so there are no environments to switch), just
 the two default build types:
 
-| Build type | Application ID | Minified | Signed with |
-| --- | --- | --- | --- |
-| `debug` | `in.geekofia.morsekit.debug` | no | debug key |
-| `release` | `in.geekofia.morsekit` | no | (no release signing configured yet) |
+| Build type | Application ID | Launcher name | Minified | Signed with |
+| --- | --- | --- | --- | --- |
+| `debug` | `in.geekofia.morsekit.debug` | MorseKit Debug | no | debug key |
+| `release` | `in.geekofia.morsekit` | MorseKit | no | (no release signing configured yet) |
 
-The `.debug` suffix lets both builds be installed side by side on one device.
+The `.debug` suffix lets both builds be installed side by side on one device. The different
+launcher name comes from `androidApp/src/debug/res/values/strings.xml`, which overrides
+`app_name` from `src/main` for debug builds only.
+
+> **Concept: source-set overlays.** Android merges resources from `src/main` with the build
+> type's source set (`src/debug`, `src/release`). A resource with the same name in the more
+> specific source set wins, with no Gradle configuration needed.
+
+> **Lesson learned.** Before this label existed, an old `in.geekofia.morsekit` install (from
+> before the `.debug` suffix) sat next to the new debug app, both labelled "MorseKit". Opening
+> the wrong icon showed stale screens. If a change seems missing on a device, check
+> `adb shell pm list packages | grep morsekit` first.
 
 ### Named APK / AAB
 

@@ -193,7 +193,7 @@ flowchart LR
 
 ```mermaid
 flowchart TB
-    App["App(platformServices)"] --> Theme["MorseKitTheme"]
+    App["App(container)"] --> Theme["MorseKitTheme(settings.themeMode)"]
     Theme --> Scaffold["Scaffold"]
     Scaffold --> Top["topBar: CenterAlignedTopAppBar"]
     Scaffold --> Bottom["bottomBar: NavigationBar<br/>one item per TopLevelDestination"]
@@ -228,7 +228,7 @@ flowchart LR
 | File | Contents |
 | --- | --- |
 | `ui/theme/Color.kt` | `LightColors` / `DarkColors`: Material 3 color schemes (teal primary, amber tertiary) |
-| `ui/theme/Theme.kt` | `ThemeMode` enum and `MorseKitTheme(themeMode, content)` |
+| `ui/theme/Theme.kt` | `ThemeMode.isDark()` and `MorseKitTheme(themeMode, content)` (`ThemeMode` itself lives in `core/settings`) |
 | `ui/theme/Type.kt` | `TextStyle.toMorseStyle()`: monospace + letter spacing for Morse |
 
 > **Concept: color *roles*.** Material 3 components don't use hard-coded colors; they use roles
@@ -236,8 +236,60 @@ flowchart LR
 > everything. We set the `surfaceContainer*` roles explicitly, because their defaults are
 > Material's purple-tinted neutrals, which would clash with a teal theme.
 
-`ThemeMode` currently always defaults to `System`. A Settings screen with saved preferences will
-drive it later.
+### Where the theme comes from
+
+The user picks a theme in Settings. It's saved, and the whole app switches immediately:
+
+```mermaid
+sequenceDiagram
+    actor U as User
+    participant S as SettingsScreen
+    participant R as SettingsRepository
+    participant K as KeyValueStore
+    participant A as App
+    participant P as MainActivity (Android)
+    U->>S: taps Dark
+    S->>R: setThemeMode(Dark)
+    R->>R: StateFlow value = settings.copy(themeMode = Dark)
+    R->>K: putString(settings.themeMode, Dark)
+    R-->>A: collectAsStateWithLifecycle emits
+    A->>A: MorseKitTheme(Dark) recomposes everything
+    A-->>P: onDarkThemeChange(true)
+    P->>P: enableEdgeToEdge with dark system bar icons
+```
+
+> **Why the callback to `MainActivity`?** Status and navigation bar icons are drawn by Android,
+> not Compose. `enableEdgeToEdge()` picks icon colors from the *system* dark mode, so choosing
+> Dark while the phone is in light mode would leave dark icons on a dark bar. `App` reports the
+> resolved theme through `onDarkThemeChange`, and `MainActivity` restyles the bars.
+> (iOS doesn't do this yet; see the note in the Settings section.)
+
+## The Settings screen
+
+`SettingsRoute` collects `SettingsRepository.settings` and passes plain values and lambdas to a
+stateless `SettingsScreen`, the same Route/Screen split as the other features.
+
+| Section | Control | Saved as | Range |
+| --- | --- | --- | --- |
+| Appearance | Theme: segmented System / Light / Dark | `settings.themeMode` (enum name) | 3 options |
+| Playback | Speed slider, with "a dot lasts N ms" from `MorseTiming` | `settings.wordsPerMinute` | 5–60 WPM |
+| Playback | Tone slider, snapping to 50 Hz steps | `settings.toneFrequencyHz` | 400–1000 Hz |
+| About | Version (`AppInfo`), privacy notice, open-source libraries | not saved | |
+
+Speed and tone are stored now and will be read by audio, flashlight and vibration playback.
+
+> **No ViewModel here, on purpose.** `SettingsRepository` already holds the state (`StateFlow`),
+> validates it (clamps out-of-range values) and persists it. A `SettingsViewModel` would only
+> forward calls, so the screen talks to the repository directly. Add a ViewModel when there's
+> screen-specific state or logic to hold.
+
+> **`StateFlow` here, snapshot state in the translator.** Settings are changed by taps and
+> sliders, not typed into a text field, so an asynchronous `StateFlow` is fine.
+> `collectAsStateWithLifecycle()` converts it to Compose state and stops collecting while the
+> app is in the background.
+
+> **iOS status bar.** On iOS the status bar still follows the *system* appearance. Matching it
+> to the in-app theme needs a hook in `ComposeUIViewController` and isn't done yet.
 
 ## Reusable components (`ui/components`)
 

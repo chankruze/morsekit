@@ -20,9 +20,18 @@ classDiagram
         <<fun interface>>
         +shareText(text)
     }
+    class KeyValueStore {
+        <<interface>>
+        +getString(key) String?
+        +putString(key, value)
+        +getInt(key) Int?
+        +putInt(key, value)
+    }
     class PlatformServices {
         +clipboard: ClipboardService
         +share: ShareService
+        +keyValueStore: KeyValueStore
+        +appInfo: AppInfo
     }
     class AndroidClipboardService {
         androidMain
@@ -38,6 +47,7 @@ classDiagram
     }
     PlatformServices --> ClipboardService
     PlatformServices --> ShareService
+    PlatformServices --> KeyValueStore
     ClipboardService <|.. AndroidClipboardService
     ShareService <|.. AndroidShareService
     ClipboardService <|.. IosClipboardService
@@ -48,11 +58,20 @@ classDiagram
 | --- | --- | --- |
 | `ClipboardService.copyText` | `ClipboardManager.setPrimaryClip(ClipData.newPlainText(...))` | `UIPasteboard.generalPasteboard.string = text` |
 | `ShareService.shareText` | `Intent.ACTION_SEND` in `Intent.createChooser(...)` | `UIActivityViewController` presented from the top-most view controller |
+| `KeyValueStore` | `SharedPreferences` (file `morsekit`) | `NSUserDefaults.standardUserDefaults` |
+| `AppInfo` (data, not a service) | `PackageManager.getPackageInfo` → `versionName`, `longVersionCode` | `NSBundle.mainBundle` → `CFBundleShortVersionString`, `CFBundleVersion` |
+
+`InMemoryKeyValueStore` (in `commonMain`) is a third implementation, used by tests and previews.
+
+> **Why not DataStore or `multiplatform-settings`?** Both are good libraries, but three
+> preferences don't need them. The interface is four methods, each platform implementation is
+> about 15 lines, and no dependency is added. If storage needs grow (history, favorites), a real
+> database would replace this rather than a bigger key-value library.
 
 Factory functions build the bundle for each platform:
 
-- `AndroidPlatformServices(context)`: `shared/src/androidMain/.../platform/AndroidPlatformServices.kt`
-- `IosPlatformServices(presenter)`: `shared/src/iosMain/.../platform/IosPlatformServices.kt`
+- `androidPlatformServices(context)`: `shared/src/androidMain/.../platform/AndroidPlatformServices.kt`
+- `iosPlatformServices(presenter)`: `shared/src/iosMain/.../platform/IosPlatformServices.kt`
 
 ## How a "Copy" tap reaches the OS
 
@@ -76,13 +95,45 @@ sequenceDiagram
 
 The common code **never knows** which one runs. The platform was chosen once, at startup:
 
-| Platform | Entry point | Creates |
+| Platform | Created in | Creates |
 | --- | --- | --- |
-| Android | `MainActivity.onCreate` | `AndroidPlatformServices(this)` |
-| iOS | `MainViewController()` | `IosPlatformServices(presenter = { controller })` |
+| Android | `MorseKitApplication.container` (lazy, once per process) | `AppContainer(androidPlatformServices(this))` |
+| iOS | `MainViewController()` (once per launch) | `AppContainer(iosPlatformServices(presenter = { controller }))` |
 
-Both pass the result into `App(platformServices)`, and it's handed down as a parameter. There's
-no DI framework, no global singleton, and no service locator.
+The container is passed into `App(container)` and handed down as parameters. There's no DI
+framework, no global singleton, and no service locator.
+
+## The app container
+
+```kotlin
+class AppContainer(val platformServices: PlatformServices) {
+    val settingsRepository = SettingsRepository(platformServices.keyValueStore)
+}
+```
+
+`AppContainer` holds objects that must be **shared by several screens** and **outlive a single
+screen**. Settings are the first: `App` reads the theme, and the Settings screen changes it, so
+both must observe the same `SettingsRepository`.
+
+```mermaid
+flowchart TB
+    subgraph Process["App process"]
+        MKA["MorseKitApplication<br/>(Android)"] --> C["AppContainer"]
+        C --> PS["PlatformServices"]
+        C --> SR["SettingsRepository"]
+    end
+    subgraph Activity["MainActivity (recreated on rotation)"]
+        App["App(container)"]
+    end
+    App -->|"reads theme"| SR
+    App --> Settings["SettingsRoute"] -->|"changes settings"| SR
+```
+
+> **Why not create it in `MainActivity`?** Android recreates the Activity on rotation. A
+> repository created there would be replaced each time, while anything retained across rotation
+> (like a ViewModel) would still hold the old one. `Application` lives as long as the process, so
+> that's where app-scoped objects belong. iOS has no such recreation, so `MainViewController()`
+> is enough.
 
 ## Interfaces vs `expect`/`actual`
 
@@ -93,17 +144,17 @@ KMP offers two ways to reach platform code. The template originally used `expect
 | --- | --- | --- |
 | How | `expect fun foo()` in common, `actual fun foo()` in each platform source set | `interface Foo` in common, `class AndroidFoo : Foo` etc. |
 | Construction parameters | Hard: every `actual` must match the same signature | Easy: Android takes a `Context`, iOS takes a view-controller provider |
-| Fakes in tests | Not possible: there's exactly one `actual` per platform | Trivial: `PlatformServices(clipboard = {}, share = {})` |
+| Fakes in tests | Not possible: there's exactly one `actual` per platform | Trivial: `InMemoryKeyValueStore()`, `clipboard = {}` |
 | Best for | Small, parameterless platform facts or functions (e.g. current time, UUID, platform name) | Services with state, dependencies or side effects |
 
 > **Concept: `fun interface`.** An interface with a single abstract method can be implemented with
 > a lambda: `ClipboardService { text -> ... }`, or `{}` for a no-op. The Android `@Preview` in
-> `MainActivity.kt` uses exactly that: `App(PlatformServices(clipboard = {}, share = {}))`.
+> `MainActivity.kt` uses exactly that: `PlatformServices(clipboard = {}, share = {}, ...)`.
 
 ## Android details
 
 ```kotlin
-fun AndroidPlatformServices(context: Context): PlatformServices {
+fun androidPlatformServices(context: Context): PlatformServices {
     val appContext = context.applicationContext
     ...
 }
@@ -146,8 +197,8 @@ The lazy presenter in `MainViewController.kt`:
 ```kotlin
 fun MainViewController(): UIViewController {
     lateinit var controller: UIViewController
-    val platformServices = IosPlatformServices(presenter = { controller })
-    controller = ComposeUIViewController { App(platformServices) }
+    val container = AppContainer(iosPlatformServices(presenter = { controller }))
+    controller = ComposeUIViewController { App(container) }
     return controller
 }
 ```

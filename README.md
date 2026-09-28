@@ -39,7 +39,7 @@ the KMP concepts used), see the [learning notes in `docs/`](docs/README.md).
 
 Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ Todo.
 
-**22 done · 7 in progress · 28 todo** (57 tasks)
+**26 done · 6 in progress · 25 todo** (57 tasks)
 
 | Feature | Done | In Progress | Todo |
 | --- | --- | --- | --- |
@@ -53,7 +53,7 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Morse Trainer | 0 | 0 | 5 |
 | Tap Morse | 0 | 0 | 4 |
 | History | 0 | 0 | 3 |
-| Settings | 0 | 1 | 3 |
+| Settings | 4 | 0 | 0 |
 | Platform | 0 | 2 | 1 |
 | Quality | 2 | 0 | 1 |
 | Release | 0 | 1 | 2 |
@@ -106,10 +106,10 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | History | Recent translations | Persist recent translations locally | P2 | ⬜ Todo |
 | History | Favorites | Allow users to favorite frequently used messages | P3 | ⬜ Todo |
 | History | Delete | Delete individual or all history items | P3 | ⬜ Todo |
-| Settings | Theme | Light, dark, and system theme selection | P1 | 🚧 In Progress |
-| Settings | WPM | Configure default Morse transmission speed | P1 | ⬜ Todo |
-| Settings | Audio | Configure default tone settings | P2 | ⬜ Todo |
-| Settings | About | Add app version, privacy information, and open-source/license information | P1 | ⬜ Todo |
+| Settings | Theme | Light, dark, and system theme selection | P1 | ✅ Done |
+| Settings | WPM | Configure default Morse transmission speed | P1 | ✅ Done |
+| Settings | Audio | Configure default tone settings | P2 | ✅ Done |
+| Settings | About | Add app version, privacy information, and open-source/license information | P1 | ✅ Done |
 | Platform | Android | Implement Android-specific torch, vibration, audio, clipboard, and sharing integrations | P0 | 🚧 In Progress |
 | Platform | iOS | Implement iOS-specific torch, haptics, audio, clipboard, and sharing integrations | P0 | 🚧 In Progress |
 | Platform | Permissions | Add only required platform permissions and document their purpose | P0 | ⬜ Todo |

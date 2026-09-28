@@ -45,7 +45,8 @@ The test packages mirror the main packages:
 | `ReferenceEntryTest` | 7 | Chart built from the alphabet in order, codes vs the independent table, A–Z/0–9/punctuation coverage, every punctuation mark has a name, accessibility labels |
 | `ReferenceSearchTest` | 11 | Character, code-prefix (incl. `·−`) and name search, ambiguous `.`/`-`, ordering, no matches |
 | `ReferenceViewModelTest` | 5 | Initial sections, filtering hides empty sections, clearing restores all 54 |
-| **Total** | **119** | |
+| `SettingsRepositoryTest` | 7 | Defaults, immediate updates, persistence across instances, independent keys, clamping, corrupt stored values, `AppSettings` invariants |
+| **Total** | **126** | |
 
 ## Testing techniques used
 
