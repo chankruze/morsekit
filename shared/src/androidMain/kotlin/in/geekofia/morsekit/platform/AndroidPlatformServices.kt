@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 
 /** Uses the application context so the services can safely outlive an Activity. */
 fun AndroidPlatformServices(context: Context): PlatformServices {
@@ -15,6 +16,8 @@ fun AndroidPlatformServices(context: Context): PlatformServices {
 }
 
 private class AndroidClipboardService(private val context: Context) : ClipboardService {
+    override val showsSystemConfirmation: Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+
     override fun copyText(text: String) {
         val clipboard = context.getSystemService(ClipboardManager::class.java) ?: return
         clipboard.setPrimaryClip(ClipData.newPlainText("MorseKit", text))

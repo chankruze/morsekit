@@ -1,6 +1,7 @@
 package `in`.geekofia.morsekit.feature.translator
 
 import `in`.geekofia.morsekit.core.model.TranslationDirection
+import `in`.geekofia.morsekit.core.morse.MorseCodec
 import `in`.geekofia.morsekit.core.morse.TranslationIssue
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -67,5 +68,33 @@ class TranslatorViewModelTest {
         viewModel.onInputChange("...")
         viewModel.onClear()
         assertEquals(TranslatorUiState(direction = TranslationDirection.MorseToText), viewModel.uiState)
+    }
+
+    @Test
+    fun swapDropsPlaceholdersForUnreadableMorse() {
+        viewModel.onDirectionSelected(TranslationDirection.MorseToText)
+        viewModel.onInputChange("... -x- ...")
+        assertEquals("S${MorseCodec.REPLACEMENT_CHAR}S", viewModel.uiState.output)
+
+        viewModel.swapDirection()
+        with(viewModel.uiState) {
+            assertEquals(TranslationDirection.TextToMorse, direction)
+            assertEquals("SS", input)
+            assertTrue(issues.isEmpty())
+        }
+    }
+
+    @Test
+    fun swapWithEmptyOutputJustChangesDirection() {
+        viewModel.swapDirection()
+        assertEquals(TranslatorUiState(direction = TranslationDirection.MorseToText), viewModel.uiState)
+    }
+
+    @Test
+    fun liveConversionUpdatesOnEveryChange() {
+        listOf("S" to "...", "SO" to "... ---", "SOS" to "... --- ...").forEach { (input, morse) ->
+            viewModel.onInputChange(input)
+            assertEquals(morse, viewModel.uiState.output)
+        }
     }
 }

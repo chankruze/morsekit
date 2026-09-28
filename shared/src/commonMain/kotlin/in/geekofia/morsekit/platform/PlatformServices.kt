@@ -7,6 +7,9 @@ package `in`.geekofia.morsekit.platform
  */
 fun interface ClipboardService {
     fun copyText(text: String)
+
+    /** True when the OS shows its own "copied" confirmation (Android 13+), so the app shouldn't. */
+    val showsSystemConfirmation: Boolean get() = false
 }
 
 /** Opens the platform share sheet for plain text. */

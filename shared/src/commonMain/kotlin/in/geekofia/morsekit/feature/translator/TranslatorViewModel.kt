@@ -29,8 +29,13 @@ class TranslatorViewModel(
         if (direction != uiState.direction) swapDirection()
     }
 
+    /**
+     * Placeholders for unreadable Morse letters are dropped from the swapped input; otherwise they
+     * would be reported as unsupported characters in the new direction.
+     */
     fun swapDirection() {
-        uiState = translate(uiState.direction.reversed, uiState.output)
+        val nextInput = uiState.output.filterNot { it == MorseCodec.REPLACEMENT_CHAR }
+        uiState = translate(uiState.direction.reversed, nextInput)
     }
 
     fun onClear() {
