@@ -91,6 +91,17 @@ class TranslatorViewModelTest {
     }
 
     @Test
+    fun exposesPlayableMessageInBothDirections() {
+        viewModel.onInputChange("SOS")
+        assertEquals("... --- ...", viewModel.uiState.message.toString())
+
+        viewModel.onDirectionSelected(TranslationDirection.MorseToText)
+        viewModel.onInputChange("... ........ -x-")
+        // Plays what was typed, including a well-formed code that isn't in the alphabet.
+        assertEquals("... ........", viewModel.uiState.message.toString())
+    }
+
+    @Test
     fun liveConversionUpdatesOnEveryChange() {
         listOf("S" to "...", "SO" to "... ---", "SOS" to "... --- ...").forEach { (input, morse) ->
             viewModel.onInputChange(input)

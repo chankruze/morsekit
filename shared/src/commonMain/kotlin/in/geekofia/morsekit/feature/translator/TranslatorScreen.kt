@@ -20,14 +20,19 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import `in`.geekofia.morsekit.core.model.TranslationDirection
+import `in`.geekofia.morsekit.core.settings.SettingsRepository
+import `in`.geekofia.morsekit.feature.playback.MorsePlaybackViewModel
+import `in`.geekofia.morsekit.feature.playback.PlaybackControls
 import `in`.geekofia.morsekit.platform.PlatformServices
 import `in`.geekofia.morsekit.ui.components.MorseDisplay
 import `in`.geekofia.morsekit.ui.components.MorseTextField
@@ -35,24 +40,34 @@ import `in`.geekofia.morsekit.ui.components.SecondaryButton
 import `in`.geekofia.morsekit.ui.components.SectionCard
 import kotlinx.coroutines.launch
 
-/** Wires the ViewModel and platform services to the stateless [TranslatorScreen]. */
+/**
+ * Wires the ViewModels and platform services to the stateless [TranslatorScreen]. Playback stops
+ * whenever the content changes, so it never plays a stale message.
+ */
 @Composable
 fun TranslatorRoute(
     platformServices: PlatformServices,
+    settingsRepository: SettingsRepository,
     modifier: Modifier = Modifier,
     viewModel: TranslatorViewModel = viewModel { TranslatorViewModel() },
+    playbackViewModel: MorsePlaybackViewModel = viewModel {
+        MorsePlaybackViewModel(platformServices.audioPlayer, settingsRepository)
+    },
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val clipboard = platformServices.clipboard
+    val state = viewModel.uiState
+    val playbackStatus by playbackViewModel.status.collectAsStateWithLifecycle()
+    val settings by settingsRepository.settings.collectAsStateWithLifecycle()
 
     TranslatorScreen(
-        state = viewModel.uiState,
+        state = state,
         snackbarHostState = snackbarHostState,
-        onInputChange = viewModel::onInputChange,
-        onDirectionSelected = viewModel::onDirectionSelected,
-        onSwap = viewModel::swapDirection,
-        onClear = viewModel::onClear,
+        onInputChange = { playbackViewModel.stop(); viewModel.onInputChange(it) },
+        onDirectionSelected = { playbackViewModel.stop(); viewModel.onDirectionSelected(it) },
+        onSwap = { playbackViewModel.stop(); viewModel.swapDirection() },
+        onClear = { playbackViewModel.stop(); viewModel.onClear() },
         onCopy = { text ->
             clipboard.copyText(text)
             if (!clipboard.showsSystemConfirmation) {
@@ -64,6 +79,20 @@ fun TranslatorRoute(
         },
         onShare = platformServices.share::shareText,
         modifier = modifier,
+        playbackControls = {
+            PlaybackControls(
+                status = playbackStatus,
+                isPreparing = playbackViewModel.isPreparing,
+                canPlay = !state.message.isEmpty,
+                wordsPerMinute = settings.wordsPerMinute,
+                errorMessage = playbackViewModel.errorMessage,
+                onPlay = { playbackViewModel.play(state.message) },
+                onPause = playbackViewModel::pause,
+                onResume = playbackViewModel::resume,
+                onStop = playbackViewModel::stop,
+                onWordsPerMinuteChange = settingsRepository::setWordsPerMinute,
+            )
+        },
     )
 }
 
@@ -78,6 +107,7 @@ fun TranslatorScreen(
     onShare: (String) -> Unit,
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    playbackControls: @Composable () -> Unit = {},
 ) {
     val isMorseInput = state.direction == TranslationDirection.MorseToText
     val issueText = remember(state.issues) { issueMessages(state.issues).joinToString("\n") }
@@ -106,6 +136,10 @@ fun TranslatorScreen(
 
             SectionCard(title = if (isMorseInput) "Text" else "Morse") {
                 TranslationOutput(state = state, isMorseInput = isMorseInput)
+            }
+
+            SectionCard(title = "Listen") {
+                playbackControls()
             }
 
             ActionRow {

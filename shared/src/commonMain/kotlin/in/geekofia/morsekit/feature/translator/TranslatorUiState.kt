@@ -1,5 +1,6 @@
 package `in`.geekofia.morsekit.feature.translator
 
+import `in`.geekofia.morsekit.core.model.MorseMessage
 import `in`.geekofia.morsekit.core.model.TranslationDirection
 import `in`.geekofia.morsekit.core.morse.MorseCodec
 import `in`.geekofia.morsekit.core.morse.TranslationIssue
@@ -23,6 +24,8 @@ data class TranslatorUiState(
     val input: String = "",
     val output: String = "",
     val issues: List<TranslationIssue> = emptyList(),
+    /** The Morse side of the translation, structured for playback. */
+    val message: MorseMessage = MorseMessage.Empty,
 ) {
     /** True when [output] contains something worth copying or sharing, not just placeholders. */
     val hasOutput: Boolean

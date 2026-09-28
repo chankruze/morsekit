@@ -120,6 +120,25 @@ class MorseDecodeTest {
     }
 
     @Test
+    fun parseKeepsWellFormedLettersForPlayback() {
+        val message = codec.parse("... ........ -x- / ---")
+        assertEquals(listOf(listOf("...", "........"), listOf("---")), message.words.map { w -> w.letters.map { it.code } })
+        assertEquals("... ........ / ---", message.toString())
+    }
+
+    @Test
+    fun parseDropsWordsWithNothingPlayable() {
+        assertEquals("---", codec.parse("abc / ---").toString())
+        assertTrue(codec.parse("").isEmpty)
+        assertTrue(codec.parse("hello").isEmpty)
+    }
+
+    @Test
+    fun parseAcceptsTypographicDotsAndDashes() {
+        assertEquals("... --- ...", codec.parse("··· −−− ···").toString())
+    }
+
+    @Test
     fun isValidMorseReflectsIssues() {
         assertTrue(codec.isValidMorse("... --- ... / .... .."))
         assertFalse(codec.isValidMorse("... ---x"))

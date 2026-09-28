@@ -63,7 +63,11 @@ fun App(
         ) { innerPadding ->
             val contentModifier = Modifier.padding(innerPadding)
             when (destination) {
-                TopLevelDestination.Translator -> TranslatorRoute(container.platformServices, contentModifier)
+                TopLevelDestination.Translator -> TranslatorRoute(
+                    platformServices = container.platformServices,
+                    settingsRepository = container.settingsRepository,
+                    modifier = contentModifier,
+                )
                 TopLevelDestination.Reference -> ReferenceRoute(contentModifier)
                 TopLevelDestination.Settings -> SettingsRoute(
                     settingsRepository = container.settingsRepository,

@@ -92,7 +92,7 @@ fun SettingsScreen(
                 supportingText = "Pitch of the audio tone.",
             )
             Text(
-                text = "Used by audio, flashlight and vibration playback, coming in a future update.",
+                text = "Used when playing Morse audio in the translator. Flashlight and vibration are coming in a future update.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

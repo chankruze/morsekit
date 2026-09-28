@@ -45,10 +45,10 @@ class TranslatorViewModel(
     private fun translate(direction: TranslationDirection, input: String): TranslatorUiState =
         when (direction) {
             TranslationDirection.TextToMorse -> codec.encode(input).let {
-                TranslatorUiState(direction, input, output = it.morse, issues = it.issues)
+                TranslatorUiState(direction, input, output = it.morse, issues = it.issues, message = it.message)
             }
             TranslationDirection.MorseToText -> codec.decode(input).let {
-                TranslatorUiState(direction, input, output = it.text, issues = it.issues)
+                TranslatorUiState(direction, input, output = it.text, issues = it.issues, message = codec.parse(input))
             }
         }
 }

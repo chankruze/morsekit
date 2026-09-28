@@ -52,6 +52,17 @@ class MorseCodec(private val alphabet: MorseAlphabet = MorseAlphabet.Internation
 
     fun isValidMorse(morse: String): Boolean = decode(morse).isValid
 
+    /**
+     * Parses Morse into a [MorseMessage], e.g. for playback. Every well-formed dot/dash letter is
+     * kept, even one that isn't in the alphabet; malformed tokens (`-x-`) are dropped.
+     */
+    fun parse(morse: String): MorseMessage = MorseMessage(
+        MorseTokenizer.morseWords(morse.mapChars(MorseNormalizer::normalizeMorseChar)).mapNotNull { tokens ->
+            val letters = tokens.filter { MorseLetter.isValidCode(it) }.map(::MorseLetter)
+            if (letters.isEmpty()) null else MorseWord(letters)
+        },
+    )
+
     private fun decodeToken(token: String): Char? =
         if (MorseLetter.isValidCode(token)) alphabet.characterFor(MorseLetter(token)) else null
 
