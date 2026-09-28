@@ -4,14 +4,48 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
+import androidx.core.content.edit
 
 /** Uses the application context so the services can safely outlive an Activity. */
-fun AndroidPlatformServices(context: Context): PlatformServices {
+fun androidPlatformServices(context: Context): PlatformServices {
     val appContext = context.applicationContext
     return PlatformServices(
         clipboard = AndroidClipboardService(appContext),
         share = AndroidShareService(appContext),
+        keyValueStore = AndroidKeyValueStore(appContext),
+        appInfo = androidAppInfo(appContext),
+    )
+}
+
+private class AndroidKeyValueStore(context: Context) : KeyValueStore {
+    private val preferences = context.getSharedPreferences("morsekit", Context.MODE_PRIVATE)
+
+    override fun getString(key: String): String? = preferences.getString(key, null)
+
+    override fun putString(key: String, value: String) {
+        preferences.edit { putString(key, value) }
+    }
+
+    override fun getInt(key: String): Int? =
+        if (preferences.contains(key)) preferences.getInt(key, 0) else null
+
+    override fun putInt(key: String, value: Int) {
+        preferences.edit { putInt(key, value) }
+    }
+}
+
+private fun androidAppInfo(context: Context): AppInfo {
+    val packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        context.packageManager.getPackageInfo(context.packageName, PackageManager.PackageInfoFlags.of(0))
+    } else {
+        @Suppress("DEPRECATION")
+        context.packageManager.getPackageInfo(context.packageName, 0)
+    }
+    return AppInfo(
+        versionName = packageInfo.versionName ?: "unknown",
+        buildNumber = packageInfo.longVersionCode.toString(),
     )
 }
 

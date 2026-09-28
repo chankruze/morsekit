@@ -24,4 +24,6 @@ fun interface ShareService {
 class PlatformServices(
     val clipboard: ClipboardService,
     val share: ShareService,
+    val keyValueStore: KeyValueStore,
+    val appInfo: AppInfo,
 )
