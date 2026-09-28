@@ -46,7 +46,7 @@ The test packages mirror the main packages:
 | `ReferenceEntryTest` | 7 | Chart built from the alphabet in order, codes vs the independent table, A–Z/0–9/punctuation coverage, every punctuation mark has a name, accessibility labels |
 | `ReferenceSearchTest` | 11 | Character, code-prefix (incl. `·−`) and name search, ambiguous `.`/`-`, ordering, no matches |
 | `ReferenceViewModelTest` | 5 | Initial sections, filtering hides empty sections, clearing restores all 54 |
-| `SettingsRepositoryTest` | 9 | Defaults, immediate updates, persistence across instances, independent keys, clamping, corrupt stored values, the one-time flash warning, `AppSettings` invariants |
+| `SettingsRepositoryTest` | 11 | Defaults, immediate updates, persistence across instances, independent keys, clamping, corrupt stored values, the one-time flash warning, reset to defaults (keeps the acknowledgement), `AppSettings` invariants |
 | `ToneScheduleTest` | 7 | Units → frames at 16 kHz, gaps, speed scaling, no rounding drift at 13 WPM |
 | `MorseAudioRendererTest` | 10 | Length and duration, exact silence, amplitude, fade in/out, measured pitch, speed, limits |
 | `MorseAudioPlayerTest` | 8 | Play/stop, completion, replay, restart while playing, stop while idle, stale completions (fake output) |
@@ -55,7 +55,7 @@ The test packages mirror the main packages:
 | `VibrationPatternTest` | 9 | Segments, gaps, alternation, speed scaling, no millisecond drift at 13 WPM, duration, limits |
 | `VibrationTransmitterTest` (androidHostTest) | 4 | Play and wait without clipping the end, cancellation stops it, failure still cancels, empty pattern |
 | `TransmissionRunnerTest` (androidHostTest) | 5 | Running state, stop runs cleanup, a new run waits for the previous cleanup, stale finishes ignored |
-| **Total** | **198** | |
+| **Total** | **200** | |
 
 ## Testing techniques used
 

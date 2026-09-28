@@ -103,3 +103,67 @@ All icons are Material Design paths saved as vector XML in `composeResources/dra
 (`ic_close`, `ic_copy`, `ic_share`, `ic_stop`, `ic_volume`, `ic_flashlight`, `ic_vibration`,
 `ic_transmit`, `ic_add`, `ic_remove`), plus the existing `ic_translate` arrows for swap. No icon
 library was added.
+
+## Headers on every screen
+
+Each screen draws its own top app bar (default surface colours) through the shared
+`ui/components/ScreenScaffold`, and the bar extends up under the status bar. The home screen's is
+centred (`centerTitle = true` → `CenterAlignedTopAppBar`); the others are left-aligned.
+
+| Screen | Title | Actions |
+| --- | --- | --- |
+| Translator (home) | App icon + **MorseKit**, centred | none (transmitting is the FAB) |
+| Reference | **Reference** | 🔍 turns the header into the search field; ← closes it (and clears the query), ✕ clears the text |
+| Settings | **Settings** | ⋮ → **Reset to defaults** (confirmed first; theme, speed and tone reset, the flash-warning acknowledgement is kept) |
+
+> **Insets, done once.** The app-level `Scaffold` only owns the bottom navigation and uses
+> `contentWindowInsets = WindowInsets(0)`. Each `ScreenScaffold` also uses zero insets, and its
+> `TopAppBar` pads itself for the status bar. Without that split, the status-bar or
+> navigation-bar padding gets applied twice, or not at all (content drawn under the status bar).
+
+> **Status bar icons follow the in-app theme, not the system's.** The status bar is transparent
+> over the header, so its icons must contrast with the header's colour. `App` computes a
+> `SystemBarAppearance` from the real colours (`surface.luminance() < 0.5` → light icons) and
+> `MainActivity` applies it with `enableEdgeToEdge`. Choosing Dark in Settings while the phone is
+> in light mode still gets light icons. (An earlier version had a primary-coloured header; working
+> from the actual colour rather than "dark theme or not" meant only one line changed when it went.)
+
+## App icon
+
+The Android launcher icons were made with Android Studio's **New › Image Asset** wizard from the
+MorseKit logo. It writes the adaptive icon (`mipmap-anydpi-v26/ic_launcher*.xml`), a foreground
+and legacy icons as `.webp` in every density, and the 512 px Play Store icon at
+`androidApp/src/main/ic_launcher-playstore.png`.
+
+The **header logo** is a separate copy, because Compose Multiplatform resources can't read Android
+`res/` (they must work on iOS too). It's derived from the Play Store icon with ImageMagick:
+
+```bash
+magick androidApp/src/main/ic_launcher-playstore.png -resize 144x144 \
+  \( -size 144x144 xc:none -fill white -draw "roundrectangle 0,0 143,143 32,32" \) \
+  -alpha set -compose DstIn -composite -strip \
+  shared/src/commonMain/composeResources/drawable/morsekit_logo.png
+```
+
+**If the logo changes, re-run the wizard and this command**, or the header shows the old logo.
+
+Two wizard defaults were then fixed by hand. **Check them again after any re-run**, because the
+wizard overwrites both:
+
+| Layer | Wizard default | Now |
+| --- | --- | --- |
+| Background | The template's green grid (`#3DDC84`), which can show at the edges in launcher animations | `@color/ic_launcher_background` = `#023A9E`, the tile's mid-edge blue |
+| Monochrome (Android 13+ themed icons) | The full-colour foreground, which the system tints into a featureless tile | `mipmap-*/ic_launcher_monochrome.webp`: the mark alone, white on transparent |
+
+The monochrome glyph is cut out of each density's foreground, so it lines up exactly. The mark's
+pixels have a red or green channel above 45% (white and cyan bars, yellow and orange dots) while
+the blue tile stays below 41%, so a soft threshold on `max(R, G)` separates them:
+
+```bash
+magick mipmap-$d/ic_launcher_foreground.webp -alpha set -channel A \
+  -fx "a*min(1,max(0,(max(r,g)-0.45)/0.2))" +channel -fill white -colorize 100 \
+  -define webp:lossless=true mipmap-$d/ic_launcher_monochrome.webp
+```
+
+The **iOS** `AppIcon` is still the project template's (backlog: *Release / App icon*).
+

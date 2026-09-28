@@ -39,7 +39,7 @@ the KMP concepts used), see the [learning notes in `docs/`](docs/README.md).
 
 Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ Todo.
 
-**39 done · 3 in progress · 17 todo** (59 tasks)
+**39 done · 4 in progress · 16 todo** (59 tasks)
 
 | Feature | Done | In Progress | Todo |
 | --- | --- | --- | --- |
@@ -56,7 +56,7 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Settings | 4 | 0 | 0 |
 | Platform | 2 | 1 | 0 |
 | Quality | 2 | 0 | 1 |
-| Release | 0 | 1 | 2 |
+| Release | 0 | 2 | 1 |
 
 #### All tasks
 
@@ -118,7 +118,7 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Quality | Accessibility | Add content descriptions, semantic labels, scalable text, and touch targets | P1 | ⬜ Todo |
 | Quality | Error states | Handle empty, invalid, and unsupported input gracefully | P1 | ✅ Done |
 | Quality | Offline | Ensure all core functionality works without network access | P0 | ✅ Done |
-| Release | App icon | Create MorseKit launcher/app icon | P1 | ⬜ Todo |
+| Release | App icon | Create MorseKit launcher/app icon | P1 | 🚧 In Progress |
 | Release | Store assets | Prepare Play Store/App Store screenshots and description | P2 | ⬜ Todo |
 | Release | Build | Generate signed Android release build and iOS archive | P1 | 🚧 In Progress |
 
