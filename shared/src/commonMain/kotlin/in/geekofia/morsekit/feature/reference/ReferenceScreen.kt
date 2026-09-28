@@ -39,6 +39,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigationevent.NavigationEventInfo
+import androidx.navigationevent.compose.NavigationBackHandler
+import androidx.navigationevent.compose.rememberNavigationEventState
 import `in`.geekofia.morsekit.core.morse.MorseCategory
 import `in`.geekofia.morsekit.ui.components.MorseDisplay
 import `in`.geekofia.morsekit.ui.components.PlaceholderContent
@@ -78,6 +81,12 @@ fun ReferenceScreen(
         searching = false
         onQueryChange("")
     }
+    // While searching, system back closes the search instead of leaving the tab.
+    NavigationBackHandler(
+        state = rememberNavigationEventState(currentInfo = NavigationEventInfo.None),
+        isBackEnabled = searching,
+        onBackCompleted = closeSearch,
+    )
 
     ScreenScaffold(
         modifier = modifier,

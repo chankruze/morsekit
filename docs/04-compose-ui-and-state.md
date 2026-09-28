@@ -194,19 +194,19 @@ flowchart LR
 ```mermaid
 flowchart TB
     App["App(container)"] --> Theme["MorseKitTheme(settings.themeMode)"]
-    Theme --> Scaffold["Scaffold"]
-    Scaffold --> Top["topBar: CenterAlignedTopAppBar"]
-    Scaffold --> Bottom["bottomBar: NavigationBar<br/>one item per TopLevelDestination"]
-    Scaffold --> Content{"when (destination)"}
-    Content -->|Translator| TR["TranslatorRoute"]
-    Content -->|Reference| RS["ReferenceRoute"]
-    Content -->|Settings| SS["SettingsScreen (placeholder)"]
+    Theme --> Scaffold["Scaffold (bottom bar only)"]
+    Scaffold --> Bottom["bottomBar: NavigationBar<br/>selectTab() on AppBackStack"]
+    Scaffold --> ND["NavDisplay(backStack.entries)"]
+    ND -->|Translator| TR["TranslatorRoute<br/>(own ScreenScaffold + top bar)"]
+    ND -->|Reference| RS["ReferenceRoute"]
+    ND -->|Settings| SS["SettingsRoute"]
 ```
 
-Navigation is intentionally simple: an `enum class TopLevelDestination` and a
-`rememberSaveable` variable holding the selected tab. Adding a tab means adding an enum entry
-plus a `when` branch. The compiler forces the branch, because `when` over an enum is
-exhaustive. A navigation library becomes worthwhile once we need a back stack (detail screens).
+Tabs are an `enum class TopLevelDestination`. Navigation 3's `NavDisplay` renders
+`AppBackStack.entries`, and system back follows `AppBackStack.goBack()`: another tab goes to the
+Translator, and the Translator leaves the app. Each screen draws its own top bar
+(`ScreenScaffold`). See [Navigation](12-navigation.md) for the back rules and how tab state is
+kept.
 
 > **Concept: `Scaffold` and `innerPadding`.** `Scaffold` lays out the top bar, bottom bar and
 > content, and hands the content an `innerPadding` so it isn't hidden behind the bars. We pass

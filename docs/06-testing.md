@@ -55,7 +55,8 @@ The test packages mirror the main packages:
 | `VibrationPatternTest` | 9 | Segments, gaps, alternation, speed scaling, no millisecond drift at 13 WPM, duration, limits |
 | `VibrationTransmitterTest` (androidHostTest) | 4 | Play and wait without clipping the end, cancellation stops it, failure still cancels, empty pattern |
 | `TransmissionRunnerTest` (androidHostTest) | 5 | Running state, stop runs cleanup, a new run waits for the previous cleanup, stale finishes ignored |
-| **Total** | **200** | |
+| `AppBackStackTest` | 8 | Start tab, other tabs above it, back to start then exit, no history between other tabs, in-app back iff more than one entry, save/restore |
+| **Total** | **208** | |
 
 ## Testing techniques used
 

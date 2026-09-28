@@ -1,5 +1,8 @@
 package `in`.geekofia.morsekit
 
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
@@ -11,17 +14,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.luminance
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.ui.NavDisplay
 import `in`.geekofia.morsekit.feature.reference.ReferenceRoute
 import `in`.geekofia.morsekit.feature.settings.SettingsRoute
 import `in`.geekofia.morsekit.feature.translator.TranslatorRoute
+import `in`.geekofia.morsekit.navigation.AppBackStack
 import `in`.geekofia.morsekit.navigation.TopLevelDestination
+import `in`.geekofia.morsekit.navigation.rememberTabStateNavEntryDecorator
 import `in`.geekofia.morsekit.ui.theme.MorseKitTheme
 import org.jetbrains.compose.resources.painterResource
 
@@ -48,7 +53,7 @@ fun App(
         )
         LaunchedEffect(appearance) { currentOnAppearanceChange(appearance) }
 
-        var destination by rememberSaveable { mutableStateOf(TopLevelDestination.Translator) }
+        val backStack = rememberSaveable(saver = AppBackStack.Saver) { AppBackStack() }
 
         // Each screen draws its own top bar (ScreenScaffold), so this Scaffold only owns the bottom
         // bar and applies no insets itself: NavigationBar pads for the system navigation bar.
@@ -58,8 +63,8 @@ fun App(
                 NavigationBar {
                     TopLevelDestination.entries.forEach { item ->
                         NavigationBarItem(
-                            selected = item == destination,
-                            onClick = { destination = item },
+                            selected = item == backStack.currentTab,
+                            onClick = { backStack.selectTab(item) },
                             icon = { Icon(painterResource(item.icon), contentDescription = null) },
                             label = { Text(item.label) },
                         )
@@ -67,20 +72,31 @@ fun App(
                 }
             },
         ) { innerPadding ->
-            val contentModifier = Modifier.padding(innerPadding)
-            when (destination) {
-                TopLevelDestination.Translator -> TranslatorRoute(
-                    platformServices = container.platformServices,
-                    settingsRepository = container.settingsRepository,
-                    modifier = contentModifier,
-                )
-                TopLevelDestination.Reference -> ReferenceRoute(contentModifier)
-                TopLevelDestination.Settings -> SettingsRoute(
-                    settingsRepository = container.settingsRepository,
-                    appInfo = container.platformServices.appInfo,
-                    modifier = contentModifier,
-                )
-            }
+            // Navigation 3 renders the back stack; system back goes to AppBackStack's rules
+            // (another tab -> Translator -> leave the app). Tabs crossfade, as peers should.
+            NavDisplay(
+                backStack = backStack.entries,
+                modifier = Modifier.padding(innerPadding),
+                onBack = { backStack.goBack() },
+                entryDecorators = listOf(rememberTabStateNavEntryDecorator()),
+                transitionSpec = { fadeIn() togetherWith fadeOut() },
+                popTransitionSpec = { fadeIn() togetherWith fadeOut() },
+                entryProvider = entryProvider {
+                    entry<TopLevelDestination> { tab ->
+                        when (tab) {
+                            TopLevelDestination.Translator -> TranslatorRoute(
+                                platformServices = container.platformServices,
+                                settingsRepository = container.settingsRepository,
+                            )
+                            TopLevelDestination.Reference -> ReferenceRoute()
+                            TopLevelDestination.Settings -> SettingsRoute(
+                                settingsRepository = container.settingsRepository,
+                                appInfo = container.platformServices.appInfo,
+                            )
+                        }
+                    }
+                },
+            )
         }
     }
 }
