@@ -27,4 +27,5 @@ class PlatformServices(
     val keyValueStore: KeyValueStore,
     val appInfo: AppInfo,
     val audioPlayer: PcmAudioPlayer,
+    val torch: TorchController,
 )

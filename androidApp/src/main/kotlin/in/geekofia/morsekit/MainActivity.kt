@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import `in`.geekofia.morsekit.platform.AppInfo
 import `in`.geekofia.morsekit.platform.InMemoryKeyValueStore
+import `in`.geekofia.morsekit.platform.NoTorchController
 import `in`.geekofia.morsekit.platform.NoOpPcmAudioPlayer
 import `in`.geekofia.morsekit.platform.PlatformServices
 
@@ -48,6 +49,7 @@ fun AppAndroidPreview() {
         keyValueStore = InMemoryKeyValueStore(),
         appInfo = AppInfo(versionName = "preview", buildNumber = "0"),
         audioPlayer = NoOpPcmAudioPlayer(),
+        torch = NoTorchController(),
     )
     App(AppContainer(services))
 }

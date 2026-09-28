@@ -17,6 +17,7 @@ fun androidPlatformServices(context: Context): PlatformServices {
         keyValueStore = AndroidKeyValueStore(appContext),
         appInfo = androidAppInfo(appContext),
         audioPlayer = AndroidPcmAudioPlayer(),
+        torch = AndroidTorchController(appContext),
     )
 }
 

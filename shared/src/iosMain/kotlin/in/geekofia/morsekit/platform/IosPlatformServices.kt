@@ -18,6 +18,7 @@ fun iosPlatformServices(presenter: () -> UIViewController?): PlatformServices =
         keyValueStore = IosKeyValueStore(),
         appInfo = iosAppInfo(),
         audioPlayer = IosPcmAudioPlayer(),
+        torch = IosTorchController(),
     )
 
 private class IosKeyValueStore : KeyValueStore {
