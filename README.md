@@ -42,6 +42,18 @@ Use the run configurations provided by the run widget in your IDE's toolbar. You
 - Android app: `./gradlew :androidApp:assembleDebug`
 - iOS app: open the [/iosApp](./iosApp) directory in Xcode and run it from there.
 
+### Versioning and release artifacts
+
+The version (SemVer) and build number live in [`version.properties`](version.properties) and are
+shared by Android and iOS. Bump them with `scripts/bump-version.sh <major|minor|patch|build>`.
+
+Builds also copy their output to `androidApp/build/dist/` with a descriptive name:
+
+- `./gradlew :androidApp:assembleRelease` → `MorseKit-v0.0.1-1-release.apk`
+- `./gradlew :androidApp:bundleRelease` → `MorseKit-v0.0.1-1-release.aab`
+
+See [docs/07-versioning-and-builds.md](docs/07-versioning-and-builds.md) for details.
+
 ### Running tests
 
 Use the run button in your IDE's editor gutter, or run tests using Gradle tasks:

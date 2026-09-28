@@ -14,6 +14,7 @@ open the file and follow along.
 | 4 | [Compose UI and state](04-compose-ui-and-state.md) | Composables, state, recomposition, ViewModel, unidirectional data flow, theming, resources |
 | 5 | [Platform services](05-platform-services.md) | Calling Android and iOS APIs from shared code: interfaces vs `expect`/`actual`, Kotlin/Native interop |
 | 6 | [Testing](06-testing.md) | `commonTest`, which platforms run which tests, how the engine tests are organized |
+| 7 | [Versioning and builds](07-versioning-and-builds.md) | SemVer from one file for both platforms, the bump script, named APK/AAB outputs, the AGP Variant API |
 
 ## The whole app on one page
 
