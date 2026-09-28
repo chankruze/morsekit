@@ -59,19 +59,76 @@ fun TorchControls(
     onStop: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    OutputControls(
+        startLabel = "Flash",
+        stopLabel = "Stop flashing",
+        note = if (isAvailable) {
+            "Caution: flashing light. Don't use it near anyone sensitive to flashing lights, " +
+                "including people with photosensitive epilepsy."
+        } else {
+            "This device doesn't have a flashlight."
+        },
+        isAvailable = isAvailable,
+        isTransmitting = isTransmitting,
+        canTransmit = canTransmit,
+        errorMessage = errorMessage,
+        onStart = onStart,
+        onStop = onStop,
+        modifier = modifier,
+    )
+}
+
+/** Vibrate / Stop for the vibration motor or Taptic Engine. */
+@Composable
+fun VibrationControls(
+    isAvailable: Boolean,
+    isTransmitting: Boolean,
+    canTransmit: Boolean,
+    errorMessage: String?,
+    onStart: () -> Unit,
+    onStop: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    OutputControls(
+        startLabel = "Vibrate",
+        stopLabel = "Stop vibrating",
+        note = if (isAvailable) {
+            "Feel the message: useful in the dark or without sound. Silent mode may reduce vibration."
+        } else {
+            "This device can't vibrate."
+        },
+        isAvailable = isAvailable,
+        isTransmitting = isTransmitting,
+        canTransmit = canTransmit,
+        errorMessage = errorMessage,
+        onStart = onStart,
+        onStop = onStop,
+        modifier = modifier,
+    )
+}
+
+/** Shared layout for a start/stop output: button, explanatory note, optional error. */
+@Composable
+private fun OutputControls(
+    startLabel: String,
+    stopLabel: String,
+    note: String,
+    isAvailable: Boolean,
+    isTransmitting: Boolean,
+    canTransmit: Boolean,
+    errorMessage: String?,
+    onStart: () -> Unit,
+    onStop: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
         if (isTransmitting) {
-            PrimaryButton("Stop flashing", onClick = onStop)
+            PrimaryButton(stopLabel, onClick = onStop)
         } else {
-            PrimaryButton("Flash", onClick = onStart, enabled = isAvailable && canTransmit)
+            PrimaryButton(startLabel, onClick = onStart, enabled = isAvailable && canTransmit)
         }
         Text(
-            text = if (isAvailable) {
-                "Caution: flashing light. Don't use it near anyone sensitive to flashing lights, " +
-                    "including people with photosensitive epilepsy."
-            } else {
-                "This device doesn't have a flashlight."
-            },
+            text = note,
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

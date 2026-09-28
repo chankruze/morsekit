@@ -39,9 +39,11 @@ import `in`.geekofia.morsekit.core.model.TranslationDirection
 import `in`.geekofia.morsekit.core.settings.SettingsRepository
 import `in`.geekofia.morsekit.feature.playback.MorsePlaybackViewModel
 import `in`.geekofia.morsekit.feature.playback.MorseTorchViewModel
+import `in`.geekofia.morsekit.feature.playback.MorseVibrationViewModel
 import `in`.geekofia.morsekit.feature.playback.PlaybackControls
 import `in`.geekofia.morsekit.feature.playback.SpeedControl
 import `in`.geekofia.morsekit.feature.playback.TorchControls
+import `in`.geekofia.morsekit.feature.playback.VibrationControls
 import `in`.geekofia.morsekit.platform.PlatformServices
 import `in`.geekofia.morsekit.ui.components.MorseDisplay
 import `in`.geekofia.morsekit.ui.components.MorseTextField
@@ -53,8 +55,8 @@ import kotlinx.coroutines.launch
  * Wires the ViewModels and platform services to the stateless [TranslatorScreen].
  *
  * Transmission stops whenever the content changes, so it never sends a stale message. The
- * flashlight also stops when this screen leaves composition (another tab) or the app goes to the
- * background, so it can never keep flashing unattended.
+ * flashlight and vibration also stop when this screen leaves composition (another tab) or the app
+ * goes to the background, so they can never keep running unattended.
  */
 @Composable
 fun TranslatorRoute(
@@ -68,6 +70,9 @@ fun TranslatorRoute(
     torchViewModel: MorseTorchViewModel = viewModel {
         MorseTorchViewModel(platformServices.torch, settingsRepository)
     },
+    vibrationViewModel: MorseVibrationViewModel = viewModel {
+        MorseVibrationViewModel(platformServices.vibration, settingsRepository)
+    },
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -75,15 +80,19 @@ fun TranslatorRoute(
     val state = viewModel.uiState
     val playbackStatus by playbackViewModel.status.collectAsStateWithLifecycle()
     val settings by settingsRepository.settings.collectAsStateWithLifecycle()
+    val stopUnattendedOutputs = {
+        torchViewModel.stop()
+        vibrationViewModel.stop()
+    }
     val stopTransmitting = {
         playbackViewModel.stop()
-        torchViewModel.stop()
+        stopUnattendedOutputs()
     }
 
-    DisposableEffect(torchViewModel) {
-        onDispose { torchViewModel.stop() }
+    DisposableEffect(torchViewModel, vibrationViewModel) {
+        onDispose { stopUnattendedOutputs() }
     }
-    LifecycleEventEffect(Lifecycle.Event.ON_STOP) { torchViewModel.stop() }
+    LifecycleEventEffect(Lifecycle.Event.ON_STOP) { stopUnattendedOutputs() }
 
     TranslatorScreen(
         state = state,
@@ -109,7 +118,7 @@ fun TranslatorRoute(
                 wordsPerMinute = settings.wordsPerMinute,
                 onWordsPerMinuteChange = settingsRepository::setWordsPerMinute,
                 // Both outputs are timed at start, so speed only changes while nothing runs.
-                enabled = audioIdle && !torchViewModel.isTransmitting,
+                enabled = audioIdle && !torchViewModel.isTransmitting && !vibrationViewModel.isTransmitting,
             )
             HorizontalDivider()
             Text("Sound", style = MaterialTheme.typography.titleSmall)
@@ -132,6 +141,16 @@ fun TranslatorRoute(
                 errorMessage = torchViewModel.errorMessage,
                 onStart = { torchViewModel.start(state.message) },
                 onStop = torchViewModel::stop,
+            )
+            HorizontalDivider()
+            Text("Vibration", style = MaterialTheme.typography.titleSmall)
+            VibrationControls(
+                isAvailable = vibrationViewModel.isVibrationAvailable,
+                isTransmitting = vibrationViewModel.isTransmitting,
+                canTransmit = !state.message.isEmpty,
+                errorMessage = vibrationViewModel.errorMessage,
+                onStart = { vibrationViewModel.start(state.message) },
+                onStop = vibrationViewModel::stop,
             )
         },
     )

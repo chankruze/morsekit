@@ -92,7 +92,7 @@ fun SettingsScreen(
                 supportingText = "Pitch of the audio tone.",
             )
             Text(
-                text = "Used for sound and flashlight transmission in the translator. Vibration is coming in a future update.",
+                text = "Used for sound, flashlight and vibration transmission in the translator.",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
