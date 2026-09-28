@@ -28,4 +28,5 @@ class PlatformServices(
     val appInfo: AppInfo,
     val audioPlayer: PcmAudioPlayer,
     val torch: TorchController,
+    val vibration: VibrationController,
 )

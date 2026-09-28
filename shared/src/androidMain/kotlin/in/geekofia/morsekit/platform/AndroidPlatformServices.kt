@@ -18,6 +18,7 @@ fun androidPlatformServices(context: Context): PlatformServices {
         appInfo = androidAppInfo(appContext),
         audioPlayer = AndroidPcmAudioPlayer(),
         torch = AndroidTorchController(appContext),
+        vibration = AndroidVibrationController(appContext),
     )
 }
 

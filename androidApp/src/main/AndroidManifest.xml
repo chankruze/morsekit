@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Morse vibration transmission (Vibrator/VibrationEffect). A normal permission: granted at
+         install, no prompt. The only permission MorseKit needs. -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+
     <application
         android:name=".MorseKitApplication"
         android:allowBackup="true"

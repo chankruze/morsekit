@@ -11,6 +11,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import `in`.geekofia.morsekit.platform.AppInfo
 import `in`.geekofia.morsekit.platform.InMemoryKeyValueStore
 import `in`.geekofia.morsekit.platform.NoTorchController
+import `in`.geekofia.morsekit.platform.NoVibrationController
 import `in`.geekofia.morsekit.platform.NoOpPcmAudioPlayer
 import `in`.geekofia.morsekit.platform.PlatformServices
 
@@ -50,6 +51,7 @@ fun AppAndroidPreview() {
         appInfo = AppInfo(versionName = "preview", buildNumber = "0"),
         audioPlayer = NoOpPcmAudioPlayer(),
         torch = NoTorchController(),
+        vibration = NoVibrationController(),
     )
     App(AppContainer(services))
 }
