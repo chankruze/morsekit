@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Behind the adaptive icon's foreground: the logo tile's mid-edge blue, so nothing clashes
+         at the edges (launcher animations can show more of the layer than the visible 72dp). -->
+    <color name="ic_launcher_background">#023A9E</color>
+</resources>
