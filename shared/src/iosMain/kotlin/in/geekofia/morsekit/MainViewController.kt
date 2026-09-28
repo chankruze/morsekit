@@ -6,7 +6,8 @@ import platform.UIKit.UIViewController
 
 fun MainViewController(): UIViewController {
     lateinit var controller: UIViewController
-    val platformServices = iosPlatformServices(presenter = { controller })
-    controller = ComposeUIViewController { App(platformServices) }
+    // Called once per app launch, so this is the app-scoped container on iOS.
+    val container = AppContainer(iosPlatformServices(presenter = { controller }))
+    controller = ComposeUIViewController { App(container) }
     return controller
 }
