@@ -3,5 +3,8 @@ TEAM_ID=
 PRODUCT_NAME=MorseKit
 PRODUCT_BUNDLE_IDENTIFIER=in.geekofia.morsekit.MorseKit$(TEAM_ID)
 
-CURRENT_PROJECT_VERSION=1
-MARKETING_VERSION=1.0
+// VERSION_NAME and VERSION_CODE come from the repo-root version.properties (shared with Android).
+#include "../../version.properties"
+
+CURRENT_PROJECT_VERSION=$(VERSION_CODE)
+MARKETING_VERSION=$(VERSION_NAME)
