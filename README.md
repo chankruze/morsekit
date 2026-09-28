@@ -39,7 +39,7 @@ the KMP concepts used), see the [learning notes in `docs/`](docs/README.md).
 
 Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ Todo.
 
-**34 done · 5 in progress · 18 todo** (57 tasks)
+**34 done · 5 in progress · 20 todo** (59 tasks)
 
 | Feature | Done | In Progress | Todo |
 | --- | --- | --- | --- |
@@ -48,7 +48,7 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Translator | 6 | 0 | 0 |
 | Morse Reference | 3 | 1 | 0 |
 | Audio | 4 | 0 | 0 |
-| Flashlight | 4 | 0 | 0 |
+| Flashlight | 4 | 0 | 2 |
 | Vibration | 0 | 1 | 2 |
 | Morse Trainer | 0 | 0 | 5 |
 | Tap Morse | 0 | 0 | 4 |
@@ -91,6 +91,8 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Flashlight | Timing | Implement correct dot/dash and gap timing | P1 | ✅ Done |
 | Flashlight | WPM | Use configurable transmission speed | P1 | ✅ Done |
 | Flashlight | Safety | Add clear controls and warning for flashing light | P1 | ✅ Done |
+| Flashlight | Screen timeout | Keep the screen on while transmitting so long, slow messages aren't cut off when the screen turns off | P3 | ⬜ Todo |
+| Flashlight | Rotation | Keep flashing across screen rotation instead of stopping | P3 | ⬜ Todo |
 | Vibration | Transmission | Transmit Morse using device vibration/haptics | P1 | ⬜ Todo |
 | Vibration | Timing | Implement Morse timing for vibration patterns | P1 | 🚧 In Progress |
 | Vibration | WPM | Use configurable transmission speed | P2 | ⬜ Todo |

@@ -127,8 +127,10 @@ saved WPM setting, locked while either is running), then **Sound** (Play/Pause/R
 
 - **Screen timeout.** If the screen turns off during a long, slow message, the app goes to the
   background and flashing stops (by design, see the table above). Keeping the screen on while
-  transmitting needs a platform hook and isn't done yet.
-- **Rotation** recreates the screen, which also stops flashing.
+  transmitting needs a platform hook and isn't done yet (backlog: *Flashlight / Screen timeout*,
+  P3, after v1).
+- **Rotation** recreates the screen, which also stops flashing (backlog: *Flashlight / Rotation*,
+  P3, after v1).
 - **LED latency.** Torch LEDs take a few milliseconds to switch, which is fine for Morse that
   people read by eye.
 - **iOS** hasn't run on a device yet (no Xcode on the development machine).
