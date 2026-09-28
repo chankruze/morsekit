@@ -3,6 +3,7 @@ package `in`.geekofia.morsekit.feature.translator
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,6 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -20,6 +22,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -27,12 +30,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import `in`.geekofia.morsekit.core.audio.PlaybackStatus
 import `in`.geekofia.morsekit.core.model.TranslationDirection
 import `in`.geekofia.morsekit.core.settings.SettingsRepository
 import `in`.geekofia.morsekit.feature.playback.MorsePlaybackViewModel
+import `in`.geekofia.morsekit.feature.playback.MorseTorchViewModel
 import `in`.geekofia.morsekit.feature.playback.PlaybackControls
+import `in`.geekofia.morsekit.feature.playback.SpeedControl
+import `in`.geekofia.morsekit.feature.playback.TorchControls
 import `in`.geekofia.morsekit.platform.PlatformServices
 import `in`.geekofia.morsekit.ui.components.MorseDisplay
 import `in`.geekofia.morsekit.ui.components.MorseTextField
@@ -41,8 +50,11 @@ import `in`.geekofia.morsekit.ui.components.SectionCard
 import kotlinx.coroutines.launch
 
 /**
- * Wires the ViewModels and platform services to the stateless [TranslatorScreen]. Playback stops
- * whenever the content changes, so it never plays a stale message.
+ * Wires the ViewModels and platform services to the stateless [TranslatorScreen].
+ *
+ * Transmission stops whenever the content changes, so it never sends a stale message. The
+ * flashlight also stops when this screen leaves composition (another tab) or the app goes to the
+ * background, so it can never keep flashing unattended.
  */
 @Composable
 fun TranslatorRoute(
@@ -53,6 +65,9 @@ fun TranslatorRoute(
     playbackViewModel: MorsePlaybackViewModel = viewModel {
         MorsePlaybackViewModel(platformServices.audioPlayer, settingsRepository)
     },
+    torchViewModel: MorseTorchViewModel = viewModel {
+        MorseTorchViewModel(platformServices.torch, settingsRepository)
+    },
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -60,14 +75,23 @@ fun TranslatorRoute(
     val state = viewModel.uiState
     val playbackStatus by playbackViewModel.status.collectAsStateWithLifecycle()
     val settings by settingsRepository.settings.collectAsStateWithLifecycle()
+    val stopTransmitting = {
+        playbackViewModel.stop()
+        torchViewModel.stop()
+    }
+
+    DisposableEffect(torchViewModel) {
+        onDispose { torchViewModel.stop() }
+    }
+    LifecycleEventEffect(Lifecycle.Event.ON_STOP) { torchViewModel.stop() }
 
     TranslatorScreen(
         state = state,
         snackbarHostState = snackbarHostState,
-        onInputChange = { playbackViewModel.stop(); viewModel.onInputChange(it) },
-        onDirectionSelected = { playbackViewModel.stop(); viewModel.onDirectionSelected(it) },
-        onSwap = { playbackViewModel.stop(); viewModel.swapDirection() },
-        onClear = { playbackViewModel.stop(); viewModel.onClear() },
+        onInputChange = { stopTransmitting(); viewModel.onInputChange(it) },
+        onDirectionSelected = { stopTransmitting(); viewModel.onDirectionSelected(it) },
+        onSwap = { stopTransmitting(); viewModel.swapDirection() },
+        onClear = { stopTransmitting(); viewModel.onClear() },
         onCopy = { text ->
             clipboard.copyText(text)
             if (!clipboard.showsSystemConfirmation) {
@@ -79,18 +103,35 @@ fun TranslatorRoute(
         },
         onShare = platformServices.share::shareText,
         modifier = modifier,
-        playbackControls = {
+        transmitControls = {
+            val audioIdle = playbackStatus == PlaybackStatus.Idle && !playbackViewModel.isPreparing
+            SpeedControl(
+                wordsPerMinute = settings.wordsPerMinute,
+                onWordsPerMinuteChange = settingsRepository::setWordsPerMinute,
+                // Both outputs are timed at start, so speed only changes while nothing runs.
+                enabled = audioIdle && !torchViewModel.isTransmitting,
+            )
+            HorizontalDivider()
+            Text("Sound", style = MaterialTheme.typography.titleSmall)
             PlaybackControls(
                 status = playbackStatus,
                 isPreparing = playbackViewModel.isPreparing,
                 canPlay = !state.message.isEmpty,
-                wordsPerMinute = settings.wordsPerMinute,
                 errorMessage = playbackViewModel.errorMessage,
                 onPlay = { playbackViewModel.play(state.message) },
                 onPause = playbackViewModel::pause,
                 onResume = playbackViewModel::resume,
                 onStop = playbackViewModel::stop,
-                onWordsPerMinuteChange = settingsRepository::setWordsPerMinute,
+            )
+            HorizontalDivider()
+            Text("Flashlight", style = MaterialTheme.typography.titleSmall)
+            TorchControls(
+                isAvailable = torchViewModel.isTorchAvailable,
+                isTransmitting = torchViewModel.isTransmitting,
+                canTransmit = !state.message.isEmpty,
+                errorMessage = torchViewModel.errorMessage,
+                onStart = { torchViewModel.start(state.message) },
+                onStop = torchViewModel::stop,
             )
         },
     )
@@ -107,7 +148,7 @@ fun TranslatorScreen(
     onShare: (String) -> Unit,
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
-    playbackControls: @Composable () -> Unit = {},
+    transmitControls: @Composable ColumnScope.() -> Unit = {},
 ) {
     val isMorseInput = state.direction == TranslationDirection.MorseToText
     val issueText = remember(state.issues) { issueMessages(state.issues).joinToString("\n") }
@@ -138,8 +179,8 @@ fun TranslatorScreen(
                 TranslationOutput(state = state, isMorseInput = isMorseInput)
             }
 
-            SectionCard(title = "Listen") {
-                playbackControls()
+            SectionCard(title = "Transmit") {
+                transmitControls()
             }
 
             ActionRow {
