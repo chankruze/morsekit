@@ -48,7 +48,7 @@ The test packages mirror the main packages:
 | `SettingsRepositoryTest` | 7 | Defaults, immediate updates, persistence across instances, independent keys, clamping, corrupt stored values, `AppSettings` invariants |
 | `ToneScheduleTest` | 7 | Units → frames at 16 kHz, gaps, speed scaling, no rounding drift at 13 WPM |
 | `MorseAudioRendererTest` | 10 | Length and duration, exact silence, amplitude, fade in/out, measured pitch, speed, limits |
-| `MorseAudioPlayerTest` | 8 | Play/pause/resume/stop, completion, replay, invalid transitions, stale completions (fake output) |
+| `MorseAudioPlayerTest` | 8 | Play/stop, completion, replay, restart while playing, stop while idle, stale completions (fake output) |
 | `TorchPlanTest` | 11 | On/off at any moment, boundaries, gaps, speed scaling, walking the steps reproduces the signals, limits |
 | `TorchTransmitterTest` (androidHostTest) | 6 | Exact switch times with fake time, late wake-ups don't accumulate, huge stalls, cancellation and failure leave the torch off |
 | `VibrationPatternTest` | 9 | Segments, gaps, alternation, speed scaling, no millisecond drift at 13 WPM, duration, limits |

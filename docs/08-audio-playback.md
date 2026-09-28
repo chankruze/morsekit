@@ -22,7 +22,7 @@ flowchart LR
 | Signals | `core/timing/MorseSignal.kt` | ✅ | `MorseTimingTest` |
 | Frame schedule | `core/audio/ToneSchedule.kt` | ✅ | `ToneScheduleTest` |
 | Tone rendering | `core/audio/MorseAudioRenderer.kt` | ✅ | `MorseAudioRendererTest` |
-| Play/pause/stop state | `core/audio/MorseAudioPlayer.kt` | ✅ | `MorseAudioPlayerTest` (fake output) |
+| Play/stop state | `core/audio/MorseAudioPlayer.kt` | ✅ | `MorseAudioPlayerTest` (fake output) |
 | Render off the main thread | `feature/playback/MorsePlaybackViewModel.kt` | ✅ | (thin glue, see below) |
 | Play samples | `AndroidPcmAudioPlayer.kt` / `IosPcmAudioPlayer.kt` | ❌ platform | Checked on a device |
 
@@ -109,24 +109,26 @@ gaps as exact silence, and have the requested pitch. The pitch check counts zero
 stateDiagram-v2
     [*] --> Idle
     Idle --> Playing: play
-    Playing --> Paused: pause
-    Paused --> Playing: resume
     Playing --> Idle: stop / finished
-    Paused --> Idle: stop
     Playing --> Playing: play (restarts)
 ```
 
-`MorseAudioPlayer` is **synchronous**. Invalid actions (pause while idle, resume while playing)
-are ignored. Each `play` gets a session number, so a late "finished" callback from an earlier
-playback can't stop a newer one; `lateCompletionFromEarlierPlaybackIsIgnored` tests exactly that.
+`MorseAudioPlayer` is **synchronous**. Stopping while idle is ignored. Each `play` gets a session
+number, so a late "finished" callback from an earlier playback can't stop a newer one; `lateCompletionFromEarlierPlaybackIsIgnored` tests exactly that.
+
+> **Why there's no pause (found on a device).** The first version had Pause/Resume. On the test
+> phone, Android's audio log showed the track **muted (`source:clientVolume`) right after
+> `AudioTrack.pause()` → `play()`**, and resuming was silent. MorseKit doesn't cause that mute.
+> Morse messages are short, so pause wasn't worth a fragile, device-specific path. Sound now works
+> like the flashlight and vibration: **Play / Stop playing**. Pause/resume was removed end to end
+> (state machine, ViewModel, `PcmAudioPlayer`, both native players), rather than kept as dead
+> code.
 
 ## The platform contract
 
 ```kotlin
 interface PcmAudioPlayer {
     fun play(audio: PcmAudio, onComplete: () -> Unit)
-    fun pause()
-    fun resume()
     fun stop()
 }
 ```
@@ -138,8 +140,8 @@ end. Because of that, the shared state machine needs no locks or atomics.
 | | Android | iOS |
 | --- | --- | --- |
 | API | `AudioTrack`, `MODE_STREAM`, `ENCODING_PCM_FLOAT`, mono | `AVAudioEngine` + `AVAudioPlayerNode`, Float32 mono |
-| Feeding samples | Background thread writing 4096-frame chunks (blocking writes wait while paused) | One `AVAudioPCMBuffer` scheduled on the node |
-| Pause / resume | `track.pause()` / `track.play()` | `node.pause()` / `node.play()` |
+| Feeding samples | Background thread writing 4096-frame chunks (blocking writes) | One `AVAudioPCMBuffer` scheduled on the node |
+| Stop | `pause()` + `flush()` + `stop()` + `release()` (flush needs a paused track) | `node.stop()` + `engine.stop()` |
 | Completion | Notification marker on the last frame, delivered to a main-thread `Handler` | `scheduleBuffer(..., .dataPlayedBack)`, then `dispatch_async(main)` |
 | Stale callbacks | A new `AudioTrack` per play; the listener ignores old tracks | Session counter |
 | Audio session | Media usage, sonification content | `AVAudioSessionCategoryPlayback` (plays even with the silent switch on) |
@@ -175,7 +177,7 @@ sequenceDiagram
 | --- | --- |
 | Morse → Text plays what you **typed**, including well-formed codes that aren't in the alphabet (`........`); malformed tokens are skipped | `MorseCodec.parse()` |
 | Speed slider on the translator = the WPM setting (same value as Settings, saved) | `settingsRepository::setWordsPerMinute` |
-| Speed can only change while stopped (the audio is rendered at a fixed speed) | `PlaybackControls` |
+| Speed can only change while stopped (the audio is rendered at a fixed speed) | `SpeedControl` |
 | Editing, swapping, clearing or changing direction stops playback | `TranslatorRoute` |
 | Messages over 5 minutes show an error instead of playing | `isTooLongToPlay` |
 
@@ -192,8 +194,9 @@ The debug build was tested on a phone with `adb`. Android's own audio service lo
 | --- | --- |
 | Track format | `channelMask=0x1` (mono), `sampleRate=16000`, `USAGE_MEDIA`, `CONTENT_TYPE_SONIFICATION` |
 | `SOS` at 20 WPM | started → stopped after ~1.94 s (1.82 s expected, plus output buffering), then released |
-| Controls | started → **paused** → **started** → paused/**stopped** |
-| UI | Play → Pause → Resume → Pause → Play, and back to Play when finished |
+| Stop | the track stops and is released immediately |
+| UI | Play → Stop playing → Play, and back to Play when finished |
+| Pause/resume (removed) | `paused` → `started` was logged, but the track was muted and silent after resuming |
 
 On iOS the code compiles against the real `AVFAudio` bindings, but it hasn't run yet (no Xcode
 on the development machine).

@@ -86,7 +86,7 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Audio | Morse audio | Convert Morse symbols into audible tones | P1 | ✅ Done |
 | Audio | WPM | Add adjustable Morse transmission speed | P1 | ✅ Done |
 | Audio | Frequency | Allow tone frequency adjustment | P2 | ✅ Done |
-| Audio | Playback controls | Play, pause, stop, and replay Morse audio | P1 | ✅ Done |
+| Audio | Playback controls | Play, stop, and replay Morse audio | P1 | ✅ Done |
 | Flashlight | Transmission | Transmit Morse using device flashlight/torch | P1 | ✅ Done |
 | Flashlight | Timing | Implement correct dot/dash and gap timing | P1 | ✅ Done |
 | Flashlight | WPM | Use configurable transmission speed | P1 | ✅ Done |

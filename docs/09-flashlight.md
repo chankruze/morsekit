@@ -120,8 +120,9 @@ unsupported torch mode raises an Objective-C exception, which Kotlin can't catch
 ## UI: the Transmit card
 
 The translator's card is now **Transmit**: one **Speed** slider shared by both outputs (the
-saved WPM setting, locked while either is running), then **Sound** (Play/Pause/Resume/Stop) and
-**Flashlight** (Flash / Stop flashing, plus the warning).
+saved WPM setting, locked while any output is running), then **Sound** (Play / Stop playing),
+**Flashlight** (Flash / Stop flashing, plus the warning) and **Vibration**. All three use one
+shared start/stop layout.
 
 ## Known limitations
 
