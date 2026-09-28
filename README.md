@@ -39,7 +39,7 @@ the KMP concepts used), see the [learning notes in `docs/`](docs/README.md).
 
 Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ Todo.
 
-**34 done · 5 in progress · 20 todo** (59 tasks)
+**39 done · 3 in progress · 17 todo** (59 tasks)
 
 | Feature | Done | In Progress | Todo |
 | --- | --- | --- | --- |
@@ -49,12 +49,12 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Morse Reference | 3 | 1 | 0 |
 | Audio | 4 | 0 | 0 |
 | Flashlight | 4 | 0 | 2 |
-| Vibration | 0 | 1 | 2 |
+| Vibration | 3 | 0 | 0 |
 | Morse Trainer | 0 | 0 | 5 |
 | Tap Morse | 0 | 0 | 4 |
 | History | 0 | 0 | 3 |
 | Settings | 4 | 0 | 0 |
-| Platform | 0 | 2 | 1 |
+| Platform | 2 | 1 | 0 |
 | Quality | 2 | 0 | 1 |
 | Release | 0 | 1 | 2 |
 
@@ -93,9 +93,9 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Flashlight | Safety | Add clear controls and warning for flashing light | P1 | ✅ Done |
 | Flashlight | Screen timeout | Keep the screen on while transmitting so long, slow messages aren't cut off when the screen turns off | P3 | ⬜ Todo |
 | Flashlight | Rotation | Keep flashing across screen rotation instead of stopping | P3 | ⬜ Todo |
-| Vibration | Transmission | Transmit Morse using device vibration/haptics | P1 | ⬜ Todo |
-| Vibration | Timing | Implement Morse timing for vibration patterns | P1 | 🚧 In Progress |
-| Vibration | WPM | Use configurable transmission speed | P2 | ⬜ Todo |
+| Vibration | Transmission | Transmit Morse using device vibration/haptics | P1 | ✅ Done |
+| Vibration | Timing | Implement Morse timing for vibration patterns | P1 | ✅ Done |
+| Vibration | WPM | Use configurable transmission speed | P2 | ✅ Done |
 | Morse Trainer | Character mode | Show Morse and ask user to identify the character | P2 | ⬜ Todo |
 | Morse Trainer | Reverse mode | Show character and ask user to enter Morse | P2 | ⬜ Todo |
 | Morse Trainer | Scoring | Track correct answers and accuracy | P2 | ⬜ Todo |
@@ -112,9 +112,9 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Settings | WPM | Configure default Morse transmission speed | P1 | ✅ Done |
 | Settings | Audio | Configure default tone settings | P2 | ✅ Done |
 | Settings | About | Add app version, privacy information, and open-source/license information | P1 | ✅ Done |
-| Platform | Android | Implement Android-specific torch, vibration, audio, clipboard, and sharing integrations | P0 | 🚧 In Progress |
+| Platform | Android | Implement Android-specific torch, vibration, audio, clipboard, and sharing integrations | P0 | ✅ Done |
 | Platform | iOS | Implement iOS-specific torch, haptics, audio, clipboard, and sharing integrations | P0 | 🚧 In Progress |
-| Platform | Permissions | Add only required platform permissions and document their purpose | P0 | ⬜ Todo |
+| Platform | Permissions | Add only required platform permissions and document their purpose | P0 | ✅ Done |
 | Quality | Accessibility | Add content descriptions, semantic labels, scalable text, and touch targets | P1 | ⬜ Todo |
 | Quality | Error states | Handle empty, invalid, and unsupported input gracefully | P1 | ✅ Done |
 | Quality | Offline | Ensure all core functionality works without network access | P0 | ✅ Done |

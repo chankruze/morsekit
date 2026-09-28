@@ -221,8 +221,18 @@ and the timing loop is shared. See [Flashlight transmission](09-flashlight.md).
 | Availability | A camera with `FLASH_INFO_AVAILABLE`, preferring the back one | `hasTorch && torchAvailable` |
 | Failure | `CameraAccessException` → `false` | Checked up front (unsupported modes raise uncatchable Obj-C exceptions) |
 
-## Planned services (not built yet)
+## Vibration
 
-| Interface | Android | iOS | Consumes |
+`VibrationController` plays a complete shared `VibrationPattern` natively (Android waveform,
+iOS Core Haptics) and can cancel it. See [Vibration transmission](10-vibration.md).
+
+## All platform services at a glance
+
+| Interface | Android | iOS | Permission |
 | --- | --- | --- | --- |
-| `HapticController` | `Vibrator` / `VibrationEffect` (+ `VIBRATE` permission) | Core Haptics (`CHHapticEngine`) | `List<MorseSignal>` |
+| `ClipboardService` | `ClipboardManager` | `UIPasteboard` | none |
+| `ShareService` | `Intent.ACTION_SEND` | `UIActivityViewController` | none |
+| `KeyValueStore` | `SharedPreferences` | `NSUserDefaults` | none |
+| `PcmAudioPlayer` | `AudioTrack` | `AVAudioEngine` | none |
+| `TorchController` | `CameraManager.setTorchMode` | `AVCaptureDevice.torchMode` | none |
+| `VibrationController` | `VibrationEffect.createWaveform` | Core Haptics | Android `VIBRATE` (normal) |

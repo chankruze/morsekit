@@ -21,7 +21,7 @@ flowchart LR
 | Android device tests | Emulator or device | `./gradlew :shared:connectedAndroidDeviceTest` | Code that needs real Android APIs (configured via `withDeviceTestBuilder`) |
 | `iosTest` | iOS simulator | `./gradlew :shared:iosSimulatorArm64Test` | iOS-only logic |
 
-Almost all tests are in `commonTest`. The exception is `TorchTransmitterTest` in `androidHostTest`: it tests a *shared* suspend function, and `runBlocking` is only available on the JVM (see [Flashlight](09-flashlight.md#testing-a-suspend-function-without-a-coroutine-test-library)).
+Almost all tests are in `commonTest`. The exceptions are in `androidHostTest`: `TorchTransmitterTest`, `VibrationTransmitterTest` and `TransmissionRunnerTest` test *shared* suspend code, and `runBlocking` is only available on the JVM (see [Flashlight](09-flashlight.md#testing-a-suspend-function-without-a-coroutine-test-library)).
 
 > **Concept: `kotlin.test`.** A multiplatform assertion library (`@Test`, `assertEquals`,
 > `assertFailsWith`, ...). On the JVM it runs on JUnit; on Kotlin/Native it uses a built-in
@@ -51,7 +51,10 @@ The test packages mirror the main packages:
 | `MorseAudioPlayerTest` | 8 | Play/pause/resume/stop, completion, replay, invalid transitions, stale completions (fake output) |
 | `TorchPlanTest` | 11 | On/off at any moment, boundaries, gaps, speed scaling, walking the steps reproduces the signals, limits |
 | `TorchTransmitterTest` (androidHostTest) | 6 | Exact switch times with fake time, late wake-ups don't accumulate, huge stalls, cancellation and failure leave the torch off |
-| **Total** | **172** | |
+| `VibrationPatternTest` | 9 | Segments, gaps, alternation, speed scaling, no millisecond drift at 13 WPM, duration, limits |
+| `VibrationTransmitterTest` (androidHostTest) | 4 | Play and wait without clipping the end, cancellation stops it, failure still cancels, empty pattern |
+| `TransmissionRunnerTest` (androidHostTest) | 5 | Running state, stop runs cleanup, a new run waits for the previous cleanup, stale finishes ignored |
+| **Total** | **190** | |
 
 ## Testing techniques used
 

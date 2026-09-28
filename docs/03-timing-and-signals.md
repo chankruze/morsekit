@@ -119,8 +119,13 @@ signals for `PARIS` add up to 43 units, and the 7-unit trailing word gap (not em
 | Pure function on `MorseMessage` | Trivial to unit test, with no clocks, coroutines or devices involved |
 | Output-agnostic | Torch, vibration and audio differ only in *what* they switch, not *when* |
 
-Two outputs consume these signals today. **Audio** converts them to exact audio frames and
-renders a tone (see [Audio playback](08-audio-playback.md)). The **flashlight** switches the
-torch from a drift-free, time-driven loop (see [Flashlight transmission](09-flashlight.md)).
-Still to come: vibration, and Farnsworth timing (letters at full speed, longer gaps between
-them, for learners).
+Three outputs consume these signals, each using the most precise clock its platform offers:
+
+| Output | Converted to | Timed by | Notes |
+| --- | --- | --- | --- |
+| Audio | Audio frames (16 kHz) | Audio hardware clock | [Audio playback](08-audio-playback.md) |
+| Flashlight | On/off at time *t* | Shared time-driven loop | [Flashlight transmission](09-flashlight.md) |
+| Vibration | Whole milliseconds | OS vibration timeline | [Vibration transmission](10-vibration.md) |
+
+All three round **cumulative** positions, so none of them drifts. Still to come: Farnsworth
+timing (letters at full speed, longer gaps between them, for learners).
