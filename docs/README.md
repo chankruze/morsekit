@@ -1,0 +1,98 @@
+# MorseKit learning notes
+
+Personal notes on how MorseKit works, and on the Kotlin Multiplatform (KMP) and Compose
+Multiplatform (CMP) concepts it uses. Every example points at real code in this repo, so you can
+open the file and follow along.
+
+## Reading order
+
+| # | Note | What you'll learn |
+| --- | --- | --- |
+| 1 | [KMP project structure](01-kmp-project-structure.md) | Modules, targets, source sets, how Android and iOS consume `shared`, Gradle setup |
+| 2 | [Morse engine](02-morse-engine.md) | How text becomes Morse and back: alphabet, normalization, tokenizing, the codec, error reporting |
+| 3 | [Timing and signals](03-timing-and-signals.md) | How Morse is turned into on/off durations for future torch, vibration and audio playback |
+| 4 | [Compose UI and state](04-compose-ui-and-state.md) | Composables, state, recomposition, ViewModel, unidirectional data flow, theming, resources |
+| 5 | [Platform services](05-platform-services.md) | Calling Android and iOS APIs from shared code: interfaces vs `expect`/`actual`, Kotlin/Native interop |
+| 6 | [Testing](06-testing.md) | `commonTest`, which platforms run which tests, how the engine tests are organized |
+
+## The whole app on one page
+
+```mermaid
+flowchart TB
+    subgraph Android["androidApp (Android entry point)"]
+        MA["MainActivity"]
+    end
+    subgraph iOS["iosApp (Xcode / SwiftUI entry point)"]
+        CV["ContentView.swift"]
+    end
+
+    subgraph Shared["shared module (Kotlin Multiplatform)"]
+        subgraph PlatformMain["androidMain / iosMain"]
+            APS["AndroidPlatformServices"]
+            IPS["IosPlatformServices"]
+            MVC["MainViewController()"]
+        end
+        subgraph Common["commonMain"]
+            App["App()"]
+            Nav["TopLevelDestination tabs"]
+            TR["TranslatorRoute / Screen"]
+            VM["TranslatorViewModel"]
+            Codec["MorseCodec"]
+            Core["core: model, morse, timing"]
+            UI["ui: theme, components"]
+            PS["platform: interfaces"]
+        end
+    end
+
+    MA -->|"creates"| APS
+    MA -->|"setContent"| App
+    CV -->|"calls"| MVC
+    MVC -->|"creates"| IPS
+    MVC -->|"ComposeUIViewController"| App
+    APS -.->|"implements"| PS
+    IPS -.->|"implements"| PS
+    App --> Nav --> TR
+    TR --> VM --> Codec --> Core
+    TR --> UI
+    TR --> PS
+```
+
+**Key rule:** arrows only point *inward*, toward `core`. `core` doesn't know Compose, Android or
+iOS exist, which is why it's easy to test and reuse.
+
+## Package map
+
+| Package (under `in.geekofia.morsekit`) | Layer | Depends on | Notes |
+| --- | --- | --- | --- |
+| `core.model` | Domain models | nothing | Immutable data classes and enums |
+| `core.morse` | Engine | `core.model` | Pure Kotlin, no Compose |
+| `core.timing` | Engine | `core.model` | Pure Kotlin, uses `kotlin.time.Duration` |
+| `platform` | Abstractions | nothing | Interfaces only in `commonMain` |
+| `ui.theme`, `ui.components` | Design system | Compose, `core.model` | Reusable, feature-agnostic |
+| `feature.*` | Features | everything above | Screen + ViewModel + UI state |
+| `navigation` | App shell | Compose resources | Bottom-bar destinations |
+| root (`App.kt`) | App shell | everything | Wires theme, navigation, features |
+
+## Glossary
+
+| Term | Meaning |
+| --- | --- |
+| **KMP** | Kotlin Multiplatform: one Kotlin codebase compiled for several platforms (here JVM/Android and Kotlin/Native/iOS). |
+| **CMP** | Compose Multiplatform: JetBrains' port of Jetpack Compose, so the same UI code runs on Android and iOS. |
+| **Target** | A platform the code is compiled for, e.g. `iosArm64`, `iosSimulatorArm64`, `android`. |
+| **Source set** | A folder of code compiled for a group of targets, e.g. `commonMain`, `iosMain`. |
+| **Composable** | A `@Composable` function that describes UI from state. |
+| **Recomposition** | Compose re-running composables whose inputs changed. |
+| **UDF** | Unidirectional data flow: state flows down, events flow up. |
+| **Unit** | The basic Morse time slot; a dot lasts 1 unit, a dash 3. |
+| **WPM** | Words per minute, measured with the standard word "PARIS" (50 units). |
+
+## Recipe: adding a new feature (e.g. Trainer)
+
+1. Put the pure logic in `core/` (or a new `core/<thing>` package) with tests in `commonTest`.
+2. Create `feature/trainer/` with `TrainerUiState` (data class), `TrainerViewModel`, and a
+   `TrainerRoute` + stateless `TrainerScreen`.
+3. Add an entry to `TopLevelDestination` and a branch in `App.kt`'s `when (destination)`.
+4. If it needs a platform API, add an interface under `platform/`, implement it in `androidMain`
+   and `iosMain`, and add it to `PlatformServices`.
+5. Test the ViewModel in `commonTest` (see `TranslatorViewModelTest`).

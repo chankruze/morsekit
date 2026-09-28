@@ -32,6 +32,9 @@ Data flows one way: composable → ViewModel → `MorseCodec` → UI state → c
 
 Engine and ViewModel tests live in `commonTest` and run on both Android (host JVM) and iOS.
 
+For a detailed walkthrough (diagrams of the Morse encode/decode flow, timing, Compose state, and
+the KMP concepts used), see the [learning notes in `docs/`](docs/README.md).
+
 ### Running the apps
 
 Use the run configurations provided by the run widget in your IDE's toolbar. You can also use these commands and options:
