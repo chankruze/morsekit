@@ -4,8 +4,12 @@ import `in`.geekofia.morsekit.core.model.MorseMessage
 
 /** Problems found while translating. Translation never throws; it reports issues instead. */
 sealed interface TranslationIssue {
-    /** A text character with no Morse code in the alphabet. It is omitted from the output. */
-    data class UnsupportedCharacter(val character: Char) : TranslationIssue
+    /**
+     * A text character with no Morse code in the alphabet. It is omitted from the output.
+     *
+     * [character] is one Unicode code point, so it may be two UTF-16 chars (e.g. an emoji).
+     */
+    data class UnsupportedCharacter(val character: String) : TranslationIssue
 
     /** A well-formed dot/dash sequence that isn't in the alphabet, e.g. `........`. */
     data class UnknownCode(val code: String) : TranslationIssue

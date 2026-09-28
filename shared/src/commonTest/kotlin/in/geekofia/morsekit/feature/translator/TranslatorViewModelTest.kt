@@ -25,7 +25,7 @@ class TranslatorViewModelTest {
     @Test
     fun surfacesIssues() {
         viewModel.onInputChange("S#")
-        assertEquals(listOf(TranslationIssue.UnsupportedCharacter('#')), viewModel.uiState.issues)
+        assertEquals(listOf(TranslationIssue.UnsupportedCharacter("#")), viewModel.uiState.issues)
     }
 
     @Test

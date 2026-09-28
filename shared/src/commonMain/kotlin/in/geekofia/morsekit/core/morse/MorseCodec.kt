@@ -17,11 +17,10 @@ class MorseCodec(private val alphabet: MorseAlphabet = MorseAlphabet.Internation
         val issues = LinkedHashSet<TranslationIssue>()
         val words = MorseTokenizer.textWords(text.mapChars(MorseNormalizer::normalizeTextChar))
             .mapNotNull { word ->
-                val letters = word.mapNotNull { char ->
-                    alphabet.codeFor(char) ?: run {
-                        issues += TranslationIssue.UnsupportedCharacter(char)
-                        null
-                    }
+                val letters = mutableListOf<MorseLetter>()
+                word.forEachCodePoint { symbol ->
+                    val code = symbol.singleOrNull()?.let(alphabet::codeFor)
+                    if (code != null) letters += code else issues += TranslationIssue.UnsupportedCharacter(symbol)
                 }
                 if (letters.isEmpty()) null else MorseWord(letters)
             }
@@ -62,6 +61,17 @@ class MorseCodec(private val alphabet: MorseAlphabet = MorseAlphabet.Internation
         } else {
             TranslationIssue.MalformedCode(token)
         }
+
+    /** Iterates by code point so a surrogate pair (e.g. an emoji) is reported as one symbol. */
+    private inline fun String.forEachCodePoint(action: (String) -> Unit) {
+        var start = 0
+        while (start < length) {
+            val isPair = this[start].isHighSurrogate() && start + 1 < length && this[start + 1].isLowSurrogate()
+            val end = if (isPair) start + 2 else start + 1
+            action(substring(start, end))
+            start = end
+        }
+    }
 
     companion object {
         /** Stands in for a Morse letter that couldn't be decoded. */

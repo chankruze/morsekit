@@ -92,13 +92,13 @@ class MorseEncodeTest {
         val result = codec.encode("S#O%S")
         assertEquals("... --- ...", result.morse)
         assertFalse(result.isValid)
-        assertEquals(listOf(UnsupportedCharacter('#'), UnsupportedCharacter('%')), result.issues)
+        assertEquals(listOf(UnsupportedCharacter("#"), UnsupportedCharacter("%")), result.issues)
     }
 
     @Test
     fun reportsEachUnsupportedCharacterOnce() {
         val result = codec.encode("é é é")
-        assertEquals(listOf(UnsupportedCharacter('é')), result.issues)
+        assertEquals(listOf(UnsupportedCharacter("é")), result.issues)
     }
 
     @Test
@@ -109,7 +109,19 @@ class MorseEncodeTest {
     @Test
     fun doesNotFoldNonAsciiLettersIntoAscii() {
         // 'ı'.uppercaseChar() == 'I'; it must not be silently encoded as I.
-        assertEquals(listOf(UnsupportedCharacter('ı')), codec.encode("ı").issues)
+        assertEquals(listOf(UnsupportedCharacter("ı")), codec.encode("ı").issues)
+    }
+
+    @Test
+    fun reportsEmojiAsOneCharacterNotSurrogateHalves() {
+        val result = codec.encode("Hi 😀😀")
+        assertEquals(".... ..", result.morse)
+        assertEquals(listOf(UnsupportedCharacter("😀")), result.issues)
+    }
+
+    @Test
+    fun loneSurrogateIsReportedWithoutCrashing() {
+        assertEquals(listOf(UnsupportedCharacter("\uD83D")), codec.encode("A\uD83D").issues)
     }
 
     @Test
