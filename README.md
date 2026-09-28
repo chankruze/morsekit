@@ -39,14 +39,14 @@ the KMP concepts used), see the [learning notes in `docs/`](docs/README.md).
 
 Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ Todo.
 
-**19 done · 6 in progress · 32 todo** (57 tasks)
+**22 done · 7 in progress · 28 todo** (57 tasks)
 
 | Feature | Done | In Progress | Todo |
 | --- | --- | --- | --- |
 | Project Foundation | 5 | 0 | 0 |
 | Morse Engine | 6 | 0 | 0 |
 | Translator | 6 | 0 | 0 |
-| Morse Reference | 0 | 0 | 4 |
+| Morse Reference | 3 | 1 | 0 |
 | Audio | 0 | 0 | 4 |
 | Flashlight | 0 | 1 | 3 |
 | Vibration | 0 | 1 | 2 |
@@ -79,10 +79,10 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Translator | Clipboard | Copy input/output to clipboard | P0 | ✅ Done |
 | Translator | Share | Share translated content using platform share APIs | P0 | ✅ Done |
 | Translator | Clear | Clear current input/output | P0 | ✅ Done |
-| Morse Reference | Alphabet chart | Display A-Z Morse reference chart | P0 | ⬜ Todo |
-| Morse Reference | Numbers | Display 0-9 Morse codes | P1 | ⬜ Todo |
-| Morse Reference | Punctuation | Display common punctuation and prosigns | P1 | ⬜ Todo |
-| Morse Reference | Search | Search/filter Morse characters | P2 | ⬜ Todo |
+| Morse Reference | Alphabet chart | Display A-Z Morse reference chart | P0 | ✅ Done |
+| Morse Reference | Numbers | Display 0-9 Morse codes | P1 | ✅ Done |
+| Morse Reference | Punctuation | Display common punctuation and prosigns | P1 | 🚧 In Progress |
+| Morse Reference | Search | Search/filter Morse characters | P2 | ✅ Done |
 | Audio | Morse audio | Convert Morse symbols into audible tones | P1 | ⬜ Todo |
 | Audio | WPM | Add adjustable Morse transmission speed | P1 | ⬜ Todo |
 | Audio | Frequency | Allow tone frequency adjustment | P2 | ⬜ Todo |
@@ -119,7 +119,6 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Release | App icon | Create MorseKit launcher/app icon | P1 | ⬜ Todo |
 | Release | Store assets | Prepare Play Store/App Store screenshots and description | P2 | ⬜ Todo |
 | Release | Build | Generate signed Android release build and iOS archive | P1 | 🚧 In Progress |
-
 
 ### Running the apps
 

@@ -42,7 +42,10 @@ The test packages mirror the main packages:
 | `MorseTimingTest` | 8 | Unit length vs WPM, bounds, gap rules, PARIS = 50 units, durations |
 | `TranslatorViewModelTest` | 11 | Live conversion, issues, swap (including dropping `�` placeholders), direction selection, clear |
 | `TranslatorUiStateTest` | 9 | Empty / Invalid / Partial / Complete status, `hasOutput`, grouped and truncated issue messages, invisible characters |
-| **Total** | **96** | |
+| `ReferenceEntryTest` | 7 | Chart built from the alphabet in order, codes vs the independent table, A–Z/0–9/punctuation coverage, every punctuation mark has a name, accessibility labels |
+| `ReferenceSearchTest` | 11 | Character, code-prefix (incl. `·−`) and name search, ambiguous `.`/`-`, ordering, no matches |
+| `ReferenceViewModelTest` | 5 | Initial sections, filtering hides empty sections, clearing restores all 54 |
+| **Total** | **119** | |
 
 ## Testing techniques used
 

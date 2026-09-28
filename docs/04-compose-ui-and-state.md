@@ -166,6 +166,29 @@ After **Copy**, a snackbar says "Copied to clipboard", except on Android 13+, wh
 already shows its own clipboard confirmation. `ClipboardService.showsSystemConfirmation`
 reports this, so the shared UI doesn't need to know the Android version.
 
+## The Reference screen
+
+A second feature built the same way: `ReferenceRoute` → `ReferenceScreen`, with a
+`ReferenceViewModel` holding snapshot state.
+
+```mermaid
+flowchart LR
+    A["MorseAlphabet.International<br/>(only source of codes)"] -->|"referenceEntries()"| E["List of ReferenceEntry<br/>char, code, category, name"]
+    Q["search query"] --> F["filterReference(entries, query)"]
+    E --> F
+    F -->|"toSections()"| S["ReferenceUiState.sections<br/>Letters / Numbers / Punctuation"]
+    S --> G["LazyVerticalGrid"]
+```
+
+| Concept | Where |
+| --- | --- |
+| **No duplicated mappings.** Entries are built from `MorseAlphabet.mappings`; the feature adds only punctuation *names*. A test fails if a punctuation mark has no name, or a name has no mark | `ReferenceEntry.kt` |
+| **Search as a pure function.** It matches a single character (`a`), a code prefix (`.-`, `·−`) or part of a name (`comma`), and keeps alphabet order | `ReferenceSearch.kt` |
+| **`LazyVerticalGrid` with `GridCells.Adaptive(96.dp)`.** As many columns as fit, so it adapts to phones, tablets and rotation. Only visible cells are composed | `ReferenceScreen.kt` |
+| **Full-width headers.** `item(span = { GridItemSpan(maxLineSpan) })` makes a section title span every column | `ReferenceGrid` |
+| **Stable `key`s.** Each cell is keyed by its character, so filtering reuses cells instead of recreating them | `items(..., key = ...)` |
+| **Accessibility.** `clearAndSetSemantics { contentDescription = "A, dot dash" }` makes each card read as one sentence, not "A" then "•−" | `ReferenceCell` |
+
 ## App shell and navigation
 
 ```mermaid
@@ -176,7 +199,7 @@ flowchart TB
     Scaffold --> Bottom["bottomBar: NavigationBar<br/>one item per TopLevelDestination"]
     Scaffold --> Content{"when (destination)"}
     Content -->|Translator| TR["TranslatorRoute"]
-    Content -->|Reference| RS["ReferenceScreen (placeholder)"]
+    Content -->|Reference| RS["ReferenceRoute"]
     Content -->|Settings| SS["SettingsScreen (placeholder)"]
 ```
 
