@@ -14,7 +14,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import `in`.geekofia.morsekit.feature.reference.ReferenceScreen
+import `in`.geekofia.morsekit.feature.reference.ReferenceRoute
 import `in`.geekofia.morsekit.feature.settings.SettingsScreen
 import `in`.geekofia.morsekit.feature.translator.TranslatorRoute
 import `in`.geekofia.morsekit.navigation.TopLevelDestination
@@ -49,7 +49,7 @@ fun App(platformServices: PlatformServices) {
             val contentModifier = Modifier.padding(innerPadding)
             when (destination) {
                 TopLevelDestination.Translator -> TranslatorRoute(platformServices, contentModifier)
-                TopLevelDestination.Reference -> ReferenceScreen(contentModifier)
+                TopLevelDestination.Reference -> ReferenceRoute(contentModifier)
                 TopLevelDestination.Settings -> SettingsScreen(contentModifier)
             }
         }
