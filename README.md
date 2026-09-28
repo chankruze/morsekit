@@ -12,6 +12,26 @@ This is a Kotlin Multiplatform project targeting Android, iOS.
     Similarly, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./shared/src/jvmMain/kotlin)
     folder is the appropriate location.
 
+### Architecture
+
+All code lives under the `in.geekofia.morsekit` package in `shared/src`:
+
+| Package | Contents |
+| --- | --- |
+| `core/model` | Immutable Morse models (`MorseLetter`, `MorseWord`, `MorseMessage`, `TranslationDirection`) |
+| `core/morse` | Pure-Kotlin engine: `MorseAlphabet`, `MorseNormalizer`, `MorseTokenizer`, `MorseCodec` |
+| `core/timing` | `MorseTiming` (WPM → unit length) and `MorseMessage.toSignals()` for playback |
+| `feature/<name>` | One package per feature: screen composables + ViewModel + UI state |
+| `navigation` | `TopLevelDestination` (bottom bar tabs) |
+| `platform` | Interfaces for platform capabilities (`ClipboardService`, `ShareService`), implemented in `androidMain` / `iosMain` |
+| `ui/theme`, `ui/components` | `MorseKitTheme` (light/dark/system) and reusable composables |
+
+Data flows one way: composable → ViewModel → `MorseCodec` → UI state → composable.
+`core` has no Compose or platform dependencies. Platform services are constructed in
+`MainActivity` / `MainViewController` and passed to `App(platformServices)` explicitly.
+
+Engine and ViewModel tests live in `commonTest` and run on both Android (host JVM) and iOS.
+
 ### Running the apps
 
 Use the run configurations provided by the run widget in your IDE's toolbar. You can also use these commands and options:
