@@ -14,8 +14,6 @@ private class FakePcmAudioPlayer : PcmAudioPlayer {
         completions += onComplete
     }
 
-    override fun pause() { calls += "pause" }
-    override fun resume() { calls += "resume" }
     override fun stop() { calls += "stop" }
 }
 
@@ -30,16 +28,12 @@ class MorseAudioPlayerTest {
     }
 
     @Test
-    fun playPauseResumeStop() {
+    fun playThenStop() {
         player.play(audio)
-        assertEquals(PlaybackStatus.Playing, player.status.value)
-        player.pause()
-        assertEquals(PlaybackStatus.Paused, player.status.value)
-        player.resume()
         assertEquals(PlaybackStatus.Playing, player.status.value)
         player.stop()
         assertEquals(PlaybackStatus.Idle, player.status.value)
-        assertEquals(listOf("play", "pause", "resume", "stop"), output.calls)
+        assertEquals(listOf("play", "stop"), output.calls)
     }
 
     @Test
@@ -59,16 +53,10 @@ class MorseAudioPlayerTest {
     }
 
     @Test
-    fun invalidTransitionsAreIgnored() {
-        player.pause()
-        player.resume()
+    fun stopWhileIdleIsIgnored() {
         player.stop()
         assertEquals(PlaybackStatus.Idle, player.status.value)
         assertEquals(emptyList(), output.calls)
-
-        player.play(audio)
-        player.resume() // not paused
-        assertEquals(listOf("play"), output.calls)
     }
 
     @Test
@@ -93,8 +81,7 @@ class MorseAudioPlayerTest {
         player.play(audio)
         player.stop()
         player.play(audio)
-        player.pause()
-        output.completions.first().invoke()
-        assertEquals(PlaybackStatus.Paused, player.status.value)
+        output.completions.first().invoke() // from the stopped playback
+        assertEquals(PlaybackStatus.Playing, player.status.value)
     }
 }

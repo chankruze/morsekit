@@ -13,17 +13,11 @@ interface PcmAudioPlayer {
     /** Starts [audio] from the beginning, replacing anything already playing. */
     fun play(audio: PcmAudio, onComplete: () -> Unit)
 
-    fun pause()
-
-    fun resume()
-
     fun stop()
 }
 
 /** Plays nothing and never completes. For previews. */
 class NoOpPcmAudioPlayer : PcmAudioPlayer {
     override fun play(audio: PcmAudio, onComplete: () -> Unit) = Unit
-    override fun pause() = Unit
-    override fun resume() = Unit
     override fun stop() = Unit
 }

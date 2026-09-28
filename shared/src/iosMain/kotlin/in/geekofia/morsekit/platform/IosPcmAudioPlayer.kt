@@ -67,14 +67,6 @@ internal class IosPcmAudioPlayer : PcmAudioPlayer {
         node.play()
     }
 
-    override fun pause() {
-        node.pause()
-    }
-
-    override fun resume() {
-        node.play()
-    }
-
     override fun stop() {
         session++
         node.stop()

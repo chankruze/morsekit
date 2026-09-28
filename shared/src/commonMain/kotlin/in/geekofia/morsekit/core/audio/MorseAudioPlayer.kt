@@ -5,13 +5,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-enum class PlaybackStatus { Idle, Playing, Paused }
+enum class PlaybackStatus { Idle, Playing }
 
 /**
- * The play / pause / resume / stop state machine on top of a platform [PcmAudioPlayer].
+ * The play / stop state machine on top of a platform [PcmAudioPlayer].
  *
  * Synchronous and main-thread only, like the [PcmAudioPlayer] contract, so it's fully testable
- * with a fake output. Invalid transitions (e.g. pause while idle) are ignored.
+ * with a fake output. Stopping while idle is ignored.
+ *
+ * There's deliberately no pause: on a real device, resuming a paused `AudioTrack` came back
+ * silent, so Sound works like the flashlight and vibration (start / stop).
  */
 class MorseAudioPlayer(private val output: PcmAudioPlayer) {
 
@@ -28,18 +31,6 @@ class MorseAudioPlayer(private val output: PcmAudioPlayer) {
         output.play(audio) {
             if (current == session) state.value = PlaybackStatus.Idle
         }
-    }
-
-    fun pause() {
-        if (state.value != PlaybackStatus.Playing) return
-        output.pause()
-        state.value = PlaybackStatus.Paused
-    }
-
-    fun resume() {
-        if (state.value != PlaybackStatus.Paused) return
-        output.resume()
-        state.value = PlaybackStatus.Playing
     }
 
     fun stop() {

@@ -48,6 +48,30 @@ fun SpeedControl(
     }
 }
 
+/** Play / Stop for the audio tone. [isRunning] covers rendering and playing. */
+@Composable
+fun SoundControls(
+    isRunning: Boolean,
+    canTransmit: Boolean,
+    errorMessage: String?,
+    onStart: () -> Unit,
+    onStop: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    OutputControls(
+        startLabel = "Play",
+        stopLabel = "Stop playing",
+        note = "Plays a tone at the pitch set in Settings.",
+        isAvailable = true,
+        isTransmitting = isRunning,
+        canTransmit = canTransmit,
+        errorMessage = errorMessage,
+        onStart = onStart,
+        onStop = onStop,
+        modifier = modifier,
+    )
+}
+
 /** Flash / Stop for the torch, with a photosensitivity warning. */
 @Composable
 fun TorchControls(

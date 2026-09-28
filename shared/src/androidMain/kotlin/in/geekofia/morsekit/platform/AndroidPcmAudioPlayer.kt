@@ -9,9 +9,9 @@ import `in`.geekofia.morsekit.core.audio.PcmAudio
 import kotlin.concurrent.thread
 
 /**
- * Streams float PCM to an [AudioTrack]. A background thread writes the samples (blocking writes
- * naturally wait while paused); a notification marker on the last frame reports completion on the
- * main thread. A new track is created per [play], so stale callbacks can't reach a newer one.
+ * Streams float PCM to an [AudioTrack]. A background thread writes the samples; a notification
+ * marker on the last frame reports completion on the main thread. A new track is created per
+ * [play], so stale callbacks can't reach a newer one.
  */
 internal class AndroidPcmAudioPlayer : PcmAudioPlayer {
     private val mainHandler = Handler(Looper.getMainLooper())
@@ -49,14 +49,6 @@ internal class AndroidPcmAudioPlayer : PcmAudioPlayer {
                 offset += written
             }
         }
-    }
-
-    override fun pause() {
-        track?.pause()
-    }
-
-    override fun resume() {
-        track?.play()
     }
 
     override fun stop() {

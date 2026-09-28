@@ -40,7 +40,7 @@ import `in`.geekofia.morsekit.core.settings.SettingsRepository
 import `in`.geekofia.morsekit.feature.playback.MorsePlaybackViewModel
 import `in`.geekofia.morsekit.feature.playback.MorseTorchViewModel
 import `in`.geekofia.morsekit.feature.playback.MorseVibrationViewModel
-import `in`.geekofia.morsekit.feature.playback.PlaybackControls
+import `in`.geekofia.morsekit.feature.playback.SoundControls
 import `in`.geekofia.morsekit.feature.playback.SpeedControl
 import `in`.geekofia.morsekit.feature.playback.TorchControls
 import `in`.geekofia.morsekit.feature.playback.VibrationControls
@@ -113,23 +113,20 @@ fun TranslatorRoute(
         onShare = platformServices.share::shareText,
         modifier = modifier,
         transmitControls = {
-            val audioIdle = playbackStatus == PlaybackStatus.Idle && !playbackViewModel.isPreparing
+            val soundRunning = playbackStatus == PlaybackStatus.Playing || playbackViewModel.isPreparing
             SpeedControl(
                 wordsPerMinute = settings.wordsPerMinute,
                 onWordsPerMinuteChange = settingsRepository::setWordsPerMinute,
                 // Both outputs are timed at start, so speed only changes while nothing runs.
-                enabled = audioIdle && !torchViewModel.isTransmitting && !vibrationViewModel.isTransmitting,
+                enabled = !soundRunning && !torchViewModel.isTransmitting && !vibrationViewModel.isTransmitting,
             )
             HorizontalDivider()
             Text("Sound", style = MaterialTheme.typography.titleSmall)
-            PlaybackControls(
-                status = playbackStatus,
-                isPreparing = playbackViewModel.isPreparing,
-                canPlay = !state.message.isEmpty,
+            SoundControls(
+                isRunning = soundRunning,
+                canTransmit = !state.message.isEmpty,
                 errorMessage = playbackViewModel.errorMessage,
-                onPlay = { playbackViewModel.play(state.message) },
-                onPause = playbackViewModel::pause,
-                onResume = playbackViewModel::resume,
+                onStart = { playbackViewModel.play(state.message) },
                 onStop = playbackViewModel::stop,
             )
             HorizontalDivider()

@@ -61,10 +61,6 @@ class MorsePlaybackViewModel(
         }
     }
 
-    fun pause() = player.pause()
-
-    fun resume() = player.resume()
-
     fun stop() {
         renderJob?.cancel()
         renderJob = null
