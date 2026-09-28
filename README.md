@@ -35,6 +35,92 @@ Engine and ViewModel tests live in `commonTest` and run on both Android (host JV
 For a detailed walkthrough (diagrams of the Morse encode/decode flow, timing, Compose state, and
 the KMP concepts used), see the [learning notes in `docs/`](docs/README.md).
 
+### Roadmap
+
+Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ Todo.
+
+**19 done · 6 in progress · 32 todo** (57 tasks)
+
+| Feature | Done | In Progress | Todo |
+| --- | --- | --- | --- |
+| Project Foundation | 5 | 0 | 0 |
+| Morse Engine | 6 | 0 | 0 |
+| Translator | 6 | 0 | 0 |
+| Morse Reference | 0 | 0 | 4 |
+| Audio | 0 | 0 | 4 |
+| Flashlight | 0 | 1 | 3 |
+| Vibration | 0 | 1 | 2 |
+| Morse Trainer | 0 | 0 | 5 |
+| Tap Morse | 0 | 0 | 4 |
+| History | 0 | 0 | 3 |
+| Settings | 0 | 1 | 3 |
+| Platform | 0 | 2 | 1 |
+| Quality | 2 | 0 | 1 |
+| Release | 0 | 1 | 2 |
+
+#### All tasks
+
+| Feature | Area | Task | Priority | Status |
+| --- | --- | --- | --- | --- |
+| Project Foundation | Project setup | Configure package/application IDs, app name MorseKit, and project metadata | P0 | ✅ Done |
+| Project Foundation | Architecture | Define shared KMP modules/packages for core, UI, and platform-specific code | P0 | ✅ Done |
+| Project Foundation | Theme | Create MorseKit Material 3 theme with light/dark/system modes | P0 | ✅ Done |
+| Project Foundation | Navigation | Set up Compose Multiplatform navigation structure | P0 | ✅ Done |
+| Project Foundation | Testing | Set up unit-test structure for shared Morse logic | P0 | ✅ Done |
+| Morse Engine | Alphabet | Implement International Morse alphabet mapping | P0 | ✅ Done |
+| Morse Engine | Encoder | Implement text-to-Morse conversion | P0 | ✅ Done |
+| Morse Engine | Decoder | Implement Morse-to-text conversion | P0 | ✅ Done |
+| Morse Engine | Validation | Handle unsupported characters and invalid Morse sequences | P0 | ✅ Done |
+| Morse Engine | Formatting | Support word separators, character spacing, and normalized Morse output | P0 | ✅ Done |
+| Morse Engine | Tests | Add comprehensive encoder/decoder unit tests | P0 | ✅ Done |
+| Translator | Text to Morse | Build text input and live Morse output | P0 | ✅ Done |
+| Translator | Morse to Text | Build Morse input and decoded text output | P0 | ✅ Done |
+| Translator | Swap | Add one-tap Text ↔ Morse mode switching | P0 | ✅ Done |
+| Translator | Clipboard | Copy input/output to clipboard | P0 | ✅ Done |
+| Translator | Share | Share translated content using platform share APIs | P0 | ✅ Done |
+| Translator | Clear | Clear current input/output | P0 | ✅ Done |
+| Morse Reference | Alphabet chart | Display A-Z Morse reference chart | P0 | ⬜ Todo |
+| Morse Reference | Numbers | Display 0-9 Morse codes | P1 | ⬜ Todo |
+| Morse Reference | Punctuation | Display common punctuation and prosigns | P1 | ⬜ Todo |
+| Morse Reference | Search | Search/filter Morse characters | P2 | ⬜ Todo |
+| Audio | Morse audio | Convert Morse symbols into audible tones | P1 | ⬜ Todo |
+| Audio | WPM | Add adjustable Morse transmission speed | P1 | ⬜ Todo |
+| Audio | Frequency | Allow tone frequency adjustment | P2 | ⬜ Todo |
+| Audio | Playback controls | Play, pause, stop, and replay Morse audio | P1 | ⬜ Todo |
+| Flashlight | Transmission | Transmit Morse using device flashlight/torch | P1 | ⬜ Todo |
+| Flashlight | Timing | Implement correct dot/dash and gap timing | P1 | 🚧 In Progress |
+| Flashlight | WPM | Use configurable transmission speed | P1 | ⬜ Todo |
+| Flashlight | Safety | Add clear controls and warning for flashing light | P1 | ⬜ Todo |
+| Vibration | Transmission | Transmit Morse using device vibration/haptics | P1 | ⬜ Todo |
+| Vibration | Timing | Implement Morse timing for vibration patterns | P1 | 🚧 In Progress |
+| Vibration | WPM | Use configurable transmission speed | P2 | ⬜ Todo |
+| Morse Trainer | Character mode | Show Morse and ask user to identify the character | P2 | ⬜ Todo |
+| Morse Trainer | Reverse mode | Show character and ask user to enter Morse | P2 | ⬜ Todo |
+| Morse Trainer | Scoring | Track correct answers and accuracy | P2 | ⬜ Todo |
+| Morse Trainer | Progression | Gradually introduce new characters | P2 | ⬜ Todo |
+| Morse Trainer | Session | Add configurable practice sessions | P3 | ⬜ Todo |
+| Tap Morse | Tap input | Tap to enter dots | P2 | ⬜ Todo |
+| Tap Morse | Long press | Long press to enter dashes | P2 | ⬜ Todo |
+| Tap Morse | Character detection | Convert tap sequences into characters | P2 | ⬜ Todo |
+| Tap Morse | Haptic feedback | Provide feedback while tapping | P3 | ⬜ Todo |
+| History | Recent translations | Persist recent translations locally | P2 | ⬜ Todo |
+| History | Favorites | Allow users to favorite frequently used messages | P3 | ⬜ Todo |
+| History | Delete | Delete individual or all history items | P3 | ⬜ Todo |
+| Settings | Theme | Light, dark, and system theme selection | P1 | 🚧 In Progress |
+| Settings | WPM | Configure default Morse transmission speed | P1 | ⬜ Todo |
+| Settings | Audio | Configure default tone settings | P2 | ⬜ Todo |
+| Settings | About | Add app version, privacy information, and open-source/license information | P1 | ⬜ Todo |
+| Platform | Android | Implement Android-specific torch, vibration, audio, clipboard, and sharing integrations | P0 | 🚧 In Progress |
+| Platform | iOS | Implement iOS-specific torch, haptics, audio, clipboard, and sharing integrations | P0 | 🚧 In Progress |
+| Platform | Permissions | Add only required platform permissions and document their purpose | P0 | ⬜ Todo |
+| Quality | Accessibility | Add content descriptions, semantic labels, scalable text, and touch targets | P1 | ⬜ Todo |
+| Quality | Error states | Handle empty, invalid, and unsupported input gracefully | P1 | ✅ Done |
+| Quality | Offline | Ensure all core functionality works without network access | P0 | ✅ Done |
+| Release | App icon | Create MorseKit launcher/app icon | P1 | ⬜ Todo |
+| Release | Store assets | Prepare Play Store/App Store screenshots and description | P2 | ⬜ Todo |
+| Release | Build | Generate signed Android release build and iOS archive | P1 | 🚧 In Progress |
+
+
 ### Running the apps
 
 Use the run configurations provided by the run widget in your IDE's toolbar. You can also use these commands and options:

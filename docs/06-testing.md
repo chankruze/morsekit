@@ -34,14 +34,15 @@ The test packages mirror the main packages:
 | Test class | Tests | What it covers |
 | --- | --- | --- |
 | `MorseAlphabetTest` | 10 | All letters/digits/punctuation present, upper case only, unique codes, reversible lookups, categories, rejects duplicates, `MorseLetter` validation |
-| `MorseEncodeTest` | 20 | SOS, A–Z, a–z, digits, punctuation, sentences, word separation, whitespace collapsing (tab/newline/NBSP), empty input, unsupported characters, `ı`, smart quotes, `encodeChar` |
+| `MorseEncodeTest` | 22 | SOS, A–Z, a–z, digits, punctuation, sentences, word separation, whitespace collapsing (tab/newline/NBSP), empty input, unsupported characters, `ı`, emoji as one character, lone surrogates, smart quotes, `encodeChar` |
 | `MorseDecodeTest` | 17 | SOS, every code, word separators (`/`, `\|`, newline, 2+ spaces), trimming, empty words, typographic dots/dashes, unknown vs malformed codes, `decodeSymbol` |
 | `MorseRoundTripTest` | 6 | text → Morse → text for every character and several sentences; Morse → text → canonical Morse |
 | `MorseNormalizerTest` | 7 | Character folding and canonical `normalizeText` / `normalizeMorse` |
 | `MorseTokenizerTest` | 6 | Word/letter splitting rules in isolation |
 | `MorseTimingTest` | 8 | Unit length vs WPM, bounds, gap rules, PARIS = 50 units, durations |
-| `TranslatorViewModelTest` | 8 | Input → output, issues, swap, direction selection, clear |
-| **Total** | **82** | |
+| `TranslatorViewModelTest` | 11 | Live conversion, issues, swap (including dropping `�` placeholders), direction selection, clear |
+| `TranslatorUiStateTest` | 9 | Empty / Invalid / Partial / Complete status, `hasOutput`, grouped and truncated issue messages, invisible characters |
+| **Total** | **96** | |
 
 ## Testing techniques used
 

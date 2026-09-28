@@ -304,11 +304,10 @@ In code (`MorseCodec.encode`):
 val issues = LinkedHashSet<TranslationIssue>()
 val words = MorseTokenizer.textWords(text.mapChars(MorseNormalizer::normalizeTextChar))
     .mapNotNull { word ->
-        val letters = word.mapNotNull { char ->
-            alphabet.codeFor(char) ?: run {
-                issues += TranslationIssue.UnsupportedCharacter(char)
-                null                       // skip this character
-            }
+        val letters = mutableListOf<MorseLetter>()
+        word.forEachCodePoint { symbol ->                     // an emoji is one symbol, not two chars
+            val code = symbol.singleOrNull()?.let(alphabet::codeFor)
+            if (code != null) letters += code else issues += TranslationIssue.UnsupportedCharacter(symbol)
         }
         if (letters.isEmpty()) null else MorseWord(letters)   // drop words with no letters left
     }
@@ -333,10 +332,10 @@ return EncodeResult(MorseMessage(words), issues.toList())
 | --- | --- |
 | After `normalizeTextChar` | `CAFÉ #1` (`É` isn't ASCII, so it's left alone) |
 | After `textWords` | `["CAFÉ", "#1"]` |
-| Word 1 | `C A F` found; `É` → `UnsupportedCharacter('É')` |
-| Word 2 | `#` → `UnsupportedCharacter('#')`; `1` found |
+| Word 1 | `C A F` found; `É` → `UnsupportedCharacter("É")` |
+| Word 2 | `#` → `UnsupportedCharacter("#")`; `1` found |
 | `morse` | `-.-. .- ..-. / .----` |
-| `issues` | `[UnsupportedCharacter('É'), UnsupportedCharacter('#')]` |
+| `issues` | `[UnsupportedCharacter("É"), UnsupportedCharacter("#")]` |
 
 ## Decoding: Morse → text
 
@@ -375,7 +374,7 @@ of `TranslationIssue`s:
 
 ```kotlin
 sealed interface TranslationIssue {
-    data class UnsupportedCharacter(val character: Char) : TranslationIssue
+    data class UnsupportedCharacter(val character: String) : TranslationIssue  // one code point
     data class UnknownCode(val code: String) : TranslationIssue
     data class MalformedCode(val token: String) : TranslationIssue
 }
@@ -383,13 +382,18 @@ sealed interface TranslationIssue {
 
 | Issue | Raised by | Example input | Meaning |
 | --- | --- | --- | --- |
-| `UnsupportedCharacter` | `encode` | `#`, `é` | No Morse code for this character; it's skipped |
+| `UnsupportedCharacter` | `encode` | `#`, `é`, `😀` | No Morse code for this character; it's skipped |
 | `UnknownCode` | `decode` | `........` | Only dots and dashes, but not in the alphabet |
 | `MalformedCode` | `decode` | `..x`, `SOS` | Contains something other than dots and dashes |
 
 > **Concept: `sealed interface`.** The compiler knows every possible subtype, so a `when (issue)`
 > without an `else` branch is *exhaustive*. Add a new issue type, and every `when` that doesn't
 > handle it (like `TranslationIssue.message()` in `TranslatorScreen.kt`) becomes a compile error.
+
+> **Why code points, not `Char`s?** A Kotlin `Char` is one UTF-16 unit. Emoji like 😀 are two
+> units (a *surrogate pair*), so reporting per `Char` would show two broken half-characters.
+> `forEachCodePoint` keeps each pair together, which is why `UnsupportedCharacter` holds a
+> `String`.
 
 > **Why `LinkedHashSet` for issues?** A set removes duplicates (`"é é é"` reports `é` once), and
 > the *linked* variant keeps first-seen order, so the UI lists issues in the order they appear.

@@ -126,7 +126,7 @@ translator uses snapshot state.
 | Action | New state |
 | --- | --- |
 | `onInputChange(x)` | Same direction, `input = x`, output/issues recomputed |
-| `swapDirection()` | Reversed direction, `input = old output`, recomputed |
+| `swapDirection()` | Reversed direction, `input = old output` (minus `�` placeholders), recomputed |
 | `onDirectionSelected(d)` | If `d` is the current direction, nothing happens; otherwise the same as swap |
 | `onClear()` | Empty state, but keeps the direction |
 
@@ -137,6 +137,34 @@ stateDiagram-v2
     TextToMorse --> MorseToText: swap, output becomes input
     MorseToText --> TextToMorse: swap, output becomes input
 ```
+
+### Status: empty, invalid and partial input
+
+`TranslatorUiState.status` is derived from the state, so the screen doesn't have to work it
+out itself:
+
+| Status | When | Output card shows | Copy/Share |
+| --- | --- | --- | --- |
+| `Empty` | Input is blank or only separators (`" / "`) | A hint: "Type text above..." | disabled |
+| `Invalid` | Input present, nothing translatable (`###`, `hello` in Morse mode) | "Nothing here could be translated." in the error color | disabled |
+| `Partial` | Some output, some issues (`SOS #`) | The translation | enabled |
+| `Complete` | Everything translated | The translation | enabled |
+
+Issues are summarized by `issueMessages()` (one line per kind, at most 5 examples each) and
+shown under the input field, which switches to its error style:
+
+| Issues | Message |
+| --- | --- |
+| `#`, `😀` unsupported | No Morse code for “#”, “😀” (skipped) |
+| `........` unknown | Unknown Morse code: “........” |
+| `-x-` malformed | Use only dots and dashes: “-x-” |
+| invisible `U+FE0F` | No Morse code for “U+FE0F” (skipped) |
+
+### Copy feedback
+
+After **Copy**, a snackbar says "Copied to clipboard", except on Android 13+, where the OS
+already shows its own clipboard confirmation. `ClipboardService.showsSystemConfirmation`
+reports this, so the shared UI doesn't need to know the Android version.
 
 ## App shell and navigation
 
