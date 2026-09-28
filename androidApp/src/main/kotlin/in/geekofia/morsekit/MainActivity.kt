@@ -6,14 +6,17 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import `in`.geekofia.morsekit.platform.AndroidPlatformServices
+import `in`.geekofia.morsekit.platform.PlatformServices
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
+        val platformServices = AndroidPlatformServices(this)
         setContent {
-            App()
+            App(platformServices)
         }
     }
 }
@@ -21,5 +24,5 @@ class MainActivity : ComponentActivity() {
 @Preview
 @Composable
 fun AppAndroidPreview() {
-    App()
+    App(PlatformServices(clipboard = {}, share = {}))
 }
