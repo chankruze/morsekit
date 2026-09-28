@@ -97,7 +97,7 @@ JVM-specific.
 | Editing, swapping, clearing or changing direction stops it | `TranslatorRoute` |
 | A new transmission waits for the previous one to switch off first (`cancelAndJoin`), so two can never overlap | `MorseTorchViewModel.start` |
 | Messages over 5 minutes are refused | `TorchPlan.isTooLong` |
-| A visible photosensitive-epilepsy warning next to the button | `TorchControls` |
+| A photosensitive-epilepsy warning dialog before the first flash (remembered once accepted) | `TranslatorRoute` |
 | If the process dies, Android switches the torch off itself | Android camera service |
 
 > **Concept: `CoroutineStart.LAZY` in the ViewModel.** `viewModelScope` runs on
@@ -117,12 +117,11 @@ when the camera is busy, which `AndroidTorchController` turns into `false`. On i
 unsupported torch mode raises an Objective-C exception, which Kotlin can't catch, so
 `IosTorchController` checks `hasTorch`, `isTorchModeSupported` and `torchAvailable` first.
 
-## UI: the Transmit card
+## UI
 
-The translator's card is now **Transmit**: one **Speed** slider shared by both outputs (the
-saved WPM setting, locked while any output is running), then **Sound** (Play / Stop playing),
-**Flashlight** (Flash / Stop flashing, plus the warning) and **Vibration**. All three use one
-shared start/stop layout.
+Flash is one option of the translator's **Transmit** floating button; while it runs, the button
+becomes **Stop flashing**. The first flash shows a one-time warning dialog. See
+[Translator UI](11-translator-ui.md).
 
 ## Known limitations
 

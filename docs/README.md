@@ -18,6 +18,7 @@ open the file and follow along.
 | 8 | [Audio playback](08-audio-playback.md) | Rendering Morse to PCM in shared code, drift-free frame timing, click-free tones, AudioTrack and AVAudioEngine, main-thread contracts |
 | 9 | [Flashlight transmission](09-flashlight.md) | Time-driven torch control without drift, testing suspend code with fake time, safety guards, torch availability |
 | 10 | [Vibration transmission](10-vibration.md) | Native vibration patterns, millisecond rounding without drift, the shared `TransmissionRunner`, Core Haptics, permissions |
+| 11 | [Translator UI](11-translator-ui.md) | The redesign: direction bar, in-card actions, the Transmit FAB speed dial, one-time flash warning, Compose techniques |
 
 ## The whole app on one page
 

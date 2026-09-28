@@ -126,5 +126,5 @@ The flashlight (`CameraManager.setTorchMode`), audio, clipboard and share need n
 
 Vibration uses the same guards as the flashlight: it stops when you leave the tab, when the app
 goes to the background, when the ViewModel is cleared, and when the content changes. Messages
-over 5 minutes are refused. The **Transmit** card has a fourth section, **Vibration**
-(Vibrate / Stop vibrating), and the shared Speed slider is locked while any output runs.
+over 5 minutes are refused. In the UI it's the **Vibrate** option of the Transmit floating button,
+which becomes **Stop vibrating** while it runs (see [Translator UI](11-translator-ui.md)).

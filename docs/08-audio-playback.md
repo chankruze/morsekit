@@ -177,7 +177,7 @@ sequenceDiagram
 | --- | --- |
 | Morse → Text plays what you **typed**, including well-formed codes that aren't in the alphabet (`........`); malformed tokens are skipped | `MorseCodec.parse()` |
 | Speed slider on the translator = the WPM setting (same value as Settings, saved) | `settingsRepository::setWordsPerMinute` |
-| Speed can only change while stopped (the audio is rendered at a fixed speed) | `SpeedControl` |
+| Speed is set with the Transmit FAB's − / + stepper before playing (the audio is rendered at a fixed speed) | `TransmitFab` |
 | Editing, swapping, clearing or changing direction stops playback | `TranslatorRoute` |
 | Messages over 5 minutes show an error instead of playing | `isTooLongToPlay` |
 
