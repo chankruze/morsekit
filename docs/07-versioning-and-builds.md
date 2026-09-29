@@ -169,6 +169,24 @@ removes.
 | Crash stack traces | R8 renames classes, so release crashes show short names. `androidApp/build/outputs/mapping/release/mapping.txt` maps them back: keep it for every published build (Play Console can store it: *App bundle explorer › Downloads › deobfuscation file*) |
 | Testing | Minification problems only show at runtime, so test a **signed** release build on a device before publishing |
 
+## The "native code without debug symbols" warning
+
+Play Console shows this for MorseKit's bundles: *"This App Bundle contains native code, and
+you've not uploaded debug symbols."* **It's expected and can be ignored.**
+
+MorseKit has no C/C++ of its own. The native code is AndroidX's `libandroidx.graphics.path.so`
+(about 10 KB per CPU type), which Compose uses to draw paths, and Google ships it **already
+stripped**. `llvm-readelf -S` shows only `.dynsym` (its 8 exported JNI functions) and a build
+ID: no `.symtab`, no `.debug*` sections. So there are no symbols anyone but Google could upload.
+
+| Tried | Result |
+| --- | --- |
+| `ndk { debugSymbolLevel = "SYMBOL_TABLE" }` (release build type) | With the NDK installed, AGP strips the library but `extractReleaseNativeSymbolTables` has nothing to extract: the AAB gets no `BUNDLE-METADATA/…debugsymbols/` |
+
+Crashes inside the library would still show its exported function names, and all of MorseKit's
+own code is Kotlin, which the R8 mapping file covers. If MorseKit ever adds its own native code,
+`debugSymbolLevel` (with the NDK installed) becomes worth setting.
+
 ## Release signing
 
 The release key never goes into git. Gradle reads the path and credentials from
