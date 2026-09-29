@@ -1,0 +1,81 @@
+# Builds the landing page (web/) and publishes it to GitHub Pages (docs/14-landing-page.md).
+# Runs when anything the page is built from changes: the site, the app version, or the app code
+# the web tests check against (the alphabet, the manifest's permissions and the stored settings
+# keys, for the privacy policy). Pull requests only build and test.
+name: Landing page
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "web/**"
+      - "version.properties"
+      - "shared/src/**/*.kt"
+      - "androidApp/src/main/AndroidManifest.xml"
+      - ".github/workflows/web-deploy.yml"
+  pull_request:
+    paths:
+      - "web/**"
+      - "version.properties"
+      - "shared/src/**/*.kt"
+      - "androidApp/src/main/AndroidManifest.xml"
+      - ".github/workflows/web-deploy.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One deployment at a time; a newer push waits instead of cancelling one mid-deploy.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - run: npm ci
+      - run: npm test
+      - run: npm run lint
+
+      # Project sites live under /<repo>/ (or / on a custom domain); configure-pages knows which.
+      - uses: actions/configure-pages@v6
+        id: pages
+        if: github.event_name != 'pull_request'
+
+      - name: Build
+        env:
+          BASE_PATH: ${{ steps.pages.outputs.base_path || '' }}/
+        run: npm run build
+
+      - uses: actions/upload-pages-artifact@v5
+        if: github.event_name != 'pull_request'
+        with:
+          path: web/dist
+
+  deploy:
+    needs: build
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v5
+        id: deployment
