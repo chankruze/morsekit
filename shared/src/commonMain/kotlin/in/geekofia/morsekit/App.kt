@@ -35,11 +35,15 @@ import org.jetbrains.compose.resources.painterResource
  *
  * [onSystemBarAppearanceChange] reports which icon colours the system bars need over the app's
  * header and bottom bar, so the host can style them (Android: `enableEdgeToEdge`).
+ *
+ * [onExit] leaves the app after the user confirms with a second back press on the start screen.
+ * Hosts without a system back button (iOS) leave it null, which turns the confirmation off.
  */
 @Composable
 fun App(
     container: AppContainer,
     onSystemBarAppearanceChange: (SystemBarAppearance) -> Unit = {},
+    onExit: (() -> Unit)? = null,
 ) {
     val settings by container.settingsRepository.settings.collectAsStateWithLifecycle()
     val currentOnAppearanceChange by rememberUpdatedState(onSystemBarAppearanceChange)
@@ -87,6 +91,7 @@ fun App(
                             TopLevelDestination.Translator -> TranslatorRoute(
                                 platformServices = container.platformServices,
                                 settingsRepository = container.settingsRepository,
+                                onExit = onExit,
                             )
                             TopLevelDestination.Reference -> ReferenceRoute()
                             TopLevelDestination.Settings -> SettingsRoute(

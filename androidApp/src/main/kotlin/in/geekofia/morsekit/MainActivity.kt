@@ -1,6 +1,7 @@
 package `in`.geekofia.morsekit
 
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -22,8 +23,16 @@ class MainActivity : ComponentActivity() {
 
         val container = (application as MorseKitApplication).container
         setContent {
-            App(container, onSystemBarAppearanceChange = ::applySystemBarStyle)
+            App(container, onSystemBarAppearanceChange = ::applySystemBarStyle, onExit = ::exitApp)
         }
+    }
+
+    /**
+     * What the system does on back from the launcher activity: since Android 12 the task moves to
+     * the background (the app stays warm for a fast relaunch); before that the activity finishes.
+     */
+    private fun exitApp() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) moveTaskToBack(true) else finish()
     }
 
     /**

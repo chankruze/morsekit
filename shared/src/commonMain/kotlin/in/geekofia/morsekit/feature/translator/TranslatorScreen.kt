@@ -23,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -48,6 +49,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigationevent.NavigationEventInfo
+import androidx.navigationevent.compose.NavigationBackHandler
+import androidx.navigationevent.compose.rememberNavigationEventState
 import `in`.geekofia.morsekit.core.audio.PlaybackStatus
 import `in`.geekofia.morsekit.core.model.TranslationDirection
 import `in`.geekofia.morsekit.core.settings.SettingsRepository
@@ -56,6 +60,7 @@ import `in`.geekofia.morsekit.feature.playback.MorseTorchViewModel
 import `in`.geekofia.morsekit.feature.playback.MorseVibrationViewModel
 import `in`.geekofia.morsekit.feature.playback.TransmitFab
 import `in`.geekofia.morsekit.feature.playback.TransmitOutput
+import `in`.geekofia.morsekit.navigation.ExitConfirmation
 import `in`.geekofia.morsekit.platform.PlatformServices
 import `in`.geekofia.morsekit.ui.components.MorseDisplay
 import `in`.geekofia.morsekit.ui.components.MorseTextField
@@ -82,6 +87,7 @@ fun TranslatorRoute(
     platformServices: PlatformServices,
     settingsRepository: SettingsRepository,
     modifier: Modifier = Modifier,
+    onExit: (() -> Unit)? = null,
     viewModel: TranslatorViewModel = viewModel { TranslatorViewModel() },
     playbackViewModel: MorsePlaybackViewModel = viewModel {
         MorsePlaybackViewModel(platformServices.audioPlayer, settingsRepository)
@@ -127,6 +133,23 @@ fun TranslatorRoute(
     DisposableEffect(torchViewModel, vibrationViewModel) {
         onDispose { stopUnattendedOutputs() }
     }
+
+    // The translator is the start screen, so back here would leave the app: ask for a second press.
+    // Only where the host can exit (Android); iOS has no back button to confirm.
+    val exitConfirmation = remember { ExitConfirmation() }
+    NavigationBackHandler(
+        state = rememberNavigationEventState(currentInfo = NavigationEventInfo.None),
+        isBackEnabled = onExit != null,
+        onBackCompleted = {
+            when (exitConfirmation.onBack()) {
+                ExitConfirmation.Decision.Exit -> onExit?.invoke()
+                ExitConfirmation.Decision.ShowHint -> scope.launch {
+                    snackbarHostState.currentSnackbarData?.dismiss()
+                    snackbarHostState.showSnackbar("Press back again to exit", duration = SnackbarDuration.Short)
+                }
+            }
+        },
+    )
     LifecycleEventEffect(Lifecycle.Event.ON_STOP) { stopUnattendedOutputs() }
 
     val transmitError = playbackViewModel.errorMessage ?: torchViewModel.errorMessage ?: vibrationViewModel.errorMessage
