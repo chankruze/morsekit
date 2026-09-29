@@ -104,6 +104,25 @@ All icons are Material Design paths saved as vector XML in `composeResources/dra
 `ic_transmit`, `ic_add`, `ic_remove`), plus the existing `ic_translate` arrows for swap. No icon
 library was added.
 
+## Share text
+
+**Copy** puts the raw result on the clipboard, so it pastes cleanly into other tools. **Share**
+wraps it in a short message (`shareMessage()` in `feature/translator/ShareMessage.kt`, a pure
+function with tests):
+
+| Direction | Message |
+| --- | --- |
+| Text → Morse (a puzzle) | "🕵️ Can you decode this secret message?", the Morse in legible glyphs (`••• −−− •••`), the same in plain dots and dashes that any decoder accepts, then "Stuck? Decode it, and learn Morse, with MorseKit 📡" and "Install it now 👉" with the store link |
+| Morse → Text (the reveal) | "📡 I decoded a Morse message with MorseKit:", the decoded text in quotes, the canonical Morse it came from, then an invitation and "Install it now 👉" with the store link |
+
+`ShareMessageTest` checks the exact text for both, and that **both Morse lines decode back** to
+the original with MorseKit's own decoder: the puzzle must be solvable by whoever receives it.
+
+The link is the Google Play listing for `in.geekofia.morsekit`. It resolves once the app is
+published; there's no App Store link for iOS recipients yet (backlog: *Release / Store links*).
+The `•` / `−` glyphs come from `MorseNotation.toDisplayGlyphs()`, the same function
+`MorseDisplay` uses on screen.
+
 ## Headers on every screen
 
 Each screen draws its own top app bar (default surface colours) through the shared
