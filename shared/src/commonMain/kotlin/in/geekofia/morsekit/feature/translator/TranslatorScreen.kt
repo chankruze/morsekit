@@ -54,6 +54,7 @@ import androidx.navigationevent.compose.NavigationBackHandler
 import androidx.navigationevent.compose.rememberNavigationEventState
 import `in`.geekofia.morsekit.core.audio.PlaybackStatus
 import `in`.geekofia.morsekit.core.model.TranslationDirection
+import `in`.geekofia.morsekit.core.review.ReviewPrompter
 import `in`.geekofia.morsekit.core.settings.SettingsRepository
 import `in`.geekofia.morsekit.feature.playback.MorsePlaybackViewModel
 import `in`.geekofia.morsekit.feature.playback.MorseTorchViewModel
@@ -86,6 +87,7 @@ import org.jetbrains.compose.resources.painterResource
 fun TranslatorRoute(
     platformServices: PlatformServices,
     settingsRepository: SettingsRepository,
+    reviewPrompter: ReviewPrompter,
     modifier: Modifier = Modifier,
     onExit: (() -> Unit)? = null,
     viewModel: TranslatorViewModel = viewModel { TranslatorViewModel() },
@@ -107,16 +109,26 @@ fun TranslatorRoute(
     val settings by settingsRepository.settings.collectAsStateWithLifecycle()
     var showFlashWarning by remember { mutableStateOf(false) }
 
+    // Asks for a store rating only at natural pauses, and only when ReviewPrompter says it's due.
+    val askForReviewIfDue = {
+        if (reviewPrompter.takePromptOpportunity()) platformServices.review.requestReview()
+    }
+    // A transmission that the user stopped (Stop, typing, swapping...) isn't a natural pause.
+    var stoppedByUser by remember { mutableStateOf(false) }
+
     val stopUnattendedOutputs = {
         torchViewModel.stop()
         vibrationViewModel.stop()
     }
     val stopTransmitting = {
+        stoppedByUser = true
         playbackViewModel.stop()
         stopUnattendedOutputs()
     }
     val start: (TransmitOutput) -> Unit = { output ->
         stopTransmitting()
+        stoppedByUser = false
+        reviewPrompter.recordSuccessfulUse()
         when (output) {
             TransmitOutput.Sound -> playbackViewModel.play(state.message)
             TransmitOutput.Flash -> torchViewModel.start(state.message)
@@ -128,6 +140,13 @@ fun TranslatorRoute(
         torchViewModel.isTransmitting -> TransmitOutput.Flash
         vibrationViewModel.isTransmitting -> TransmitOutput.Vibrate
         else -> null
+    }
+
+    // When a transmission finishes by itself, that's a good moment to (maybe) ask for a rating.
+    var previousOutput by remember { mutableStateOf<TransmitOutput?>(null) }
+    LaunchedEffect(activeOutput) {
+        if (previousOutput != null && activeOutput == null && !stoppedByUser) askForReviewIfDue()
+        previousOutput = activeOutput
     }
 
     DisposableEffect(torchViewModel, vibrationViewModel) {
@@ -186,8 +205,14 @@ fun TranslatorRoute(
                         snackbarHostState.showSnackbar("Copied to clipboard")
                     }
                 }
+                reviewPrompter.recordSuccessfulUse()
+                askForReviewIfDue()
             },
-            onShare = { shareMessage(state)?.let(platformServices.share::shareText) },
+            onShare = {
+                // Counts as a use, but no prompt: the share sheet is about to open.
+                shareMessage(state)?.let(platformServices.share::shareText)
+                reviewPrompter.recordSuccessfulUse()
+            },
             modifier = contentModifier,
             transmitFab = {
                 TransmitFab(

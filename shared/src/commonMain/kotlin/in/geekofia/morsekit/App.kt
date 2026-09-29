@@ -91,12 +91,14 @@ fun App(
                             TopLevelDestination.Translator -> TranslatorRoute(
                                 platformServices = container.platformServices,
                                 settingsRepository = container.settingsRepository,
+                                reviewPrompter = container.reviewPrompter,
                                 onExit = onExit,
                             )
                             TopLevelDestination.Reference -> ReferenceRoute()
                             TopLevelDestination.Settings -> SettingsRoute(
                                 settingsRepository = container.settingsRepository,
                                 appInfo = container.platformServices.appInfo,
+                                reviewService = container.platformServices.review,
                             )
                         }
                     }

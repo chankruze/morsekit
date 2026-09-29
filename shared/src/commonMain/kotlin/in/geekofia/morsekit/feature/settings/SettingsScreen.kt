@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
@@ -21,6 +22,7 @@ import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Slider
+import androidx.compose.material3.Surface
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -29,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
@@ -46,11 +49,13 @@ import `in`.geekofia.morsekit.core.settings.SettingsRepository
 import `in`.geekofia.morsekit.core.settings.ThemeMode
 import `in`.geekofia.morsekit.core.timing.MorseTiming
 import `in`.geekofia.morsekit.platform.AppInfo
+import `in`.geekofia.morsekit.platform.ReviewService
 import `in`.geekofia.morsekit.ui.components.ScreenScaffold
 import `in`.geekofia.morsekit.ui.components.SectionCard
 import `in`.geekofia.morsekit.ui.theme.spaceGroteskFontFamily
 import morsekit.shared.generated.resources.Res
 import morsekit.shared.generated.resources.ic_more_vert
+import morsekit.shared.generated.resources.ic_star
 import org.jetbrains.compose.resources.painterResource
 import kotlin.math.roundToInt
 
@@ -62,12 +67,15 @@ import kotlin.math.roundToInt
 fun SettingsRoute(
     settingsRepository: SettingsRepository,
     appInfo: AppInfo,
+    reviewService: ReviewService,
     modifier: Modifier = Modifier,
 ) {
     val settings by settingsRepository.settings.collectAsStateWithLifecycle()
     SettingsScreen(
         settings = settings,
         appInfo = appInfo,
+        rateStoreName = reviewService.storeName.takeIf { reviewService.canOpenStorePage },
+        onRate = reviewService::openStorePage,
         onThemeModeChange = settingsRepository::setThemeMode,
         onWordsPerMinuteChange = settingsRepository::setWordsPerMinute,
         onToneFrequencyChange = settingsRepository::setToneFrequencyHz,
@@ -81,6 +89,8 @@ fun SettingsRoute(
 fun SettingsScreen(
     settings: AppSettings,
     appInfo: AppInfo,
+    rateStoreName: String?,
+    onRate: () -> Unit,
     onThemeModeChange: (ThemeMode) -> Unit,
     onWordsPerMinuteChange: (Int) -> Unit,
     onToneFrequencyChange: (Int) -> Unit,
@@ -128,6 +138,8 @@ fun SettingsScreen(
         SettingsContent(
             settings = settings,
             appInfo = appInfo,
+            rateStoreName = rateStoreName,
+            onRate = onRate,
             onThemeModeChange = onThemeModeChange,
             onWordsPerMinuteChange = onWordsPerMinuteChange,
             onToneFrequencyChange = onToneFrequencyChange,
@@ -140,6 +152,8 @@ fun SettingsScreen(
 private fun SettingsContent(
     settings: AppSettings,
     appInfo: AppInfo,
+    rateStoreName: String?,
+    onRate: () -> Unit,
     onThemeModeChange: (ThemeMode) -> Unit,
     onWordsPerMinuteChange: (Int) -> Unit,
     onToneFrequencyChange: (Int) -> Unit,
@@ -183,6 +197,9 @@ private fun SettingsContent(
         }
 
         SectionCard(title = "About") {
+            if (rateStoreName != null) {
+                RateBanner(storeName = rateStoreName, onClick = onRate)
+            }
             LabeledValue(label = "Version", value = "${appInfo.versionName} (${appInfo.buildNumber})")
             HorizontalDivider()
             Text("Privacy", style = MaterialTheme.typography.bodyLarge)
@@ -206,6 +223,41 @@ private fun SettingsContent(
         }
 
         DeveloperCredits()
+    }
+}
+
+/**
+ * Opens the store page to rate the app: an explicit tap, allowed on both stores. Deliberately no
+ * "Do you like the app?" question, which the stores' rating guidelines discourage.
+ */
+@Composable
+private fun RateBanner(storeName: String, onClick: () -> Unit) {
+    Surface(
+        onClick = onClick,
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.primaryContainer,
+        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            Icon(
+                painter = painterResource(Res.drawable.ic_star),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(32.dp),
+            )
+            Column(modifier = Modifier.weight(1f)) {
+                Text("Rate MorseKit", style = MaterialTheme.typography.titleMedium)
+                Text(
+                    text = "A quick rating on $storeName helps others find it.",
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+        }
     }
 }
 

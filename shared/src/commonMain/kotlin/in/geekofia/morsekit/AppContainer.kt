@@ -1,5 +1,6 @@
 package `in`.geekofia.morsekit
 
+import `in`.geekofia.morsekit.core.review.ReviewPrompter
 import `in`.geekofia.morsekit.core.settings.SettingsRepository
 import `in`.geekofia.morsekit.platform.PlatformServices
 
@@ -12,4 +13,11 @@ import `in`.geekofia.morsekit.platform.PlatformServices
  */
 class AppContainer(val platformServices: PlatformServices) {
     val settingsRepository = SettingsRepository(platformServices.keyValueStore)
+
+    val reviewPrompter = ReviewPrompter(platformServices.keyValueStore, nowMillis = ::currentTimeMillis).also {
+        it.recordAppStart()
+    }
 }
+
+/** Wall-clock time in epoch milliseconds. */
+private fun currentTimeMillis(): Long = kotlin.time.Clock.System.now().toEpochMilliseconds()
