@@ -24,6 +24,7 @@ import androidx.navigation3.ui.NavDisplay
 import `in`.geekofia.morsekit.feature.reference.ReferenceRoute
 import `in`.geekofia.morsekit.feature.settings.SettingsRoute
 import `in`.geekofia.morsekit.feature.translator.TranslatorRoute
+import `in`.geekofia.morsekit.feature.update.UpdateDialogs
 import `in`.geekofia.morsekit.navigation.AppBackStack
 import `in`.geekofia.morsekit.navigation.TopLevelDestination
 import `in`.geekofia.morsekit.navigation.rememberTabStateNavEntryDecorator
@@ -58,6 +59,8 @@ fun App(
         LaunchedEffect(appearance) { currentOnAppearanceChange(appearance) }
 
         val backStack = rememberSaveable(saver = AppBackStack.Saver) { AppBackStack() }
+
+        UpdateDialogs(container.updateController)
 
         // Each screen draws its own top bar (ScreenScaffold), so this Scaffold only owns the bottom
         // bar and applies no insets itself: NavigationBar pads for the system navigation bar.
@@ -99,6 +102,9 @@ fun App(
                                 settingsRepository = container.settingsRepository,
                                 appInfo = container.platformServices.appInfo,
                                 reviewService = container.platformServices.review,
+                                onCheckForUpdates = container.updateController
+                                    .takeIf { it.isSupported }
+                                    ?.let { controller -> controller::checkNow },
                             )
                         }
                     }

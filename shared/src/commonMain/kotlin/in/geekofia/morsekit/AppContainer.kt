@@ -2,6 +2,8 @@ package `in`.geekofia.morsekit
 
 import `in`.geekofia.morsekit.core.review.ReviewPrompter
 import `in`.geekofia.morsekit.core.settings.SettingsRepository
+import `in`.geekofia.morsekit.core.update.UpdateController
+import `in`.geekofia.morsekit.core.update.UpdatePrompter
 import `in`.geekofia.morsekit.platform.PlatformServices
 
 /**
@@ -17,6 +19,11 @@ class AppContainer(val platformServices: PlatformServices) {
     val reviewPrompter = ReviewPrompter(platformServices.keyValueStore, nowMillis = ::currentTimeMillis).also {
         it.recordAppStart()
     }
+
+    val updateController = UpdateController(
+        service = platformServices.appUpdates,
+        prompter = UpdatePrompter(platformServices.keyValueStore, nowMillis = ::currentTimeMillis),
+    )
 }
 
 /** Wall-clock time in epoch milliseconds. */

@@ -69,11 +69,13 @@ fun SettingsRoute(
     appInfo: AppInfo,
     reviewService: ReviewService,
     modifier: Modifier = Modifier,
+    onCheckForUpdates: (() -> Unit)? = null,
 ) {
     val settings by settingsRepository.settings.collectAsStateWithLifecycle()
     SettingsScreen(
         settings = settings,
         appInfo = appInfo,
+        onCheckForUpdates = onCheckForUpdates,
         rateStoreName = reviewService.storeName.takeIf { reviewService.canOpenStorePage },
         onRate = reviewService::openStorePage,
         onThemeModeChange = settingsRepository::setThemeMode,
@@ -89,6 +91,7 @@ fun SettingsRoute(
 fun SettingsScreen(
     settings: AppSettings,
     appInfo: AppInfo,
+    onCheckForUpdates: (() -> Unit)?,
     rateStoreName: String?,
     onRate: () -> Unit,
     onThemeModeChange: (ThemeMode) -> Unit,
@@ -138,6 +141,7 @@ fun SettingsScreen(
         SettingsContent(
             settings = settings,
             appInfo = appInfo,
+            onCheckForUpdates = onCheckForUpdates,
             rateStoreName = rateStoreName,
             onRate = onRate,
             onThemeModeChange = onThemeModeChange,
@@ -152,6 +156,7 @@ fun SettingsScreen(
 private fun SettingsContent(
     settings: AppSettings,
     appInfo: AppInfo,
+    onCheckForUpdates: (() -> Unit)?,
     rateStoreName: String?,
     onRate: () -> Unit,
     onThemeModeChange: (ThemeMode) -> Unit,
@@ -201,6 +206,11 @@ private fun SettingsContent(
                 RateBanner(storeName = rateStoreName, onClick = onRate)
             }
             LabeledValue(label = "Version", value = "${appInfo.versionName} (${appInfo.buildNumber})")
+            if (onCheckForUpdates != null) {
+                TextButton(onClick = onCheckForUpdates, modifier = Modifier.fillMaxWidth()) {
+                    Text("Check for updates")
+                }
+            }
             HorizontalDivider()
             Text("Privacy", style = MaterialTheme.typography.bodyLarge)
             Text(
