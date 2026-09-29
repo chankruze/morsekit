@@ -28,6 +28,24 @@ val appVersionCode: Int = versionProperties.getProperty("VERSION_CODE")?.trim()?
     ?.takeIf { it > 0 }
     ?: error("version.properties: VERSION_CODE must be a positive integer")
 
+// --- Release signing ------------------------------------------------------------------------
+// Credentials live in keystore.properties at the repo root (git-ignored; see
+// keystore.properties.example). Without that file, release builds are produced unsigned, so a
+// fresh clone or CI still builds. Read through `providers` so edits invalidate the config cache.
+
+private val keystoreProperties: Properties? =
+    providers.fileContents(rootProject.layout.projectDirectory.file("keystore.properties")).asText.orNull
+        ?.let { text -> Properties().apply { load(text.reader()) } }
+
+private fun Properties.required(key: String): String =
+    getProperty(key)?.trim()?.takeIf { it.isNotEmpty() }
+        ?: error("keystore.properties: '$key' is missing or empty")
+
+/** Supports absolute paths, paths relative to the repo root, and a leading `~` for home. */
+private fun keystoreFile(path: String): File =
+    if (path.startsWith("~")) File(System.getProperty("user.home") + path.removePrefix("~"))
+    else rootProject.file(path)
+
 kotlin {
     compilerOptions {
         jvmTarget = JvmTarget.JVM_11
@@ -53,6 +71,16 @@ android {
         versionCode = appVersionCode
         versionName = appVersionName
     }
+    signingConfigs {
+        keystoreProperties?.let { props ->
+            create("release") {
+                storeFile = keystoreFile(props.required("storeFile"))
+                storePassword = props.required("storePassword")
+                keyAlias = props.required("keyAlias")
+                keyPassword = props.required("keyPassword")
+            }
+        }
+    }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -68,6 +96,8 @@ android {
             // Libraries ship their own keep rules (consumer rules); app rules go in proguard-rules.pro.
             isMinifyEnabled = true
             isShrinkResources = true
+            // Null (unsigned) when keystore.properties is absent.
+            signingConfig = signingConfigs.findByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
