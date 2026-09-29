@@ -57,7 +57,8 @@ The test packages mirror the main packages:
 | `TransmissionRunnerTest` (androidHostTest) | 5 | Running state, stop runs cleanup, a new run waits for the previous cleanup, stale finishes ignored |
 | `AppBackStackTest` | 8 | Start tab, other tabs above it, back to start then exit, no history between other tabs, in-app back iff more than one entry, save/restore |
 | `ShareMessageTest` | 7 | Exact puzzle and reveal texts, canonical Morse in the reveal, both Morse lines decode back, nothing to share, the install call to action, store link |
-| **Total** | **215** | |
+| `AboutContentTest` | 2 | Credit links, the bundled font credited with its licence |
+| **Total** | **217** | |
 
 ## Testing techniques used
 

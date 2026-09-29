@@ -275,8 +275,21 @@ stateless `SettingsScreen`, the same Route/Screen split as the other features.
 | Playback | Speed slider, with "a dot lasts N ms" from `MorseTiming` | `settings.wordsPerMinute` | 5–60 WPM |
 | Playback | Tone slider, snapping to 50 Hz steps | `settings.toneFrequencyHz` | 400–1000 Hz |
 | About | Version (`AppInfo`), privacy notice, open-source libraries | not saved | |
+| (below the cards) | Developer credits: flat text in Space Grotesk, with links to GitHub and geekofia.in | not saved | |
 
 Speed and tone are stored now and will be read by audio, flashlight and vibration playback.
+
+> **Links and a bundled variable font.** The credits line is an `AnnotatedString` built with
+> `withLink(LinkAnnotation.Url(url, TextLinkStyles(...)))`. `Text` makes each link tappable
+> (opening the browser through the platform's URI handler) and exposes it to screen readers,
+> with no click handling code. The font, **Space Grotesk**, is one variable TTF in
+> `composeResources/font/`, so it works on Android and iOS. Its weight axis runs from 300 to 700
+> with a default of **300**, so `spaceGroteskFontFamily()` declares
+> `Font(Res.font.space_grotesk, FontWeight.Normal / Medium / SemiBold)`. Compose Multiplatform's
+> `Font()` turns each weight into variation settings (`wght` = 400 / 500 / 600); without them,
+> text would render at the file's Light default. The font is licensed under the SIL Open Font
+> License 1.1: it's credited in About, and the licence text is in `licenses/SpaceGrotesk-OFL.txt`
+> (it's also embedded in the font file's name table).
 
 > **No ViewModel here, on purpose.** `SettingsRepository` already holds the state (`StateFlow`),
 > validates it (clamps out-of-range values) and persists it. A `SettingsViewModel` would only
