@@ -237,6 +237,7 @@ iOS Core Haptics) and can cancel it. See [Vibration transmission](10-vibration.m
 | `TorchController` | `CameraManager.setTorchMode` | `AVCaptureDevice.torchMode` | none |
 | `VibrationController` | `VibrationEffect.createWaveform` | Core Haptics | Android `VIBRATE` (normal) |
 | `ReviewService` | Play In-App Review (`com.google.android.play:review`); `FakeReviewManager` in debuggable builds | StoreKit `SKStoreReviewController.requestReviewInScene` | none |
+| `AppUpdateService` | Play In-App Updates (`com.google.android.play:app-update`); `FakeAppUpdateManager` in debuggable builds | None (`NoAppUpdateService`): MorseKit stays offline | none |
 
 ## Store ratings (`ReviewService`)
 
@@ -257,4 +258,43 @@ may show nothing. That's expected.
 > Debuggable builds use `FakeReviewManager`, which runs the whole request → launch flow without
 > showing UI or submitting anything. To see the real sheet, install through a Play internal
 > testing track or internal app sharing.
+
+## In-app updates (`AppUpdateService`)
+
+| Platform | How |
+| --- | --- |
+| Android | **Google Play In-App Updates** (`com.google.android.play:app-update` 2.1.0). It talks to the Play Store app over IPC, so MorseKit still has **no internet permission** (checked in the merged manifest) |
+| iOS | **None.** Apple has no in-app update API; the usual workaround (querying the iTunes lookup API) would be MorseKit's first network request, breaking the "doesn't use the network" promise. iOS's automatic App Store updates keep the app current |
+
+**Modes (Android).** *Flexible* for normal releases: Play asks, downloads in the background, and
+MorseKit shows **"Update ready: Restart / Later"** when it's done. *Immediate* (full-screen,
+blocking) only when the update is urgent: `updatePriority` ≥ 4 (set when publishing through the Play
+Developer API, e.g. fastlane or gradle-play-publisher; the Play Console UI can't set it) or ignored
+for ≥ 30 days (`clientVersionStalenessDays`).
+
+```mermaid
+flowchart LR
+    R["App resumes"] --> C{"store reports?"}
+    C -->|"immediate update in progress"| I["resume Immediate"]
+    C -->|"update, and a daily check is due"| M{"chooseUpdateMode"}
+    M -->|urgent| I
+    M -->|normal, not snoozed| F["Flexible: Play asks"]
+    F -->|"Not now"| S["snooze this version 7 days"]
+    F -->|"accept"| D["downloads in background"] --> RD["Update ready: Restart / Later"]
+```
+
+| Piece | Where | Tested by |
+| --- | --- | --- |
+| Mode choice (`chooseUpdateMode`, `AvailableUpdate.isUrgent`) | `core/update/AppUpdates.kt` | `ChooseUpdateModeTest` |
+| Daily check limit, 7-day snooze (urgent and manual checks ignore it) | `core/update/UpdatePrompter.kt` | `UpdatePrompterTest` |
+| Orchestration: check on resume, resume interrupted immediate updates, ready-to-install state, manual checks | `core/update/UpdateController.kt` (app-scoped, in `AppContainer`) | `UpdateControllerTest` (fake service) |
+| Dialogs: "Update ready", "You're up to date" | `feature/update/UpdateDialogs.kt` | on device |
+| "Check for updates" (Android only) | Settings → About | on device |
+
+> **Testing before publishing.** Play's update flow only works for apps installed from Google
+> Play. Debuggable builds use `FakeAppUpdateManager`: automatic checks report no update (so
+> nothing pops up while developing), and **Settings → Check for updates** simulates a newer
+> version, accepted and downloaded, which shows the real "Update ready" dialog. To test the real
+> Play flow, use internal app sharing or a testing track with two builds of increasing
+> `VERSION_CODE`.
 

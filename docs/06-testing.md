@@ -60,7 +60,10 @@ The test packages mirror the main packages:
 | `AboutContentTest` | 2 | Credit links, the bundled font credited with its licence |
 | `ExitConfirmationTest` | 5 | First back hints, second within the window exits (including exactly at 2 s), after the window it starts over, asks again after exiting |
 | `ReviewPrompterTest` | 7 | Due after days and uses, needs a first use, day and use thresholds, 120-day cooldown, first use recorded once, survives restarts |
-| **Total** | **229** | |
+| `ChooseUpdateModeTest` | 7 | Flexible by default, immediate for priority ≥ 4 or 30 days stale, fallbacks when a type isn't allowed |
+| `UpdatePrompterTest` | 4 | Daily check limit, 7-day snooze, newer versions not snoozed, urgent and manual ignore the snooze |
+| `UpdateControllerTest` | 10 | Offer on resume, once a day, declines snoozed, interrupted immediate resumed, ready-to-install and Later, manual up-to-date and offered, unsupported platform |
+| **Total** | **250** | |
 
 ## Testing techniques used
 
