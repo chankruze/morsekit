@@ -46,6 +46,10 @@ jobs:
           cache: npm
           cache-dependency-path: web/package-lock.json
 
+      # A lockfile made behind a private npm mirror points at hosts CI can't reach.
+      - name: Check the lockfile uses the public registry
+        run: node scripts/public-lockfile.mjs --check
+
       - run: npm ci
       - run: npm test
       - run: npm run lint

@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "test": "vitest run",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lockfile:public": "node scripts/public-lockfile.mjs"
   },
   "dependencies": {
     "react": "^19.2.8",

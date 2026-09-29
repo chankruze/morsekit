@@ -17,6 +17,8 @@ npm run build     # → web/dist/
 - The version in the footer comes from the repo's `version.properties` at build time.
 - The Google Play button says "Coming soon" until `PLAY_PUBLISHED` in `src/links.ts` is `true`.
 - `BASE_PATH=/morsekit/ npm run build` builds for a sub-path (GitHub Pages project sites).
+- After `npm install` behind a private npm mirror, run `npm run lockfile:public` (CI can only
+  reach the public registry).
 - Pushing to `main` deploys (`.github/workflows/web-deploy.yml`).
 - If the app gains a permission or stores a new kind of data, update `src/privacy/policy.ts`
   (the tests will say so).

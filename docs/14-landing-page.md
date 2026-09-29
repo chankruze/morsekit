@@ -98,9 +98,17 @@ Pull requests only build and test.
 
 | Step | Why |
 | --- | --- |
+| Lockfile check | `scripts/public-lockfile.mjs --check`: every download URL must be on `registry.npmjs.org` (see below) |
 | `npm ci`, `npm test`, `npm run lint` | A failing test (e.g. the policy is out of date) stops the deploy |
 | `configure-pages` → `BASE_PATH` | The site lives under `/morsekit/`; Vite prefixes every URL with it |
 | `upload-pages-artifact`, `deploy-pages` | The Pages "GitHub Actions" source: no `gh-pages` branch |
+
+> **Private npm mirrors (found on the first deploy).** npm writes each package's download URL
+> into `package-lock.json`. On a machine whose npm uses a company mirror, new packages get the
+> mirror's URLs, which GitHub's runners can't reach, so `npm ci` failed. `npm run lockfile:public`
+> rewrites them to the public registry (same tarballs, so the integrity hashes still match), and
+> locally npm keeps downloading through the mirror. CI checks this first, so the error says what
+> to do. **After `npm install` on such a machine, run `npm run lockfile:public`.**
 
 Pages was switched on once, with Actions as the source:
 `gh api -X POST repos/chankruze/morsekit/pages -f build_type=workflow`. The account's Pages
