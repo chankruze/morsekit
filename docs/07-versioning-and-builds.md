@@ -80,7 +80,7 @@ the two default build types:
 | Build type | Application ID | Launcher name | Minified | Signed with |
 | --- | --- | --- | --- | --- |
 | `debug` | `in.geekofia.morsekit.debug` | MorseKit Debug | no | debug key |
-| `release` | `in.geekofia.morsekit` | MorseKit | no | (no release signing configured yet) |
+| `release` | `in.geekofia.morsekit` | MorseKit | **yes (R8 + resource shrinking)** | the release key, via `keystore.properties` (unsigned if that file is absent) |
 
 The `.debug` suffix lets both builds be installed side by side on one device. The different
 launcher name comes from `androidApp/src/debug/res/values/strings.xml`, which overrides
@@ -144,3 +144,56 @@ androidComponents {
 | `SingleArtifact.BUNDLE` | Same, for the `.aab` |
 | `finalizedBy` | Runs the copy right after `assemble<Variant>` / `bundle<Variant>`, so the normal commands produce named files |
 | `providers.fileContents(...)` | Reads `version.properties` in a way the **configuration cache** tracks; editing the file correctly invalidates the cache |
+
+## Shrinking release builds (R8)
+
+Release builds run **R8** (`isMinifyEnabled = true`), which removes unused code, inlines and
+optimises, and shortens class and member names. Then **resource shrinking**
+(`isShrinkResources = true`) drops Android resources nothing references. Debug builds are left
+alone.
+
+| | Before | After | Change |
+| --- | --- | --- | --- |
+| Release APK | 26.3 MB | 3.06 MB | −88% |
+| Release AAB (what Play downloads from) | 9.35 MB | 4.30 MB | −54% |
+| Code (`classes.dex`, uncompressed) | 25.4 MB | 2.54 MB | −90% |
+
+Almost the whole APK was code (Compose, Kotlin and the other libraries), which is exactly what R8
+removes.
+
+| Topic | Notes |
+| --- | --- |
+| Keep rules | Libraries ship their own (consumer rules); MorseKit's `proguard-rules.pro` is empty because the app uses no reflection. Add a rule there only if a release build shows a missing class or method at runtime |
+| Compose resources | Loaded from `assets/composeResources/` through generated accessors, so resource shrinking (which works on `res/`) doesn't touch fonts, icons or the logo |
+| Enums saved by name | `ThemeMode` and the saved tab are stored as `name`; R8 keeps enum names' values, so saved settings still load |
+| Crash stack traces | R8 renames classes, so release crashes show short names. `androidApp/build/outputs/mapping/release/mapping.txt` maps them back: keep it for every published build (Play Console can store it: *App bundle explorer › Downloads › deobfuscation file*) |
+| Testing | Minification problems only show at runtime, so test a **signed** release build on a device before publishing |
+
+## Release signing
+
+The release key never goes into git. Gradle reads the path and credentials from
+**`keystore.properties`** at the repo root, which is git-ignored along with `*.jks` and
+`*.keystore`:
+
+```properties
+storeFile=~/Desktop/MorseKit.jks     # absolute, relative to the repo root, or ~ for home
+storePassword=...
+keyAlias=...
+keyPassword=...
+```
+
+`keystore.properties.example` (committed) documents the keys. Behaviour:
+
+| `keystore.properties` | Release build |
+| --- | --- |
+| Absent (fresh clone, CI) | Builds, **unsigned** |
+| Present but a value is missing | Fails: `keystore.properties: 'storePassword' is missing or empty` |
+| Complete | Signed with the release key, so `assembleRelease` / `bundleRelease` are ready to upload |
+
+It's read with `providers.fileContents`, so editing the file invalidates the configuration cache.
+
+> **Keep the keystore safe.** Google Play ties the app to its signing key; with Play App Signing,
+> this is the *upload* key. Back up `MorseKit.jks` and its passwords somewhere other than this
+> machine (a password manager). Losing the upload key means asking Google to reset it; without
+> Play App Signing, a lost key means you can never update the app.
+
