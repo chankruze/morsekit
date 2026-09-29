@@ -164,7 +164,7 @@ fun TranslatorRoute(
                     }
                 }
             },
-            onShare = platformServices.share::shareText,
+            onShare = { shareMessage(state)?.let(platformServices.share::shareText) },
             modifier = contentModifier,
             transmitFab = {
                 TransmitFab(
@@ -206,7 +206,7 @@ fun TranslatorScreen(
     onSwap: () -> Unit,
     onClear: () -> Unit,
     onCopy: (String) -> Unit,
-    onShare: (String) -> Unit,
+    onShare: () -> Unit,
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     transmitFab: @Composable () -> Unit = {},
@@ -326,7 +326,7 @@ private fun OutputCard(
     state: TranslatorUiState,
     isMorseInput: Boolean,
     onCopy: (String) -> Unit,
-    onShare: (String) -> Unit,
+    onShare: () -> Unit,
 ) {
     Card(
         colors = CardDefaults.cardColors(
@@ -345,7 +345,7 @@ private fun OutputCard(
             IconButton(onClick = { onCopy(state.output) }, enabled = state.hasOutput) {
                 Icon(painterResource(Res.drawable.ic_copy), contentDescription = "Copy")
             }
-            IconButton(onClick = { onShare(state.output) }, enabled = state.hasOutput) {
+            IconButton(onClick = onShare, enabled = state.hasOutput) {
                 Icon(painterResource(Res.drawable.ic_share), contentDescription = "Share")
             }
         }

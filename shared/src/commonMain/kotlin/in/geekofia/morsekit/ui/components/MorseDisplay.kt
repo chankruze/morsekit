@@ -33,19 +33,8 @@ fun MorseDisplay(
         }
         return
     }
-    val displayText = remember(morse) { morse.toDisplayGlyphs() }
+    val displayText = remember(morse) { MorseNotation.toDisplayGlyphs(morse) }
     SelectionContainer(modifier = modifier) {
         Text(text = displayText, style = style.toMorseStyle())
     }
 }
-
-private const val DISPLAY_DOT = '•'
-private const val DISPLAY_DASH = '−'
-
-private fun String.toDisplayGlyphs(): String = map {
-    when (it) {
-        MorseNotation.DOT -> DISPLAY_DOT
-        MorseNotation.DASH -> DISPLAY_DASH
-        else -> it
-    }
-}.joinToString("")
