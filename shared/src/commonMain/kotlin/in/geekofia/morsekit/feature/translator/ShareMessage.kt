@@ -2,9 +2,10 @@ package `in`.geekofia.morsekit.feature.translator
 
 import `in`.geekofia.morsekit.core.model.MorseNotation
 import `in`.geekofia.morsekit.core.model.TranslationDirection
+import `in`.geekofia.morsekit.platform.StoreListing
 
 /** Where recipients can get MorseKit. Resolves once the app is published on Google Play. */
-internal const val MORSEKIT_STORE_URL = "https://play.google.com/store/apps/details?id=in.geekofia.morsekit"
+internal const val MORSEKIT_STORE_URL = StoreListing.PLAY_URL
 
 /**
  * The text sent by Share, or `null` if there's nothing to share.

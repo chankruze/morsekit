@@ -20,6 +20,7 @@ fun iosPlatformServices(presenter: () -> UIViewController?): PlatformServices =
         audioPlayer = IosPcmAudioPlayer(),
         torch = IosTorchController(),
         vibration = IosVibrationController(),
+        review = IosReviewService(presenter),
     )
 
 private class IosKeyValueStore : KeyValueStore {

@@ -1,5 +1,6 @@
 package `in`.geekofia.morsekit.platform
 
+import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -8,8 +9,11 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.content.edit
 
-/** Uses the application context so the services can safely outlive an Activity. */
-fun androidPlatformServices(context: Context): PlatformServices {
+/**
+ * Uses the application context so the services can safely outlive an Activity. [currentActivity]
+ * supplies the resumed Activity for the few APIs that need one (the in-app review sheet).
+ */
+fun androidPlatformServices(context: Context, currentActivity: () -> Activity?): PlatformServices {
     val appContext = context.applicationContext
     return PlatformServices(
         clipboard = AndroidClipboardService(appContext),
@@ -19,6 +23,7 @@ fun androidPlatformServices(context: Context): PlatformServices {
         audioPlayer = AndroidPcmAudioPlayer(),
         torch = AndroidTorchController(appContext),
         vibration = AndroidVibrationController(appContext),
+        review = AndroidReviewService(appContext, currentActivity),
     )
 }
 

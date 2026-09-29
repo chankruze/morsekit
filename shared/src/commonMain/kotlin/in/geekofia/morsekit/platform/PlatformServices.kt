@@ -29,4 +29,5 @@ class PlatformServices(
     val audioPlayer: PcmAudioPlayer,
     val torch: TorchController,
     val vibration: VibrationController,
+    val review: ReviewService,
 )
