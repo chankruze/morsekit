@@ -24,6 +24,7 @@ fun androidPlatformServices(context: Context, currentActivity: () -> Activity?):
         torch = AndroidTorchController(appContext),
         vibration = AndroidVibrationController(appContext),
         review = AndroidReviewService(appContext, currentActivity),
+        appUpdates = AndroidAppUpdateService(appContext, currentActivity),
     )
 }
 

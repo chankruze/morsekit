@@ -21,6 +21,9 @@ fun iosPlatformServices(presenter: () -> UIViewController?): PlatformServices =
         torch = IosTorchController(),
         vibration = IosVibrationController(),
         review = IosReviewService(presenter),
+        // Apple has no in-app update API, and MorseKit doesn't query the App Store itself, so it
+        // stays offline. iOS's automatic App Store updates keep the app current.
+        appUpdates = NoAppUpdateService(),
     )
 
 private class IosKeyValueStore : KeyValueStore {

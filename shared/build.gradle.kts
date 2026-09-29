@@ -45,6 +45,7 @@ kotlin {
             implementation(libs.compose.uiTooling)
             implementation(libs.androidx.core.ktx)
             implementation(libs.play.review)
+            implementation(libs.play.app.update)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)

@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import `in`.geekofia.morsekit.platform.AppInfo
 import `in`.geekofia.morsekit.platform.InMemoryKeyValueStore
+import `in`.geekofia.morsekit.platform.NoAppUpdateService
 import `in`.geekofia.morsekit.platform.NoReviewService
 import `in`.geekofia.morsekit.platform.NoTorchController
 import `in`.geekofia.morsekit.platform.NoVibrationController
@@ -74,6 +75,7 @@ fun AppAndroidPreview() {
         torch = NoTorchController(),
         vibration = NoVibrationController(),
         review = NoReviewService(),
+        appUpdates = NoAppUpdateService(),
     )
     App(AppContainer(services))
 }
