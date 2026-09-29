@@ -39,13 +39,13 @@ the KMP concepts used), see the [learning notes in `docs/`](docs/README.md).
 
 Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ Todo.
 
-**39 done · 4 in progress · 17 todo** (60 tasks)
+**49 done · 4 in progress · 18 todo** (71 tasks)
 
 | Feature | Done | In Progress | Todo |
 | --- | --- | --- | --- |
-| Project Foundation | 5 | 0 | 0 |
+| Project Foundation | 6 | 0 | 0 |
 | Morse Engine | 6 | 0 | 0 |
-| Translator | 6 | 0 | 0 |
+| Translator | 8 | 0 | 0 |
 | Morse Reference | 3 | 1 | 0 |
 | Audio | 4 | 0 | 0 |
 | Flashlight | 4 | 0 | 2 |
@@ -53,10 +53,10 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Morse Trainer | 0 | 0 | 5 |
 | Tap Morse | 0 | 0 | 4 |
 | History | 0 | 0 | 3 |
-| Settings | 4 | 0 | 0 |
+| Settings | 6 | 0 | 0 |
 | Platform | 2 | 1 | 0 |
 | Quality | 2 | 0 | 1 |
-| Release | 0 | 2 | 2 |
+| Release | 5 | 2 | 3 |
 
 #### All tasks
 
@@ -67,6 +67,7 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Project Foundation | Theme | Create MorseKit Material 3 theme with light/dark/system modes | P0 | ✅ Done |
 | Project Foundation | Navigation | Set up Compose Multiplatform navigation structure | P0 | ✅ Done |
 | Project Foundation | Testing | Set up unit-test structure for shared Morse logic | P0 | ✅ Done |
+| Project Foundation | Back navigation | Navigation 3 back stack with Material back rules, kept tab state and press-back-again to exit | P1 | ✅ Done |
 | Morse Engine | Alphabet | Implement International Morse alphabet mapping | P0 | ✅ Done |
 | Morse Engine | Encoder | Implement text-to-Morse conversion | P0 | ✅ Done |
 | Morse Engine | Decoder | Implement Morse-to-text conversion | P0 | ✅ Done |
@@ -79,6 +80,8 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Translator | Clipboard | Copy input/output to clipboard | P0 | ✅ Done |
 | Translator | Share | Share translated content using platform share APIs | P0 | ✅ Done |
 | Translator | Clear | Clear current input/output | P0 | ✅ Done |
+| Translator | Redesign | One-screen layout: direction bar, in-card copy/share, Transmit FAB speed dial with WPM stepper | P1 | ✅ Done |
+| Translator | Share message | Share a friendly puzzle (Text → Morse) or reveal (Morse → Text) message with the store link | P2 | ✅ Done |
 | Morse Reference | Alphabet chart | Display A-Z Morse reference chart | P0 | ✅ Done |
 | Morse Reference | Numbers | Display 0-9 Morse codes | P1 | ✅ Done |
 | Morse Reference | Punctuation | Display common punctuation and prosigns | P1 | 🚧 In Progress |
@@ -112,6 +115,8 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Settings | WPM | Configure default Morse transmission speed | P1 | ✅ Done |
 | Settings | Audio | Configure default tone settings | P2 | ✅ Done |
 | Settings | About | Add app version, privacy information, and open-source/license information | P1 | ✅ Done |
+| Settings | Reset | Reset settings to defaults, with confirmation | P3 | ✅ Done |
+| Settings | Credits | Developer credits and links | P3 | ✅ Done |
 | Platform | Android | Implement Android-specific torch, vibration, audio, clipboard, and sharing integrations | P0 | ✅ Done |
 | Platform | iOS | Implement iOS-specific torch, haptics, audio, clipboard, and sharing integrations | P0 | 🚧 In Progress |
 | Platform | Permissions | Add only required platform permissions and document their purpose | P0 | ✅ Done |
@@ -121,7 +126,13 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Release | App icon | Create MorseKit launcher/app icon | P1 | 🚧 In Progress |
 | Release | Store assets | Prepare Play Store/App Store screenshots and description | P2 | ⬜ Todo |
 | Release | Build | Generate signed Android release build and iOS archive | P1 | 🚧 In Progress |
+| Release | CI | GitHub Actions workflow: build signed APK/AAB and mapping file for GitHub releases | P1 | ✅ Done |
+| Release | Play publishing | Upload GitHub releases to Play internal testing with release notes; approved promotion to production | P1 | ✅ Done |
+| Release | Play setup | Create the Play Console app and first upload; service account and PLAY_SERVICE_ACCOUNT_JSON secret; production environment | P1 | ⬜ Todo |
 | Release | Store links | Check the Play Store link in shared messages once published; add an App Store link for iOS recipients | P2 | ⬜ Todo |
+| Release | Ratings | Ask for a store rating at good moments and add a Rate MorseKit banner | P2 | ✅ Done |
+| Release | In-app updates | Android: Play In-App Updates (flexible, immediate when urgent), daily check with 7-day snooze, Check for updates in Settings | P2 | ✅ Done |
+| Release | Shrinking | R8 minification and resource shrinking for release builds | P2 | ✅ Done |
 
 ### Running the apps
 
