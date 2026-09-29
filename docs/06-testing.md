@@ -59,7 +59,8 @@ The test packages mirror the main packages:
 | `ShareMessageTest` | 7 | Exact puzzle and reveal texts, canonical Morse in the reveal, both Morse lines decode back, nothing to share, the install call to action, store link |
 | `AboutContentTest` | 2 | Credit links, the bundled font credited with its licence |
 | `ExitConfirmationTest` | 5 | First back hints, second within the window exits (including exactly at 2 s), after the window it starts over, asks again after exiting |
-| **Total** | **222** | |
+| `ReviewPrompterTest` | 7 | Due after days and uses, needs a first use, day and use thresholds, 120-day cooldown, first use recorded once, survives restarts |
+| **Total** | **229** | |
 
 ## Testing techniques used
 

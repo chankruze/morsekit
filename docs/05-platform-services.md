@@ -236,3 +236,25 @@ iOS Core Haptics) and can cancel it. See [Vibration transmission](10-vibration.m
 | `PcmAudioPlayer` | `AudioTrack` | `AVAudioEngine` | none |
 | `TorchController` | `CameraManager.setTorchMode` | `AVCaptureDevice.torchMode` | none |
 | `VibrationController` | `VibrationEffect.createWaveform` | Core Haptics | Android `VIBRATE` (normal) |
+| `ReviewService` | Play In-App Review (`com.google.android.play:review`); `FakeReviewManager` in debuggable builds | StoreKit `SKStoreReviewController.requestReviewInScene` | none |
+
+## Store ratings (`ReviewService`)
+
+Both stores require their **native** rating prompt; custom "rate us" dialogs aren't allowed
+(Google Play's in-app review policy; App Store Review Guideline 5.6.1). Both stores also decide
+whether the prompt actually appears (a Play quota; on iOS at most 3 times a year), so a request
+may show nothing. That's expected.
+
+| Piece | Where | Notes |
+| --- | --- | --- |
+| When to ask | `core/review/ReviewPrompter` (tested) | At least 3 days since first use, at least 5 successful uses (copy, share, transmit), at most once per 120 days; counters in `KeyValueStore` |
+| Asking moments | `TranslatorRoute` | After a copy, or when a transmission **finishes by itself** (not when you stop it, type or swap). Never at launch, never as the share sheet opens |
+| Native prompt | `AndroidReviewService` / `IosReviewService` | Android needs an `Activity`: `MorseKitApplication` tracks the resumed one in a `WeakReference` |
+| "Rate MorseKit" banner | Settings → About | An explicit tap opens the store page (allowed on both stores). No "do you like it?" question. Hidden on iOS until `StoreListing.APP_STORE_ID` exists |
+| Store identifiers | `platform/StoreListing` | One place for the Play package and URL (also used by the share text) and the future App Store ID |
+
+> **Testing before publishing.** Play's sheet only appears for apps installed from Google Play.
+> Debuggable builds use `FakeReviewManager`, which runs the whole request → launch flow without
+> showing UI or submitting anything. To see the real sheet, install through a Play internal
+> testing track or internal app sharing.
+
