@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+/* The app's own Space Grotesk (variable, OFL; licenses/SpaceGrotesk-OFL.txt), self-hosted so the
+   page, like the app, makes no third-party requests. */
+@font-face {
+  font-family: "Space Grotesk";
+  src: url("@/assets/fonts/SpaceGrotesk.ttf") format("truetype");
+  font-weight: 300 700;
+  font-display: swap;
+}
+
+/* Colours sampled from the MorseKit logo. */
+@theme {
+  --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --color-night: #050c26;
+  --color-navy: #01165a;
+  --color-brand: #024bc6;
+  --color-cyan: #07c7fe;
+  --color-sun: #fdc31a;
+  --color-ember: #fd5a2c;
+  --color-cream: #fdfaf0;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    color-scheme: dark;
+  }
+  body {
+    @apply bg-night text-cream antialiased;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-cyan;
+  }
+}
+
+@layer components {
+  .hero-glow {
+    @apply pointer-events-none absolute -top-40 left-1/2 h-[42rem] w-[72rem] -translate-x-1/2 rounded-full;
+    background: radial-gradient(
+      closest-side,
+      color-mix(in srgb, var(--color-brand) 55%, transparent),
+      color-mix(in srgb, var(--color-cyan) 12%, transparent),
+      transparent
+    );
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

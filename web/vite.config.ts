@@ -7,7 +7,10 @@ import { defineConfig } from "vite";
 
 /** The app's version.properties (repo root), so the page always shows the current version. */
 function appVersion(): string {
-  const text = readFileSync(new URL("../version.properties", import.meta.url), "utf8");
+  const text = readFileSync(
+    new URL("../version.properties", import.meta.url),
+    "utf8",
+  );
   const name = /^VERSION_NAME=(.+)$/m.exec(text)?.[1]?.trim();
   if (!name) throw new Error("version.properties: VERSION_NAME not found");
   return name;
@@ -20,7 +23,14 @@ export default defineConfig({
   define: {
     __APP_VERSION__: JSON.stringify(appVersion()),
   },
-  plugins: [react(), babel({ presets: [reactCompilerPreset()] }), tailwindcss()],
+  plugins: [
+    react(),
+    babel({ presets: [reactCompilerPreset()] }),
+    tailwindcss(),
+  ],
+  resolve: {
+    alias: { "@": fileURLToPath(new URL("src", import.meta.url)) },
+  },
   build: {
     // Two pages: the landing page and /privacy/ (the URL given to Play Console).
     rolldownOptions: {

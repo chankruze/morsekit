@@ -9,16 +9,17 @@ privacy policy at `/privacy/`. See
 cd web
 npm install
 npm run dev       # http://localhost:5173
-npm test          # vitest: codec, timing; alphabet and privacy facts match the app's source
+npm test          # vitest: engine, routes; alphabet and privacy facts match the app's source
 npm run lint
 npm run build     # → web/dist/
 ```
 
 - The version in the footer comes from the repo's `version.properties` at build time.
-- The Google Play button says "Coming soon" until `PLAY_PUBLISHED` in `src/links.ts` is `true`.
+- The Google Play button says "Coming soon" until `PLAY_PUBLISHED` in `src/constants/links.ts` is `true`.
+- Code layout follows `/structure` (`.claude/commands/structure.md`).
 - `BASE_PATH=/morsekit/ npm run build` builds for a sub-path (GitHub Pages project sites).
 - After `npm install` behind a private npm mirror, run `npm run lockfile:public` (CI can only
   reach the public registry).
 - Pushing to `main` deploys (`.github/workflows/web-deploy.yml`).
-- If the app gains a permission or stores a new kind of data, update `src/privacy/policy.ts`
+- If the app gains a permission or stores a new kind of data, update `src/screens/privacy/constants/policy.ts`
   (the tests will say so).
