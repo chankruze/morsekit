@@ -287,7 +287,13 @@ fun TranslatorScreen(
 
         SnackbarHost(
             hostState = snackbarHostState,
-            modifier = Modifier.align(Alignment.BottomCenter).padding(start = 16.dp, end = 16.dp, bottom = FAB_CLEARANCE),
+            // Clear the Transmit FAB only while it's shown (there's something to send; clearing the
+            // text also stops any transmission). Otherwise sit just above the bottom bar.
+            modifier = Modifier.align(Alignment.BottomCenter).padding(
+                start = 16.dp,
+                end = 16.dp,
+                bottom = if (state.message.isEmpty) 8.dp else FAB_CLEARANCE,
+            ),
         )
     }
 }
