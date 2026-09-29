@@ -29,7 +29,7 @@ flowchart LR
 | --- | --- |
 | Reference or Settings | Goes to the Translator |
 | Reference, with search open | Closes the search (and clears the query) |
-| Translator | Leaves the app |
+| Translator | Shows "Press back again to exit"; a second back within 2 s leaves the app (Android) |
 
 `AppBackStack.entries` is `[Translator]` on the start tab and `[Translator, currentTab]` on any
 other tab. `NavDisplay` intercepts system back **only when its back stack has more than one
@@ -38,6 +38,31 @@ entry**, so this list shape makes the rules above happen automatically.
 
 Switching between Reference and Settings replaces the top entry rather than stacking, so back
 from either always returns to the Translator. Tabs don't build up history.
+
+## Exit confirmation ("press back again")
+
+On the start screen, back would leave the app, so `TranslatorRoute` registers a
+`NavigationBackHandler` that asks for a second press first. `NavDisplay` doesn't intercept back
+there (only one entry), so this handler gets it. On other tabs the translator isn't composed, so
+the handler isn't registered at all.
+
+```mermaid
+stateDiagram-v2
+    [*] --> Waiting
+    Waiting --> Armed: back / show "Press back again to exit"
+    Armed --> [*]: back within 2 s / onExit()
+    Armed --> Armed: back after 2 s / show the hint again
+```
+
+| Piece | Where |
+| --- | --- |
+| The rule (2 s window, injectable clock) | `navigation/ExitConfirmation.kt`, tested with `TestTimeSource` |
+| The handler and snackbar | `TranslatorRoute` (its snackbar already sits clear of the Transmit FAB) |
+| Actually leaving | `App(onExit = …)`. Android's `MainActivity.exitApp()` does what the system does: `moveTaskToBack(true)` on Android 12+ (the app stays warm), `finish()` before that |
+| iOS | Passes no `onExit`, so the handler is disabled; there's no back button to confirm |
+
+The window matches a short snackbar's display time, so the hint is on screen for the whole time
+a second press counts.
 
 ## Keeping tab state
 

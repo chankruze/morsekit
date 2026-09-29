@@ -58,7 +58,8 @@ The test packages mirror the main packages:
 | `AppBackStackTest` | 8 | Start tab, other tabs above it, back to start then exit, no history between other tabs, in-app back iff more than one entry, save/restore |
 | `ShareMessageTest` | 7 | Exact puzzle and reveal texts, canonical Morse in the reveal, both Morse lines decode back, nothing to share, the install call to action, store link |
 | `AboutContentTest` | 2 | Credit links, the bundled font credited with its licence |
-| **Total** | **217** | |
+| `ExitConfirmationTest` | 5 | First back hints, second within the window exits (including exactly at 2 s), after the window it starts over, asks again after exiting |
+| **Total** | **222** | |
 
 ## Testing techniques used
 
