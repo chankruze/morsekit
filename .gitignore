@@ -24,3 +24,6 @@ androidApp/release/
 keystore.properties
 *.jks
 *.keystore
+
+# Python bytecode (scripts/play tests)
+__pycache__/

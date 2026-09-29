@@ -1,0 +1,53 @@
+# Promotes a release from Google Play's internal testing track to production and sends it for
+# review. Run it by hand (Actions > Promote to production > Run workflow) after testing the
+# internal build. The `production` environment should require your approval (see
+# docs/13-ci-release.md), so a click in the run is the last check before users get it.
+name: Promote to production
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_code:
+        description: Version code to promote (empty = the newest on internal testing)
+        required: false
+      rollout:
+        description: Percent of users (below 100 is a staged rollout; raise it with another run)
+        required: true
+        default: "100"
+      update_priority:
+        description: In-app update priority (4-5 make MorseKit ask for an immediate update)
+        type: choice
+        options: ["0", "1", "2", "3", "4", "5"]
+        default: "0"
+      dry_run:
+        description: Only validate with Play; don't publish
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: play-production
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: production
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Promote internal → production
+        env:
+          PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          VERSION_CODE: ${{ inputs.version_code }}
+          ROLLOUT: ${{ inputs.rollout }}
+          PRIORITY: ${{ inputs.update_priority }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          args=(--from internal --to production --rollout "$ROLLOUT" --priority "$PRIORITY")
+          if [ -n "$VERSION_CODE" ]; then args+=(--version-code "$VERSION_CODE"); fi
+          if [ "$DRY_RUN" = true ]; then args+=(--dry-run); fi
+          python3 scripts/play/play.py promote "${args[@]}"

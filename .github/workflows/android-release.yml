@@ -1,11 +1,13 @@
 # Builds the signed release APK, AAB and R8 mapping file.
 #
-# - Publishing a GitHub release attaches them to that release.
+# - Publishing a GitHub release attaches them to that release and uploads the AAB to Google
+#   Play's internal testing track, with the release body as "What's new". Promoting to
+#   production is a separate, approved step: play-promote.yml.
 # - Running it by hand (Actions > Android release > Run workflow) keeps them as workflow
-#   artifacts only, to try a build before releasing.
+#   artifacts only, and asks Play to validate the upload without publishing it.
 #
-# Signing uses four repository secrets (see docs/13-ci-release.md):
-#   KEYSTORE_BASE64, KEYSTORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD
+# Secrets (see docs/13-ci-release.md): KEYSTORE_BASE64, KEYSTORE_PASSWORD, KEY_ALIAS,
+# KEY_PASSWORD for signing; PLAY_SERVICE_ACCOUNT_JSON for Google Play (skipped until it's set).
 name: Android release
 
 on:
@@ -41,6 +43,7 @@ jobs:
           name=$(sed -n 's/^VERSION_NAME=//p' version.properties | tr -d '[:space:]')
           code=$(sed -n 's/^VERSION_CODE=//p' version.properties | tr -d '[:space:]')
           echo "name=$name" >> "$GITHUB_OUTPUT"
+          echo "code=$code" >> "$GITHUB_OUTPUT"
           echo "base=MorseKit-v$name-$code-release" >> "$GITHUB_OUTPUT"
           echo "Version $name ($code)"
 
@@ -80,7 +83,9 @@ jobs:
             "$(escape "$KEY_PASSWORD")" > keystore.properties
 
       - name: Test
-        run: ./gradlew --console=plain :shared:testAndroidHostTest
+        run: |
+          ./gradlew --console=plain :shared:testAndroidHostTest
+          python3 -m unittest discover -s scripts/play
 
       - name: Build APK and AAB
         run: ./gradlew --console=plain :androidApp:assembleRelease :androidApp:bundleRelease
@@ -119,6 +124,24 @@ jobs:
           TAG: ${{ github.event.release.tag_name }}
         run: gh release upload "$TAG" dist/* --clobber
 
+      # scripts/play/play.py talks to the Play Developer API directly (no third-party action
+      # sees the key). Manual runs only validate; nothing is published.
+      - name: Upload to Google Play (internal testing)
+        env:
+          PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          BASE: ${{ steps.version.outputs.base }}
+          RELEASE_NAME: ${{ steps.version.outputs.name }} (${{ steps.version.outputs.code }})
+          NOTES: ${{ github.event.release.body }}
+          DRY_RUN: ${{ github.event_name != 'release' }}
+        run: |
+          if [ -z "$PLAY_SERVICE_ACCOUNT_JSON" ]; then
+            echo "::notice::PLAY_SERVICE_ACCOUNT_JSON is not set; skipping Google Play"; exit 0
+          fi
+          printf '%s' "$NOTES" > "$RUNNER_TEMP/notes.md"
+          args=(--aab "dist/$BASE.aab" --mapping "dist/$BASE-mapping.txt"
+                --notes-file "$RUNNER_TEMP/notes.md" --release-name "$RELEASE_NAME" --track internal)
+          if [ "$DRY_RUN" = true ]; then args+=(--dry-run); fi
+          python3 scripts/play/play.py upload "${args[@]}"
 
       - name: Remove signing files
         if: always()
