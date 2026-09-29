@@ -1,0 +1,125 @@
+# Builds the signed release APK, AAB and R8 mapping file.
+#
+# - Publishing a GitHub release attaches them to that release.
+# - Running it by hand (Actions > Android release > Run workflow) keeps them as workflow
+#   artifacts only, to try a build before releasing.
+#
+# Signing uses four repository secrets (see docs/13-ci-release.md):
+#   KEYSTORE_BASE64, KEYSTORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD
+name: Android release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: write # gh release upload
+
+concurrency:
+  group: android-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      # Matches gradle/gradle-daemon-jvm.properties (Azul 21), so Gradle doesn't download another JDK.
+      - uses: actions/setup-java@v6
+        with:
+          distribution: zulu
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@v6
+
+      - name: Read version
+        id: version
+        run: |
+          name=$(sed -n 's/^VERSION_NAME=//p' version.properties | tr -d '[:space:]')
+          code=$(sed -n 's/^VERSION_CODE=//p' version.properties | tr -d '[:space:]')
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+          echo "base=MorseKit-v$name-$code-release" >> "$GITHUB_OUTPUT"
+          echo "Version $name ($code)"
+
+      # A release tagged v1.2.0 must build version 1.2.0, so the wrong commit can't be shipped.
+      # Tags may carry a suffix for build-only releases, e.g. v1.0.0+5.
+      - name: Check the tag matches version.properties
+        if: github.event_name == 'release'
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+          VERSION: ${{ steps.version.outputs.name }}
+        run: |
+          case "$TAG" in
+            "v$VERSION" | "v$VERSION"[+-]*) echo "Tag $TAG matches $VERSION" ;;
+            *) echo "::error::Tag $TAG doesn't match VERSION_NAME=$VERSION (expected v$VERSION)"; exit 1 ;;
+          esac
+
+      # Recreates keystore.properties (git-ignored) from secrets. The keystore lives outside the
+      # workspace and is deleted in the last step.
+      - name: Set up release signing
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          for name in KEYSTORE_BASE64 KEYSTORE_PASSWORD KEY_ALIAS KEY_PASSWORD; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Secret $name is not set; a release must be signed"; exit 1
+            fi
+          done
+          keystore="$RUNNER_TEMP/release.jks"
+          echo "$KEYSTORE_BASE64" | base64 --decode > "$keystore"
+          # Properties files treat backslashes as escapes, so double them.
+          escape() { printf '%s' "$1" | sed 's/\\/\\\\/g'; }
+          printf 'storeFile=%s\nstorePassword=%s\nkeyAlias=%s\nkeyPassword=%s\n' \
+            "$keystore" "$(escape "$KEYSTORE_PASSWORD")" "$(escape "$KEY_ALIAS")" \
+            "$(escape "$KEY_PASSWORD")" > keystore.properties
+
+      - name: Test
+        run: ./gradlew --console=plain :shared:testAndroidHostTest
+
+      - name: Build APK and AAB
+        run: ./gradlew --console=plain :androidApp:assembleRelease :androidApp:bundleRelease
+
+      - name: Collect artifacts
+        env:
+          BASE: ${{ steps.version.outputs.base }}
+        run: |
+          mkdir -p dist
+          cp "androidApp/build/dist/$BASE.apk" "androidApp/build/dist/$BASE.aab" dist/
+          cp androidApp/build/outputs/mapping/release/mapping.txt "dist/$BASE-mapping.txt"
+          ls -l dist
+
+      # Fails the job if either file is unsigned; prints the (public) certificate digest.
+      - name: Verify signatures
+        env:
+          BASE: ${{ steps.version.outputs.base }}
+        run: |
+          apksigner=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
+          "$apksigner" verify --print-certs "dist/$BASE.apk" | grep -E "certificate (DN|SHA-256)"
+          jarsigner -verify "dist/$BASE.aab" | grep -q "jar verified" \
+            || { echo "::error::The AAB is not signed"; exit 1; }
+          echo "AAB signed"
+
+      - name: Upload workflow artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ steps.version.outputs.base }}
+          path: dist/*
+          if-no-files-found: error
+
+      - name: Attach to the release
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: gh release upload "$TAG" dist/* --clobber
+
+
+      - name: Remove signing files
+        if: always()
+        run: rm -f "$RUNNER_TEMP/release.jks" keystore.properties
