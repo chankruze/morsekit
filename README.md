@@ -142,6 +142,12 @@ Builds also copy their output to `androidApp/build/dist/` with a descriptive nam
 
 See [docs/07-versioning-and-builds.md](docs/07-versioning-and-builds.md) for details.
 
+Publishing a GitHub release runs [`android-release.yml`](.github/workflows/android-release.yml),
+which attaches the signed APK, AAB and R8 mapping file to the release and uploads the AAB to
+Google Play's internal testing track. [`play-promote.yml`](.github/workflows/play-promote.yml)
+then promotes it to production after your approval. See
+[docs/13-ci-release.md](docs/13-ci-release.md) for the one-time setup.
+
 ### Running tests
 
 Use the run button in your IDE's editor gutter, or run tests using Gradle tasks:

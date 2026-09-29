@@ -20,6 +20,7 @@ open the file and follow along.
 | 10 | [Vibration transmission](10-vibration.md) | Native vibration patterns, millisecond rounding without drift, the shared `TransmissionRunner`, Core Haptics, permissions |
 | 11 | [Translator UI](11-translator-ui.md) | The redesign: direction bar, in-card actions, the Transmit FAB speed dial, one-time flash warning, per-screen headers and insets, the app icon |
 | 12 | [Navigation](12-navigation.md) | Navigation 3 with a back stack you own, Material back rules, keeping tab state, `navigationevent` back handlers |
+| 13 | [Release builds and Google Play](13-ci-release.md) | GitHub Actions builds signed APK/AAB for a release, uploads to Play internal testing, approved promotion to production, a dependency-free Play API client |
 
 ## The whole app on one page
 

@@ -186,11 +186,13 @@ keyPassword=...
 
 | `keystore.properties` | Release build |
 | --- | --- |
-| Absent (fresh clone, CI) | Builds, **unsigned** |
+| Absent (fresh clone) | Builds, **unsigned** |
 | Present but a value is missing | Fails: `keystore.properties: 'storePassword' is missing or empty` |
 | Complete | Signed with the release key, so `assembleRelease` / `bundleRelease` are ready to upload |
 
 It's read with `providers.fileContents`, so editing the file invalidates the configuration cache.
+In CI, the release workflow writes this file from repository secrets
+([note 13](13-ci-release.md)).
 
 > **Keep the keystore safe.** Google Play ties the app to its signing key; with Play App Signing,
 > this is the *upload* key. Back up `MorseKit.jks` and its passwords somewhere other than this
