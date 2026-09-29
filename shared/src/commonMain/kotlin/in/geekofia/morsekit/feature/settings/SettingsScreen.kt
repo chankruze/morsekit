@@ -32,6 +32,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import `in`.geekofia.morsekit.core.settings.AppSettings
@@ -41,6 +48,7 @@ import `in`.geekofia.morsekit.core.timing.MorseTiming
 import `in`.geekofia.morsekit.platform.AppInfo
 import `in`.geekofia.morsekit.ui.components.ScreenScaffold
 import `in`.geekofia.morsekit.ui.components.SectionCard
+import `in`.geekofia.morsekit.ui.theme.spaceGroteskFontFamily
 import morsekit.shared.generated.resources.Res
 import morsekit.shared.generated.resources.ic_more_vert
 import org.jetbrains.compose.resources.painterResource
@@ -196,7 +204,33 @@ private fun SettingsContent(
                 }
             }
         }
+
+        DeveloperCredits()
     }
+}
+
+/**
+ * "Developed with ❤️ by chankruze at geekofia", flat at the bottom of the screen (not a card),
+ * in Space Grotesk. Both names are links; tapping one opens the browser.
+ */
+@Composable
+private fun DeveloperCredits() {
+    val linkStyles = TextLinkStyles(
+        style = SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold),
+    )
+    val credits = buildAnnotatedString {
+        append("Developed with ❤️ by ")
+        withLink(LinkAnnotation.Url(DEVELOPER_URL, linkStyles)) { append(DEVELOPER_NAME) }
+        append(" at ")
+        withLink(LinkAnnotation.Url(ORGANIZATION_URL, linkStyles)) { append(ORGANIZATION_NAME) }
+    }
+    Text(
+        text = credits,
+        modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 16.dp),
+        style = MaterialTheme.typography.bodyMedium.copy(fontFamily = spaceGroteskFontFamily()),
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        textAlign = TextAlign.Center,
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

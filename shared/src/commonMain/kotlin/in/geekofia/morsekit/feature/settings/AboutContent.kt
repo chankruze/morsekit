@@ -22,4 +22,10 @@ internal val openSourceLibraries = listOf(
     OpenSourceLibrary("JSpecify annotations (Android)", "JSpecify", "Apache License 2.0"),
     OpenSourceLibrary("Skiko (iOS)", "JetBrains", "Apache License 2.0"),
     OpenSourceLibrary("Skia, via Skiko (iOS)", "Google", "BSD 3-Clause License"),
+    OpenSourceLibrary("Space Grotesk (font)", "The Space Grotesk Project Authors", "SIL Open Font License 1.1"),
 )
+
+internal const val DEVELOPER_NAME = "chankruze"
+internal const val DEVELOPER_URL = "https://github.com/chankruze"
+internal const val ORGANIZATION_NAME = "geekofia"
+internal const val ORGANIZATION_URL = "https://geekofia.in"
