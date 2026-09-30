@@ -2,6 +2,7 @@ package `in`.geekofia.morsekit
 
 import `in`.geekofia.morsekit.core.review.ReviewPrompter
 import `in`.geekofia.morsekit.core.settings.SettingsRepository
+import `in`.geekofia.morsekit.core.trainer.TrainerRepository
 import `in`.geekofia.morsekit.core.update.UpdateController
 import `in`.geekofia.morsekit.core.update.UpdatePrompter
 import `in`.geekofia.morsekit.platform.PlatformServices
@@ -15,6 +16,7 @@ import `in`.geekofia.morsekit.platform.PlatformServices
  */
 class AppContainer(val platformServices: PlatformServices) {
     val settingsRepository = SettingsRepository(platformServices.keyValueStore)
+    val trainerRepository = TrainerRepository(platformServices.keyValueStore)
 
     val reviewPrompter = ReviewPrompter(platformServices.keyValueStore, nowMillis = ::currentTimeMillis).also {
         it.recordAppStart()

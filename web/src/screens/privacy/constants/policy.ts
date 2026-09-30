@@ -27,6 +27,10 @@ export const STORED_DATA: StoredDataKind[] = [
     what: "When to suggest rating the app: how many times you've used it successfully, and when it was first used and last asked.",
   },
   {
+    prefix: "trainer",
+    what: "Your Morse practice in Learn: which characters you've unlocked, how often you got each one right or wrong, your recent answers, and whether the Morse is shown.",
+  },
+  {
     prefix: "update",
     what: "When the app last checked for an update, and a version you chose to skip for a while.",
   },
