@@ -20,7 +20,7 @@ export const PERMISSIONS: PolicyPermission[] = [
 export const STORED_DATA: StoredDataKind[] = [
   {
     prefix: "settings",
-    what: "Your settings: theme, Morse speed, tone pitch, and whether you've seen the flashlight warning.",
+    what: "Your settings: theme, Morse speeds (for playing and for tapping), tone pitch, and whether you've seen the flashlight warning.",
   },
   {
     prefix: "review",

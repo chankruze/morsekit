@@ -27,8 +27,8 @@ export const FEATURES: Feature[] = [
     text: "Every letter, number and punctuation mark, searchable.",
   },
   {
-    icon: "settings",
-    title: "Your way",
-    text: "Light or dark theme, your default speed and tone.",
+    icon: "tap",
+    title: "Tap it",
+    text: "Key Morse with one finger: tap for a dot, hold for a dash, and watch it turn into text.",
   },
 ];
