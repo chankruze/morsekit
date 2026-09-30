@@ -1,5 +1,6 @@
 package `in`.geekofia.morsekit.core.settings
 
+import `in`.geekofia.morsekit.core.tap.TapTiming
 import `in`.geekofia.morsekit.core.timing.MorseTiming
 import `in`.geekofia.morsekit.platform.InMemoryKeyValueStore
 import kotlin.test.Test
@@ -111,5 +112,24 @@ class SettingsRepositoryTest {
     fun appSettingsRejectsOutOfRangeValues() {
         assertFailsWith<IllegalArgumentException> { AppSettings(wordsPerMinute = 0) }
         assertFailsWith<IllegalArgumentException> { AppSettings(toneFrequencyHz = 20_000) }
+    }
+
+    @Test
+    fun tapSpeedDefaultsSlowerThanPlaybackAndPersists() {
+        assertEquals(TapTiming.DEFAULT_WPM, repository().settings.value.tapWordsPerMinute)
+        repository().setTapWordsPerMinute(12)
+        assertEquals(12, repository().settings.value.tapWordsPerMinute)
+        assertEquals(MorseTiming.DEFAULT_WPM, repository().settings.value.wordsPerMinute)
+    }
+
+    @Test
+    fun tapSpeedIsClampedAndReset() {
+        val repository = repository()
+        repository.setTapWordsPerMinute(1)
+        assertEquals(MorseTiming.MIN_WPM, repository.settings.value.tapWordsPerMinute)
+        store.putInt(SettingsRepository.KEY_TAP_WPM, 999)
+        assertEquals(MorseTiming.MAX_WPM, repository().settings.value.tapWordsPerMinute)
+        repository.resetToDefaults()
+        assertEquals(TapTiming.DEFAULT_WPM, repository.settings.value.tapWordsPerMinute)
     }
 }

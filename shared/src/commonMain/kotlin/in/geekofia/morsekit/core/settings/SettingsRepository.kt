@@ -27,10 +27,13 @@ class SettingsRepository(private val store: KeyValueStore) {
     /** Values outside [AppSettings.MIN_TONE_HZ]..[AppSettings.MAX_TONE_HZ] are clamped. */
     fun setToneFrequencyHz(hz: Int) = update { it.copy(toneFrequencyHz = hz.clampTone()) }
 
+    /** Clamped like [setWordsPerMinute]. */
+    fun setTapWordsPerMinute(wpm: Int) = update { it.copy(tapWordsPerMinute = wpm.clampWpm()) }
+
     fun acknowledgeFlashWarning() = update { it.copy(flashWarningAcknowledged = true) }
 
     /**
-     * Restores the user-facing settings (theme, speed, tone) to their defaults. The flash-warning
+     * Restores the user-facing settings (theme, speeds, tone) to their defaults. The flash-warning
      * acknowledgement isn't a setting shown on screen, so it's kept: resetting shouldn't make the
      * user accept the warning again.
      */
@@ -42,6 +45,7 @@ class SettingsRepository(private val store: KeyValueStore) {
         store.putInt(KEY_WPM, updated.wordsPerMinute)
         store.putInt(KEY_TONE_HZ, updated.toneFrequencyHz)
         store.putBoolean(KEY_FLASH_WARNING_ACKNOWLEDGED, updated.flashWarningAcknowledged)
+        store.putInt(KEY_TAP_WPM, updated.tapWordsPerMinute)
     }
 
     /** Missing, unknown or out-of-range stored values fall back to defaults or are clamped. */
@@ -55,6 +59,7 @@ class SettingsRepository(private val store: KeyValueStore) {
             toneFrequencyHz = store.getInt(KEY_TONE_HZ)?.clampTone() ?: defaults.toneFrequencyHz,
             flashWarningAcknowledged = store.getBoolean(KEY_FLASH_WARNING_ACKNOWLEDGED)
                 ?: defaults.flashWarningAcknowledged,
+            tapWordsPerMinute = store.getInt(KEY_TAP_WPM)?.clampWpm() ?: defaults.tapWordsPerMinute,
         )
     }
 
@@ -67,5 +72,6 @@ class SettingsRepository(private val store: KeyValueStore) {
         const val KEY_WPM = "settings.wordsPerMinute"
         const val KEY_TONE_HZ = "settings.toneFrequencyHz"
         const val KEY_FLASH_WARNING_ACKNOWLEDGED = "settings.flashWarningAcknowledged"
+        const val KEY_TAP_WPM = "settings.tapWordsPerMinute"
     }
 }
