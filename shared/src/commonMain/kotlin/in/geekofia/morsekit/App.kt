@@ -23,6 +23,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import `in`.geekofia.morsekit.feature.reference.ReferenceRoute
 import `in`.geekofia.morsekit.feature.settings.SettingsRoute
+import `in`.geekofia.morsekit.feature.tap.TapRoute
 import `in`.geekofia.morsekit.feature.translator.TranslatorRoute
 import `in`.geekofia.morsekit.feature.update.UpdateDialogs
 import `in`.geekofia.morsekit.navigation.AppBackStack
@@ -96,6 +97,11 @@ fun App(
                                 settingsRepository = container.settingsRepository,
                                 reviewPrompter = container.reviewPrompter,
                                 onExit = onExit,
+                            )
+                            TopLevelDestination.Tap -> TapRoute(
+                                platformServices = container.platformServices,
+                                settingsRepository = container.settingsRepository,
+                                reviewPrompter = container.reviewPrompter,
                             )
                             TopLevelDestination.Reference -> ReferenceRoute()
                             TopLevelDestination.Settings -> SettingsRoute(

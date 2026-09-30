@@ -27,15 +27,22 @@ internal fun shareMessage(state: TranslatorUiState): String? {
             appendLine("Stuck? Decode it, and learn Morse, with MorseKit 📡")
             append("Install it now 👉 $MORSEKIT_STORE_URL")
         }
-        TranslationDirection.MorseToText -> buildString {
-            appendLine("📡 I decoded a Morse message with MorseKit:")
-            appendLine()
-            appendLine("\"${state.output}\"")
-            appendLine()
-            appendLine(state.message.toString())
-            appendLine()
-            appendLine("Decode your own, and learn Morse, with MorseKit.")
-            append("Install it now 👉 $MORSEKIT_STORE_URL")
-        }
+        TranslationDirection.MorseToText -> revealMessage(
+            intro = "📡 I decoded a Morse message with MorseKit:",
+            text = state.output,
+            morse = state.message.toString(),
+        )
     }
+}
+
+/** The reveal: the text, the canonical Morse it came from, and an invitation. Also used by Tap. */
+internal fun revealMessage(intro: String, text: String, morse: String): String = buildString {
+    appendLine(intro)
+    appendLine()
+    appendLine("\"$text\"")
+    appendLine()
+    appendLine(morse)
+    appendLine()
+    appendLine("Decode your own, and learn Morse, with MorseKit.")
+    append("Install it now 👉 $MORSEKIT_STORE_URL")
 }
