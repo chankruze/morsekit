@@ -37,9 +37,9 @@ the KMP concepts used), see the [learning notes in `docs/`](docs/README.md).
 
 ### Roadmap
 
-Progress on the MorseKit backlog. Status: ✅ Done · �� In Progress · ⬜ Todo.
+Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ Todo.
 
-**51 done · 4 in progress · 18 todo** (73 tasks)
+**52 done · 4 in progress · 18 todo** (74 tasks)
 
 | Feature | Done | In Progress | Todo |
 | --- | --- | --- | --- |
@@ -56,7 +56,7 @@ Progress on the MorseKit backlog. Status: ✅ Done · �� In Progress · ⬜ 
 | Settings | 6 | 0 | 0 |
 | Platform | 2 | 1 | 0 |
 | Quality | 2 | 0 | 1 |
-| Release | 7 | 2 | 3 |
+| Release | 8 | 2 | 3 |
 
 #### All tasks
 
@@ -135,6 +135,7 @@ Progress on the MorseKit backlog. Status: ✅ Done · �� In Progress · ⬜ 
 | Release | Shrinking | R8 minification and resource shrinking for release builds | P2 | ✅ Done |
 | Release | Landing page | Website (web/, Vite + React + Tailwind) with live translator and screenshots, deployed to GitHub Pages | P2 | ✅ Done |
 | Release | Privacy policy | Public privacy policy page for Play Console, checked against the app's permissions and stored data | P1 | ✅ Done |
+| Release | Beta signup | Join the closed test from the website: Google Group testers list, opt-in and install steps | P1 | ✅ Done |
 
 ### Running the apps
 

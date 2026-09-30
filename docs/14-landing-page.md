@@ -96,6 +96,35 @@ and gets the same accuracy without rendering anything.
 **Privacy of the page itself.** The font is self-hosted and there are no analytics or external
 scripts, so, like the app, the page makes no third-party requests.
 
+## Joining the beta (closed testing)
+
+The **Join the beta** section (and, until `PLAY_PUBLISHED` is `true`, the hero's Google Play
+button) signs people up for Play's closed test without the site handling any email address:
+
+```mermaid
+flowchart LR
+    V["Visitor"] -->|"1. Join group"| G["Google Group<br/>geekofia@googlegroups.com"]
+    G -.->|"is the testers list<br/>(Play Console › Closed testing › Testers)"| P["Play closed test"]
+    V -->|"2. Opt in"| O["play.google.com/apps/testing/in.geekofia.morsekit"]
+    O --> P
+    V -->|"3. Install"| S["Play listing"]
+```
+
+| Choice | Why |
+| --- | --- |
+| A Google Group as the testers list | Anyone who joins becomes a tester automatically; Play's API can't add single emails to an email list |
+| No form on the site | A static site can't store emails without a third-party service, which would break "no third-party requests" |
+| Policy section "Beta testing" | The group's owner sees members' emails, so the policy says so (effective date 30 September 2026) |
+
+**Play Console setup (once):** Test and release › Closed testing › the track › Testers ›
+**Google Groups** › add `geekofia@googlegroups.com`. The group must let anyone join
+(groups.google.com › the group › Settings › Who can join: *Anyone on the web*). Every member
+becomes a tester of any app that lists the group, so a MorseKit-only group keeps the lists
+separate.
+
+`constants/links.test.ts` checks that the Play links use the `applicationId` from
+`androidApp/build.gradle.kts`, and that the group page matches the group's address.
+
 ## The privacy policy
 
 Play Console needs a public privacy policy URL: **https://morsekit.geekofia.in/privacy/**.
@@ -109,6 +138,7 @@ What it says, and where each claim comes from:
 | Only permission: vibration | `AndroidManifest.xml` (checked by a test) |
 | What's stored on the device: settings, rating-prompt state, update-check state | `KEY_*` constants: `settings.*`, `review.*`, `update.*` (checked by a test) |
 | Settings may be in the user's device backup | `android:allowBackup="true"` |
+| Beta testers' emails are visible to the group owner | The testers Google Group (`TESTING_GROUP_EMAIL`) |
 | Flashlight needs no camera access | `CameraManager.setTorchMode` |
 | In-app updates and reviews are Google Play's | Play In-App Updates and Review libraries ([note 5](05-platform-services.md)) |
 | The website has no cookies, analytics or third-party requests | Self-hosted font, no scripts |
@@ -149,7 +179,7 @@ Pages was switched on once, with Actions as the source:
 
 ## Tests
 
-`npm test` runs vitest (25 tests), each file next to the code it covers:
+`npm test` runs vitest (30 tests), each file next to the code it covers:
 
 | File | Covers |
 | --- | --- |
@@ -157,4 +187,5 @@ Pages was switched on once, with Actions as the source:
 | `morse/utils/*.test.ts` | Encode/decode, normalization, word splitting, glyphs, round trip; tone timing (60 ms unit at 20 WPM, 1/3/7 gaps, PARIS = 50 units) |
 | `screens/home/utils/build-signal-marks.test.ts` | The hero signal gives each element its own tone, in order |
 | `screens/privacy/constants/policy.test.ts` | The policy lists exactly the manifest's permissions and every stored-data prefix |
+| `constants/links.test.ts` | The Play links use the app's `applicationId`; the group page matches the group address |
 | `providers/app-routes.test.ts` | Under `/` and a sub-path: `privacy/` (with or without `/`) is the privacy route; the root is home |
