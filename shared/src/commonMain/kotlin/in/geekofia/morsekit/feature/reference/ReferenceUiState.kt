@@ -9,7 +9,7 @@ data class ReferenceSection(
 
 data class ReferenceUiState(
     val query: String = "",
-    /** Non-empty sections in category order (letters, digits, punctuation). */
+    /** Non-empty sections in category order (letters, digits, punctuation, prosigns). */
     val sections: List<ReferenceSection> = emptyList(),
 ) {
     val hasResults: Boolean get() = sections.isNotEmpty()

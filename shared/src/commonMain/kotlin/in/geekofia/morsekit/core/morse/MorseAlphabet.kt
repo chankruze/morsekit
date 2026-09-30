@@ -2,7 +2,14 @@ package `in`.geekofia.morsekit.core.morse
 
 import `in`.geekofia.morsekit.core.model.MorseLetter
 
-enum class MorseCategory { Letter, Digit, Punctuation }
+enum class MorseCategory {
+    Letter,
+    Digit,
+    Punctuation,
+
+    /** Not an alphabet character: see [MorseProsigns]. [MorseMapping.category] never returns it. */
+    Prosign,
+}
 
 data class MorseMapping(val character: Char, val code: MorseLetter) {
     val category: MorseCategory

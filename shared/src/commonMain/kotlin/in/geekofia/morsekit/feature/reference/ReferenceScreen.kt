@@ -15,6 +15,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -28,8 +29,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -171,7 +174,7 @@ private fun ReferenceGrid(sections: List<ReferenceSection>) {
                     color = MaterialTheme.colorScheme.primary,
                 )
             }
-            items(section.entries, key = { it.character.toString() }) { entry ->
+            items(section.entries, key = { "${it.category}-${it.symbol}" }) { entry ->
                 ReferenceCell(entry)
             }
         }
@@ -186,7 +189,11 @@ private fun ReferenceCell(entry: ReferenceEntry) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            Text(text = entry.character.toString(), style = MaterialTheme.typography.headlineMedium)
+            if (entry.isProsign) {
+                ProsignLetters(entry.symbol)
+            } else {
+                Text(text = entry.symbol, style = MaterialTheme.typography.headlineMedium)
+            }
             MorseDisplay(morse = entry.code, style = MaterialTheme.typography.bodyLarge)
             if (entry.name != null) {
                 Text(
@@ -194,7 +201,8 @@ private fun ReferenceCell(entry: ReferenceEntry) {
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
-                    maxLines = 1,
+                    // Prosign meanings ("Go ahead, named station only") are longer than names.
+                    maxLines = if (entry.isProsign) 2 else 1,
                     overflow = TextOverflow.Ellipsis,
                 )
             }
@@ -202,9 +210,26 @@ private fun ReferenceCell(entry: ReferenceEntry) {
     }
 }
 
+/** Prosigns are written with a bar over the letters (S̅O̅S̅): one sign, sent without gaps. */
+@Composable
+private fun ProsignLetters(letters: String) {
+    val barColor = LocalContentColor.current
+    Text(
+        text = letters,
+        style = MaterialTheme.typography.headlineMedium,
+        modifier = Modifier
+            .padding(top = 4.dp)
+            .drawBehind {
+                val stroke = 2.dp.toPx()
+                drawLine(barColor, Offset(0f, stroke / 2), Offset(size.width, stroke / 2), strokeWidth = stroke)
+            },
+    )
+}
+
 private val MorseCategory.title: String
     get() = when (this) {
         MorseCategory.Letter -> "Letters"
         MorseCategory.Digit -> "Numbers"
         MorseCategory.Punctuation -> "Punctuation"
+        MorseCategory.Prosign -> "Prosigns"
     }

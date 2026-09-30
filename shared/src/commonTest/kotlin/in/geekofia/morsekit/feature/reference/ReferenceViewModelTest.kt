@@ -15,8 +15,11 @@ class ReferenceViewModelTest {
     fun startsWithAllSectionsInOrder() {
         with(viewModel.uiState) {
             assertEquals("", query)
-            assertEquals(listOf(MorseCategory.Letter, MorseCategory.Digit, MorseCategory.Punctuation), categories)
-            assertEquals(listOf(26, 10, 18), sections.map { it.entries.size })
+            assertEquals(
+                listOf(MorseCategory.Letter, MorseCategory.Digit, MorseCategory.Punctuation, MorseCategory.Prosign),
+                categories,
+            )
+            assertEquals(listOf(26, 10, 18, 10), sections.map { it.entries.size })
         }
     }
 
@@ -30,7 +33,10 @@ class ReferenceViewModelTest {
     @Test
     fun searchCanSpanSections() {
         viewModel.onQueryChange("...")
-        assertEquals(listOf(MorseCategory.Letter, MorseCategory.Digit, MorseCategory.Punctuation), categories)
+        assertEquals(
+            listOf(MorseCategory.Letter, MorseCategory.Digit, MorseCategory.Punctuation, MorseCategory.Prosign),
+            categories,
+        )
     }
 
     @Test
@@ -44,6 +50,12 @@ class ReferenceViewModelTest {
         viewModel.onQueryChange("xyz")
         viewModel.onQueryChange("")
         assertTrue(viewModel.uiState.hasResults)
-        assertEquals(54, viewModel.uiState.sections.sumOf { it.entries.size })
+        assertEquals(64, viewModel.uiState.sections.sumOf { it.entries.size })
+    }
+
+    @Test
+    fun prosignSearchFindsTheProsignsSection() {
+        viewModel.onQueryChange("distress")
+        assertEquals(listOf(MorseCategory.Prosign), categories)
     }
 }
