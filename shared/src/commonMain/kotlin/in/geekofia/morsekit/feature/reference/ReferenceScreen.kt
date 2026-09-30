@@ -34,6 +34,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -91,7 +93,11 @@ fun ReferenceScreen(
     ScreenScaffold(
         modifier = modifier,
         title = {
-            if (searching) HeaderSearchField(query = state.query, onQueryChange = onQueryChange) else Text("Reference")
+            if (searching) {
+                HeaderSearchField(query = state.query, onQueryChange = onQueryChange)
+            } else {
+                Text("Reference", modifier = Modifier.semantics { heading() })
+            }
         },
         navigationIcon = {
             if (searching) {
@@ -160,7 +166,7 @@ private fun ReferenceGrid(sections: List<ReferenceSection>) {
             item(key = "header-${section.category}", span = { GridItemSpan(maxLineSpan) }) {
                 Text(
                     text = section.category.title,
-                    modifier = Modifier.padding(top = 8.dp),
+                    modifier = Modifier.padding(top = 8.dp).semantics { heading() },
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.primary,
                 )

@@ -15,6 +15,27 @@ object MorseNotation {
     const val DISPLAY_DOT = '•'
     const val DISPLAY_DASH = '−'
 
+    /**
+     * How a screen reader should say canonical Morse: `... --- ...` → "dot dot dot, dash dash
+     * dash, dot dot dot", with "space" between words. The display glyphs (`•` `−`) would otherwise
+     * be read as "bullet" and "minus". Anything that isn't a dot or dash is kept as it is.
+     */
+    fun toSpokenForm(morse: String): String =
+        morse.split(WORD_SEPARATOR.trim())
+            .map { word ->
+                word.split(LETTER_SEPARATOR).filter { it.isNotEmpty() }.joinToString(", ") { letter ->
+                    letter.map {
+                        when (it) {
+                            DOT -> "dot"
+                            DASH -> "dash"
+                            else -> it.toString()
+                        }
+                    }.joinToString(" ")
+                }
+            }
+            .filter { it.isNotEmpty() }
+            .joinToString(", space, ")
+
     /** Canonical Morse with [DOT]/[DASH] swapped for [DISPLAY_DOT]/[DISPLAY_DASH]. */
     fun toDisplayGlyphs(morse: String): String = morse.map {
         when (it) {

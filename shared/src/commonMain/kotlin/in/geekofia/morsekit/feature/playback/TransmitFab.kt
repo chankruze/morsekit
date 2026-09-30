@@ -30,7 +30,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.disabled
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
@@ -149,7 +152,10 @@ private fun SpeedStepper(wordsPerMinute: Int, onChange: (Int) -> Unit) {
             Text(
                 text = "$wordsPerMinute WPM",
                 style = MaterialTheme.typography.labelLarge,
-                modifier = Modifier.semantics { stateDescription = "Speed $wordsPerMinute words per minute" },
+                modifier = Modifier.semantics {
+                    stateDescription = "Speed $wordsPerMinute words per minute"
+                    liveRegion = LiveRegionMode.Polite
+                },
             )
             IconButton(
                 onClick = { onChange(stepWpm(wordsPerMinute, faster = true)) },
@@ -161,7 +167,10 @@ private fun SpeedStepper(wordsPerMinute: Int, onChange: (Int) -> Unit) {
     }
 }
 
-/** A labelled mini FAB. Both the label and the button start the output. */
+/**
+ * A labelled mini FAB. Both the label and the button start the output; screen readers get only
+ * the button, labelled with the note too ("Flash, no flashlight"), so each option is one stop.
+ */
 @Composable
 private fun OptionRow(
     label: String,
@@ -181,6 +190,7 @@ private fun OptionRow(
             shape = MaterialTheme.shapes.small,
             color = MaterialTheme.colorScheme.surfaceContainerHigh,
             shadowElevation = 2.dp,
+            modifier = Modifier.clearAndSetSemantics {},
         ) {
             Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp), horizontalAlignment = Alignment.End) {
                 Text(label, style = MaterialTheme.typography.labelLarge)
@@ -198,7 +208,7 @@ private fun OptionRow(
             containerColor = MaterialTheme.colorScheme.secondaryContainer,
             modifier = if (available) Modifier else Modifier.semantics { disabled() },
         ) {
-            Icon(painterResource(icon), contentDescription = label)
+            Icon(painterResource(icon), contentDescription = listOfNotNull(label, note).joinToString(", "))
         }
     }
 }

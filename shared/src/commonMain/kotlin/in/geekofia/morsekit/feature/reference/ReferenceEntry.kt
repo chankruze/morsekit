@@ -17,9 +17,7 @@ data class ReferenceEntry(
 ) {
     /** What a screen reader announces, e.g. "A, dot dash" or "Comma, dash dash dot dot dash dash". */
     val accessibilityLabel: String
-        get() = "${name ?: character}, " + code.map {
-            if (it == MorseNotation.DOT) "dot" else "dash"
-        }.joinToString(" ")
+        get() = "${name ?: character}, " + MorseNotation.toSpokenForm(code)
 }
 
 /** Builds the chart from the alphabet, in the alphabet's order. */

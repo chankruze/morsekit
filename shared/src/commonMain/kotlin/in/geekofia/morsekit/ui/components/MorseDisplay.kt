@@ -6,6 +6,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import `in`.geekofia.morsekit.core.model.MorseNotation
 import `in`.geekofia.morsekit.ui.theme.toMorseStyle
@@ -34,7 +36,12 @@ fun MorseDisplay(
         return
     }
     val displayText = remember(morse) { MorseNotation.toDisplayGlyphs(morse) }
+    val spoken = remember(morse) { MorseNotation.toSpokenForm(morse) }
     SelectionContainer(modifier = modifier) {
-        Text(text = displayText, style = style.toMorseStyle())
+        Text(
+            text = displayText,
+            style = style.toMorseStyle(),
+            modifier = Modifier.semantics { contentDescription = spoken },
+        )
     }
 }

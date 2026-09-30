@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -243,7 +244,7 @@ private fun AppTitle() {
         // Decorative: the name next to it already identifies the app to screen readers.
         Image(painterResource(Res.drawable.morsekit_logo), contentDescription = null, modifier = Modifier.size(32.dp))
         Spacer(Modifier.width(12.dp))
-        Text("MorseKit")
+        Text("MorseKit", modifier = Modifier.semantics { heading() })
     }
 }
 
@@ -318,7 +319,7 @@ private fun DirectionBar(direction: TranslationDirection, onSwap: () -> Unit) {
         IconButton(onClick = onSwap) {
             Icon(
                 painter = painterResource(Res.drawable.ic_translate),
-                contentDescription = "Swap to $to to $from",
+                contentDescription = "Swap: translate $to to $from",
                 modifier = Modifier.rotate(rotation),
             )
         }
@@ -406,11 +407,11 @@ private fun OutputCard(
     }
 }
 
-/** Card title on the left, optional action on the right, at a constant height. */
+/** Card title on the left, optional action on the right; at least 48 dp tall, taller with large fonts. */
 @Composable
 private fun CardHeader(label: String, action: @Composable () -> Unit = {}) {
     Row(
-        modifier = Modifier.fillMaxWidth().height(48.dp).padding(start = 16.dp, end = 4.dp),
+        modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).padding(start = 16.dp, end = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
