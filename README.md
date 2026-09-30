@@ -39,7 +39,7 @@ the KMP concepts used), see the [learning notes in `docs/`](docs/README.md).
 
 Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ Todo.
 
-**54 done · 5 in progress · 16 todo** (75 tasks)
+**58 done · 5 in progress · 12 todo** (75 tasks)
 
 | Feature | Done | In Progress | Todo |
 | --- | --- | --- | --- |
@@ -51,7 +51,7 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Flashlight | 4 | 0 | 2 |
 | Vibration | 3 | 0 | 0 |
 | Morse Trainer | 0 | 0 | 5 |
-| Tap Morse | 0 | 0 | 4 |
+| Tap Morse | 4 | 0 | 0 |
 | History | 0 | 0 | 3 |
 | Settings | 7 | 0 | 0 |
 | Platform | 2 | 1 | 0 |
@@ -104,10 +104,10 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Morse Trainer | Scoring | Track correct answers and accuracy | P2 | ⬜ Todo |
 | Morse Trainer | Progression | Gradually introduce new characters | P2 | ⬜ Todo |
 | Morse Trainer | Session | Add configurable practice sessions | P3 | ⬜ Todo |
-| Tap Morse | Tap input | Tap to enter dots | P2 | ⬜ Todo |
-| Tap Morse | Long press | Long press to enter dashes | P2 | ⬜ Todo |
-| Tap Morse | Character detection | Convert tap sequences into characters | P2 | ⬜ Todo |
-| Tap Morse | Haptic feedback | Provide feedback while tapping | P3 | ⬜ Todo |
+| Tap Morse | Tap input | Tap to enter dots | P2 | ✅ Done |
+| Tap Morse | Long press | Long press to enter dashes | P2 | ✅ Done |
+| Tap Morse | Character detection | Convert tap sequences into characters | P2 | ✅ Done |
+| Tap Morse | Haptic feedback | Provide feedback while tapping | P3 | ✅ Done |
 | History | Recent translations | Persist recent translations locally | P2 | ⬜ Todo |
 | History | Favorites | Allow users to favorite frequently used messages | P3 | ⬜ Todo |
 | History | Delete | Delete individual or all history items | P3 | ⬜ Todo |

@@ -41,6 +41,8 @@ The test packages mirror the main packages:
 | `MorseTokenizerTest` | 6 | Word/letter splitting rules in isolation |
 | `MorseProsignsTest` | 3 | Prosign codes vs an independent table, the four that share a code with punctuation, meanings and unique letters |
 | `MorseNotationTest` | 5 | Display glyphs; the spoken form for screen readers (pauses between letters, "space" between words) |
+| `TapDecoderTest` | 18 | Keying by hand with fake time: dot/dash threshold, letter and word gaps, deadlines, manual edits cancelling pending breaks, backspace, clear |
+| `TapViewModelTest` | 6 | Saved tap speed, keying with a fake clock, `heldAsDash`, screen-reader actions |
 | `MorseTimingTest` | 8 | Unit length vs WPM, bounds, gap rules, PARIS = 50 units, durations |
 | `TranslatorViewModelTest` | 12 | Live conversion, issues, swap (including dropping `�` placeholders), direction selection, clear |
 | `StepWpmTest` | 6 | Speed ladder covers 5–60, neighbouring steps, snapping between steps, ends, clamping, 20→60 in a few taps |
@@ -48,7 +50,7 @@ The test packages mirror the main packages:
 | `ReferenceEntryTest` | 10 | Chart built from the alphabet in order, codes vs the independent table, A–Z/0–9/punctuation coverage, every punctuation mark has a name, prosign entries, accessibility labels (prosign letters spelled out) |
 | `ReferenceSearchTest` | 15 | Character, code-prefix (incl. `·−`) and name search, ambiguous `.`/`-`, ordering, no matches; prosigns by letters, meaning and code (HH is eight dots) |
 | `ReferenceViewModelTest` | 6 | Initial sections (including Prosigns), filtering hides empty sections, clearing restores all 64 |
-| `SettingsRepositoryTest` | 11 | Defaults, immediate updates, persistence across instances, independent keys, clamping, corrupt stored values, the one-time flash warning, reset to defaults (keeps the acknowledgement), `AppSettings` invariants |
+| `SettingsRepositoryTest` | 13 | Defaults, immediate updates, persistence across instances, independent keys, clamping, corrupt stored values, the one-time flash warning, reset to defaults (keeps the acknowledgement), `AppSettings` invariants, the tap speed |
 | `ToneScheduleTest` | 7 | Units → frames at 16 kHz, gaps, speed scaling, no rounding drift at 13 WPM |
 | `MorseAudioRendererTest` | 10 | Length and duration, exact silence, amplitude, fade in/out, measured pitch, speed, limits |
 | `MorseAudioPlayerTest` | 8 | Play/stop, completion, replay, restart while playing, stop while idle, stale completions (fake output) |
@@ -65,7 +67,7 @@ The test packages mirror the main packages:
 | `ChooseUpdateModeTest` | 7 | Flexible by default, immediate for priority ≥ 4 or 30 days stale, fallbacks when a type isn't allowed |
 | `UpdatePrompterTest` | 4 | Daily check limit, 7-day snooze, newer versions not snoozed, urgent and manual ignore the snooze |
 | `UpdateControllerTest` | 10 | Offer on resume, once a day, declines snoozed, interrupted immediate resumed, ready-to-install and Later, manual up-to-date and offered, unsupported platform |
-| **Total** | **266** | |
+| **Total** | **292** | |
 
 ## Testing techniques used
 

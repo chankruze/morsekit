@@ -23,6 +23,7 @@ open the file and follow along.
 | 13 | [Release builds and Google Play](13-ci-release.md) | GitHub Actions builds signed APK/AAB for a release, uploads to Play internal testing, approved promotion to production, a dependency-free Play API client |
 | 14 | [Landing page](14-landing-page.md) | The `web/` site: Vite, React and Tailwind next to the app, a TypeScript port of the engine kept in sync by tests, Web Audio timing |
 | 15 | [Accessibility](15-accessibility.md) | Morse spoken as dots and dashes, headings, announced values, one stop per action, 48 dp targets, font scaling, how to test with TalkBack |
+| 16 | [Tap Morse](16-tap-morse.md) | Keying by hand: a pure decoder with fake time, thresholds from a tap speed, deadlines instead of polling, haptics, a key screen readers can use |
 
 ## The whole app on one page
 
