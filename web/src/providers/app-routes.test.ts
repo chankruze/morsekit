@@ -3,22 +3,22 @@ import { describe, expect, it } from "vitest";
 import { ROUTES } from "@/constants/routes";
 import { APP_ROUTES } from "@/providers/app-routes";
 
-const PAGES_BASENAME = "/morsekit/";
+// "/" on the custom domain (morsekit.geekofia.in); a sub-path if the site is served as a
+// github.io project page.
+describe.each(["/", "/morsekit/"])("routes under %s", (basename) => {
+  const matchedRoute = (path: string) =>
+    matchRoutes(APP_ROUTES, `${basename}${path}`, basename)?.at(-1)?.route;
 
-const matchedPath = (url: string) =>
-  matchRoutes(APP_ROUTES, url, PAGES_BASENAME)?.at(-1)?.route;
-
-describe("routes on GitHub Pages", () => {
   it("serves the privacy policy at the Play Console URL, with or without the slash", () => {
-    expect(matchedPath("/morsekit/privacy/")?.path).toBe(ROUTES.privacy);
-    expect(matchedPath("/morsekit/privacy")?.path).toBe(ROUTES.privacy);
+    expect(matchedRoute("privacy/")?.path).toBe(ROUTES.privacy);
+    expect(matchedRoute("privacy")?.path).toBe(ROUTES.privacy);
   });
 
   it("serves home at the site root", () => {
-    expect(matchedPath("/morsekit/")?.index).toBe(true);
+    expect(matchedRoute("")?.index).toBe(true);
   });
 
   it("sends unknown paths to the catch-all", () => {
-    expect(matchedPath("/morsekit/nope")?.path).toBe("*");
+    expect(matchedRoute("nope")?.path).toBe("*");
   });
 });
