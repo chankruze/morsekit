@@ -1,5 +1,6 @@
 package `in`.geekofia.morsekit.core.settings
 
+import `in`.geekofia.morsekit.core.tap.TapMode
 import `in`.geekofia.morsekit.core.timing.MorseTiming
 import `in`.geekofia.morsekit.platform.KeyValueStore
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,6 +31,8 @@ class SettingsRepository(private val store: KeyValueStore) {
     /** Clamped like [setWordsPerMinute]. */
     fun setTapWordsPerMinute(wpm: Int) = update { it.copy(tapWordsPerMinute = wpm.clampWpm()) }
 
+    fun setTapMode(mode: TapMode) = update { it.copy(tapMode = mode) }
+
     fun acknowledgeFlashWarning() = update { it.copy(flashWarningAcknowledged = true) }
 
     /**
@@ -46,6 +49,7 @@ class SettingsRepository(private val store: KeyValueStore) {
         store.putInt(KEY_TONE_HZ, updated.toneFrequencyHz)
         store.putBoolean(KEY_FLASH_WARNING_ACKNOWLEDGED, updated.flashWarningAcknowledged)
         store.putInt(KEY_TAP_WPM, updated.tapWordsPerMinute)
+        store.putString(KEY_TAP_MODE, updated.tapMode.name)
     }
 
     /** Missing, unknown or out-of-range stored values fall back to defaults or are clamped. */
@@ -60,6 +64,9 @@ class SettingsRepository(private val store: KeyValueStore) {
             flashWarningAcknowledged = store.getBoolean(KEY_FLASH_WARNING_ACKNOWLEDGED)
                 ?: defaults.flashWarningAcknowledged,
             tapWordsPerMinute = store.getInt(KEY_TAP_WPM)?.clampWpm() ?: defaults.tapWordsPerMinute,
+            tapMode = store.getString(KEY_TAP_MODE)
+                ?.let { name -> TapMode.entries.firstOrNull { it.name == name } }
+                ?: defaults.tapMode,
         )
     }
 
@@ -73,5 +80,6 @@ class SettingsRepository(private val store: KeyValueStore) {
         const val KEY_TONE_HZ = "settings.toneFrequencyHz"
         const val KEY_FLASH_WARNING_ACKNOWLEDGED = "settings.flashWarningAcknowledged"
         const val KEY_TAP_WPM = "settings.tapWordsPerMinute"
+        const val KEY_TAP_MODE = "settings.tapMode"
     }
 }

@@ -1,5 +1,6 @@
 package `in`.geekofia.morsekit.core.settings
 
+import `in`.geekofia.morsekit.core.tap.TapMode
 import `in`.geekofia.morsekit.core.tap.TapTiming
 import `in`.geekofia.morsekit.core.timing.MorseTiming
 
@@ -14,6 +15,7 @@ data class AppSettings(
     val flashWarningAcknowledged: Boolean = false,
     /** Speed for keying on the Tap screen; slower than playback by default (see [TapTiming]). */
     val tapWordsPerMinute: Int = TapTiming.DEFAULT_WPM,
+    val tapMode: TapMode = TapMode.Timing,
 ) {
     init {
         require(wordsPerMinute in MorseTiming.MIN_WPM..MorseTiming.MAX_WPM) { "WPM out of range: $wordsPerMinute" }

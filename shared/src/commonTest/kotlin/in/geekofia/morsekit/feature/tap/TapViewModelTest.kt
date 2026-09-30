@@ -1,6 +1,7 @@
 package `in`.geekofia.morsekit.feature.tap
 
 import `in`.geekofia.morsekit.core.settings.SettingsRepository
+import `in`.geekofia.morsekit.core.tap.TapMode
 import `in`.geekofia.morsekit.core.tap.TapTiming
 import `in`.geekofia.morsekit.platform.InMemoryKeyValueStore
 import kotlin.test.Test
@@ -83,5 +84,31 @@ class TapViewModelTest {
         assertEquals("", viewModel.state.currentLetter)
         viewModel.clear()
         assertTrue(viewModel.state.isEmpty)
+    }
+
+    @Test
+    fun switchingModesKeepsTheTextAndStopsTimers() {
+        assertEquals(TapMode.Timing, viewModel.mode)
+        hold(100) // "." with a letter gap pending
+        assertEquals(450, viewModel.millisUntilNextChange())
+        viewModel.setMode(TapMode.Buttons)
+        assertEquals(TapMode.Buttons, settings.settings.value.tapMode)
+        assertEquals(".", viewModel.state.currentLetter)
+        assertNull(viewModel.millisUntilNextChange())
+    }
+
+    @Test
+    fun buttonsModeKeysWithoutTimingAndPreviewsTheLetter() {
+        viewModel.setMode(TapMode.Buttons)
+        viewModel.dash()
+        assertEquals('T', viewModel.preview)
+        viewModel.dot()
+        assertEquals('N', viewModel.preview)
+        now += 60_000 // no timing: waiting changes nothing
+        viewModel.advance()
+        assertEquals("-.", viewModel.state.currentLetter)
+        viewModel.endLetter()
+        assertEquals("N", viewModel.state.text)
+        assertNull(viewModel.preview)
     }
 }

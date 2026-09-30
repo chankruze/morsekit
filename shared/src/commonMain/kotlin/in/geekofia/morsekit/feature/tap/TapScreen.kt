@@ -13,6 +13,9 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -35,6 +38,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import `in`.geekofia.morsekit.core.review.ReviewPrompter
 import `in`.geekofia.morsekit.core.settings.SettingsRepository
+import `in`.geekofia.morsekit.core.tap.TapMode
 import `in`.geekofia.morsekit.core.tap.TapState
 import `in`.geekofia.morsekit.core.tap.TapTiming
 import `in`.geekofia.morsekit.feature.translator.revealMessage
@@ -78,21 +82,25 @@ fun TapRoute(
     }
 
     val text = state.text.trimEnd()
+    val tick = { haptics.performHapticFeedback(HapticFeedbackType.KeyboardTap) }
     ScreenScaffold(title = { Text("Tap", modifier = Modifier.semantics { heading() }) }, modifier = modifier) { inner ->
         Box(inner.fillMaxSize()) {
             TapScreen(
                 state = state,
                 heldAsDash = heldAsDash,
                 timing = viewModel.timing,
+                mode = settings.tapMode,
+                preview = viewModel.preview,
+                onModeChange = viewModel::setMode,
                 onPress = {
-                    haptics.performHapticFeedback(HapticFeedbackType.KeyboardTap)
+                    tick()
                     viewModel.press()
                 },
                 onRelease = viewModel::release,
-                onDot = viewModel::dot,
-                onDash = viewModel::dash,
-                onEndLetter = viewModel::endLetter,
-                onSpace = viewModel::space,
+                onDot = { tick(); viewModel.dot() },
+                onDash = { tick(); viewModel.dash() },
+                onEndLetter = { tick(); viewModel.endLetter() },
+                onSpace = { tick(); viewModel.space() },
                 onBackspace = viewModel::backspace,
                 onClear = viewModel::clear,
                 onCopy = {
@@ -124,6 +132,9 @@ fun TapScreen(
     state: TapState,
     heldAsDash: Boolean,
     timing: TapTiming,
+    mode: TapMode,
+    preview: Char?,
+    onModeChange: (TapMode) -> Unit,
     onPress: () -> Unit,
     onRelease: () -> Unit,
     onDot: () -> Unit,
@@ -141,7 +152,7 @@ fun TapScreen(
         modifier = modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        MessageCard(state)
+        MessageCard(state, preview)
         MessageActions(
             hasText = state.text.isNotBlank(),
             isEmpty = state.isEmpty,
@@ -150,23 +161,36 @@ fun TapScreen(
             onCopy = onCopy,
             onShare = onShare,
         )
-        MorseKey(
-            pressed = state.isPressed,
-            heldAsDash = heldAsDash,
-            onPress = onPress,
-            onRelease = onRelease,
-            onDot = onDot,
-            onDash = onDash,
-            onEndLetter = onEndLetter,
-            onSpace = onSpace,
-            modifier = Modifier.fillMaxWidth().weight(1f).heightIn(min = KEY_MIN_HEIGHT),
-        )
-        TapSpeed(timing = timing, onChange = onTapSpeedChange)
+        ModeSelector(selected = mode, onSelected = onModeChange)
+        val keyArea = Modifier.fillMaxWidth().weight(1f).heightIn(min = KEY_MIN_HEIGHT)
+        when (mode) {
+            TapMode.Timing -> {
+                MorseKey(
+                    pressed = state.isPressed,
+                    heldAsDash = heldAsDash,
+                    onPress = onPress,
+                    onRelease = onRelease,
+                    onDot = onDot,
+                    onDash = onDash,
+                    onEndLetter = onEndLetter,
+                    onSpace = onSpace,
+                    modifier = keyArea,
+                )
+                TapSpeed(timing = timing, onChange = onTapSpeedChange)
+            }
+            TapMode.Buttons -> TapButtons(
+                onDot = onDot,
+                onDash = onDash,
+                onEndLetter = onEndLetter,
+                onSpace = onSpace,
+                modifier = keyArea,
+            )
+        }
     }
 }
 
 @Composable
-private fun MessageCard(state: TapState) {
+private fun MessageCard(state: TapState, preview: Char?) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
@@ -187,6 +211,11 @@ private fun MessageCard(state: TapState) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("Keying", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
                     MorseDisplay(morse = state.currentLetter, style = MaterialTheme.typography.titleLarge)
+                    Text(
+                        text = "→ ${preview ?: "?"}",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
                 }
             }
         }
@@ -217,6 +246,27 @@ private fun MessageActions(
         }
     }
 }
+
+@Composable
+private fun ModeSelector(selected: TapMode, onSelected: (TapMode) -> Unit) {
+    val options = TapMode.entries
+    SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+        options.forEachIndexed { index, mode ->
+            SegmentedButton(
+                selected = mode == selected,
+                onClick = { onSelected(mode) },
+                shape = SegmentedButtonDefaults.itemShape(index = index, count = options.size),
+                label = { Text(mode.label) },
+            )
+        }
+    }
+}
+
+private val TapMode.label: String
+    get() = when (this) {
+        TapMode.Timing -> "Timing"
+        TapMode.Buttons -> "Buttons"
+    }
 
 /** The stepper, and what the speed means in milliseconds, so the thresholds aren't a mystery. */
 @Composable

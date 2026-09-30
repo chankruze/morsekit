@@ -212,4 +212,23 @@ class TapDecoderTest {
         assertNull(decoder.nextDeadline(s))
         assertEquals("A", decoder.endLetter(s).text)
     }
+
+    @Test
+    fun stopTimersKeepsTheTextButCancelsBreaksAndAHeldKey() {
+        val (keyed, end) = key(TapState(), 0, ".-")
+        val held = decoder.press(keyed, end + 100) // within the letter gap: still the same letter
+        val stopped = decoder.stopTimers(held)
+        assertEquals(".-", stopped.currentLetter)
+        assertFalse(stopped.isPressed)
+        assertNull(decoder.nextDeadline(stopped))
+    }
+
+    @Test
+    fun previewShowsWhatTheLetterDecodesToSoFar() {
+        assertNull(decoder.preview(TapState()))
+        assertEquals('E', decoder.preview(decoder.element(TapState(), dash = false)))
+        val a = decoder.element(decoder.element(TapState(), dash = false), dash = true)
+        assertEquals('A', decoder.preview(a))
+        assertNull(decoder.preview(TapState(currentLetter = "........-")))
+    }
 }

@@ -78,7 +78,14 @@ class TapDecoder(
      */
     fun endLetter(state: TapState): TapState = commitLetter(state).copy(releasedAt = null)
 
-    /** Adds a dot or dash without timing (screen-reader actions). */
+    /** Drops any pending automatic break (e.g. when switching to [TapMode.Buttons]); keeps the text. */
+    fun stopTimers(state: TapState): TapState = state.copy(pressedAt = null, releasedAt = null)
+
+    /** What the letter being keyed decodes to so far (`.-` → `A`), or `null` if nothing matches yet. */
+    fun preview(state: TapState): Char? =
+        state.currentLetter.takeIf { it.isNotEmpty() }?.let(codec::decodeSymbol)
+
+    /** Adds a dot or dash without timing ([TapMode.Buttons], screen-reader actions). */
     fun element(state: TapState, dash: Boolean): TapState = state.copy(
         currentLetter = state.currentLetter + if (dash) MorseNotation.DASH else MorseNotation.DOT,
         releasedAt = null,

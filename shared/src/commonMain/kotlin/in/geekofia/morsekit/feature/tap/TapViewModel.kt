@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import `in`.geekofia.morsekit.core.settings.SettingsRepository
 import `in`.geekofia.morsekit.core.tap.TapDecoder
+import `in`.geekofia.morsekit.core.tap.TapMode
 import `in`.geekofia.morsekit.core.tap.TapState
 import `in`.geekofia.morsekit.core.tap.TapTiming
 import kotlin.time.TimeSource
@@ -28,6 +29,11 @@ class TapViewModel(
         private set
 
     val timing: TapTiming get() = TapTiming(settingsRepository.settings.value.tapWordsPerMinute)
+
+    val mode: TapMode get() = settingsRepository.settings.value.tapMode
+
+    /** What the letter being keyed decodes to so far, e.g. `A` for `.-`. */
+    val preview: Char? get() = decoder.preview(state)
 
     private val decoder: TapDecoder get() = TapDecoder(timing)
 
@@ -64,6 +70,13 @@ class TapViewModel(
     fun clear() = edit(decoder::clear)
 
     fun setTapSpeed(wordsPerMinute: Int) = settingsRepository.setTapWordsPerMinute(wordsPerMinute)
+
+    /** Keeps what's been keyed, but no timer from one mode fires in the other. */
+    fun setMode(mode: TapMode) {
+        settingsRepository.setTapMode(mode)
+        state = decoder.stopTimers(state)
+        heldAsDash = false
+    }
 
     private inline fun edit(transform: (TapState) -> TapState) {
         state = transform(state)

@@ -1,5 +1,6 @@
 package `in`.geekofia.morsekit.core.settings
 
+import `in`.geekofia.morsekit.core.tap.TapMode
 import `in`.geekofia.morsekit.core.tap.TapTiming
 import `in`.geekofia.morsekit.core.timing.MorseTiming
 import `in`.geekofia.morsekit.platform.InMemoryKeyValueStore
@@ -131,5 +132,14 @@ class SettingsRepositoryTest {
         assertEquals(MorseTiming.MAX_WPM, repository().settings.value.tapWordsPerMinute)
         repository.resetToDefaults()
         assertEquals(TapTiming.DEFAULT_WPM, repository.settings.value.tapWordsPerMinute)
+    }
+
+    @Test
+    fun tapModeDefaultsToTimingPersistsAndFallsBackWhenUnknown() {
+        assertEquals(TapMode.Timing, repository().settings.value.tapMode)
+        repository().setTapMode(TapMode.Buttons)
+        assertEquals(TapMode.Buttons, repository().settings.value.tapMode)
+        store.putString(SettingsRepository.KEY_TAP_MODE, "Telepathy")
+        assertEquals(TapMode.Timing, repository().settings.value.tapMode)
     }
 }
