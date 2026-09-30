@@ -1,7 +1,16 @@
 # 16. Tap Morse
 
-The **Tap** tab turns the screen into a straight key: tap for a dot, hold for a dash, and the
-pauses between presses decide where letters and words end, as in real hand-sent Morse.
+The **Tap** tab lets you key Morse by hand, in one of two modes (a **Timing | Buttons** switch,
+remembered as `settings.tapMode`):
+
+| Mode | Input | Good for |
+| --- | --- | --- |
+| **Timing** (default) | One key, like a straight key: tap for a dot, hold for a dash; pauses end letters and words | Real hand-sent Morse, rhythm practice |
+| **Buttons** | **Dot**, **Dash**, **Next letter**, **Space**: no timing at all | Beginners, slow careful input, screen readers |
+
+Both show the letter being keyed and what it decodes to so far (`•− → A`; `?` if nothing matches
+yet), which makes it a learning aid too. Switching modes keeps what's been keyed but stops any
+pending timer (`TapDecoder.stopTimers`), so a letter isn't ended behind your back.
 
 ```
 ┌──────────────────────────┐
@@ -9,14 +18,21 @@ pauses between presses decide where letters and words end, as in real hand-sent 
 │ ┌──────────────────────┐ │
 │ │ HELLO WOR            │ │  decoded text (a live region for screen readers)
 │ │ •••• • •−•• •−•• −−− │ │  its Morse
-│ │ Keying  •−•          │ │  the letter being keyed
+│ │ Keying  •−•  → R     │ │  the letter being keyed, and what it decodes to
 │ └──────────────────────┘ │
 │          ⌫   ✕   ⧉   ⤴  │  delete, clear, copy, share
+│ [ Timing  |  Buttons ]   │  mode switch
 │ ┌──────────────────────┐ │
-│ │      TAP · HOLD      │ │  MorseKey: DOT while held, DASH past the threshold
+│ │      TAP · HOLD      │ │  Timing: MorseKey (DOT while held, DASH past the threshold)
 │ └──────────────────────┘ │
-│       − 8 WPM +          │  tap speed, and what it means in ms
+│       − 8 WPM +          │  tap speed, and what it means in ms (Timing only)
 └──────────────────────────┘
+
+Buttons mode replaces the key and the speed with:
+│ ┌─────────┐ ┌─────────┐  │
+│ │    •    │ │    −    │  │  Dot, Dash
+│ └─────────┘ └─────────┘  │
+│ [Next letter] [ Space ]  │
 ```
 
 ## From presses to text: `TapDecoder`
@@ -73,6 +89,6 @@ translator's Morse → Text (`revealMessage()` in `ShareMessage.kt`), with the t
 
 | Test | Covers |
 | --- | --- |
-| `TapDecoderTest` (18) | Thresholds per speed, dot/dash at the exact threshold, letter and word gaps, late advance, press after a pause, a whole sentence with its Morse, unknown codes, deadlines, one space at most, manual edits, backspace through letters and spaces, clear with a held key |
-| `TapViewModelTest` (6) | The saved tap speed, keying with a fake clock, `heldAsDash`, faster speeds, screen-reader actions, delete and clear |
-| `SettingsRepositoryTest` | The tap speed's default, persistence, clamping and reset |
+| `TapDecoderTest` (20) | Thresholds per speed, dot/dash at the exact threshold, letter and word gaps, late advance, press after a pause, a whole sentence with its Morse, unknown codes, deadlines, one space at most, manual edits, backspace through letters and spaces, clear with a held key, `stopTimers`, `preview` |
+| `TapViewModelTest` (8) | The saved tap speed, keying with a fake clock, `heldAsDash`, faster speeds, screen-reader actions, delete and clear, switching modes, Buttons mode with the preview |
+| `SettingsRepositoryTest` | The tap speed's default, persistence, clamping and reset; the tap mode, including an unknown stored value |

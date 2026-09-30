@@ -39,7 +39,7 @@ the KMP concepts used), see the [learning notes in `docs/`](docs/README.md).
 
 Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ Todo.
 
-**58 done · 5 in progress · 12 todo** (75 tasks)
+**59 done · 5 in progress · 12 todo** (76 tasks)
 
 | Feature | Done | In Progress | Todo |
 | --- | --- | --- | --- |
@@ -51,7 +51,7 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Flashlight | 4 | 0 | 2 |
 | Vibration | 3 | 0 | 0 |
 | Morse Trainer | 0 | 0 | 5 |
-| Tap Morse | 4 | 0 | 0 |
+| Tap Morse | 5 | 0 | 0 |
 | History | 0 | 0 | 3 |
 | Settings | 7 | 0 | 0 |
 | Platform | 2 | 1 | 0 |
@@ -108,6 +108,7 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Tap Morse | Long press | Long press to enter dashes | P2 | ✅ Done |
 | Tap Morse | Character detection | Convert tap sequences into characters | P2 | ✅ Done |
 | Tap Morse | Haptic feedback | Provide feedback while tapping | P3 | ✅ Done |
+| Tap Morse | Button mode | Dot, Dash, Next letter and Space buttons with a Timing | Buttons switch, plus a live letter preview | P2 | ✅ Done |
 | History | Recent translations | Persist recent translations locally | P2 | ⬜ Todo |
 | History | Favorites | Allow users to favorite frequently used messages | P3 | ⬜ Todo |
 | History | Delete | Delete individual or all history items | P3 | ⬜ Todo |
