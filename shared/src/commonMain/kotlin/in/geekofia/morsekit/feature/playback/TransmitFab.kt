@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Surface
@@ -30,18 +29,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.disabled
-import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.unit.dp
+import `in`.geekofia.morsekit.ui.components.SpeedStepper
 import morsekit.shared.generated.resources.Res
-import morsekit.shared.generated.resources.ic_add
 import morsekit.shared.generated.resources.ic_close
 import morsekit.shared.generated.resources.ic_flashlight
-import morsekit.shared.generated.resources.ic_remove
 import morsekit.shared.generated.resources.ic_stop
 import morsekit.shared.generated.resources.ic_transmit
 import morsekit.shared.generated.resources.ic_vibration
@@ -90,7 +85,7 @@ fun TransmitFab(
         ) {
             AnimatedVisibility(visible = menuOpen, enter = fadeIn() + scaleIn(), exit = fadeOut() + scaleOut()) {
                 Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    SpeedStepper(wordsPerMinute, onWordsPerMinuteChange)
+                    SpeedStepper(wordsPerMinute = wordsPerMinute, onChange = onWordsPerMinuteChange)
                     OptionRow("Sound", null, Res.drawable.ic_volume, available = true) {
                         expanded = false
                         onStart(TransmitOutput.Sound)
@@ -130,38 +125,6 @@ fun TransmitFab(
                         contentDescription = if (menuOpen) "Close transmit options" else "Transmit",
                     )
                 }
-            }
-        }
-    }
-}
-
-@Composable
-private fun SpeedStepper(wordsPerMinute: Int, onChange: (Int) -> Unit) {
-    Surface(
-        shape = MaterialTheme.shapes.extraLarge,
-        color = MaterialTheme.colorScheme.surfaceContainerHigh,
-        shadowElevation = 2.dp,
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(
-                onClick = { onChange(stepWpm(wordsPerMinute, faster = false)) },
-                enabled = wordsPerMinute > WPM_STEPS.first(),
-            ) {
-                Icon(painterResource(Res.drawable.ic_remove), contentDescription = "Slower")
-            }
-            Text(
-                text = "$wordsPerMinute WPM",
-                style = MaterialTheme.typography.labelLarge,
-                modifier = Modifier.semantics {
-                    stateDescription = "Speed $wordsPerMinute words per minute"
-                    liveRegion = LiveRegionMode.Polite
-                },
-            )
-            IconButton(
-                onClick = { onChange(stepWpm(wordsPerMinute, faster = true)) },
-                enabled = wordsPerMinute < WPM_STEPS.last(),
-            ) {
-                Icon(painterResource(Res.drawable.ic_add), contentDescription = "Faster")
             }
         }
     }

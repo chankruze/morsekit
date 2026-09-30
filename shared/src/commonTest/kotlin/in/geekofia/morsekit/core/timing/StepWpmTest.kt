@@ -1,6 +1,5 @@
-package `in`.geekofia.morsekit.feature.playback
+package `in`.geekofia.morsekit.core.timing
 
-import `in`.geekofia.morsekit.core.timing.MorseTiming
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
