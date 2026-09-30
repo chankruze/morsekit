@@ -29,6 +29,7 @@ turns canonical Morse into speech, and every place that shows Morse uses it:
 | Controls announce their value in words: speed "Speed 20 words per minute" (also a polite **live region**, so − / + announce the new value), sliders "20 WPM" / "600 Hz" | `SpeedStepper`, `SliderSetting` |
 | One stop per action: each Transmit option is read once, as its button, with its note ("Flash, No flashlight"); the label chip beside it is hidden from screen readers (`clearAndSetSemantics {}`) because the button does the same thing | `OptionRow` |
 | Unavailable options are marked `disabled()` and say why | `OptionRow` |
+| Icon-and-label actions (Learn's *Play again* and *Show Morse*) are one touch target each (`clickable` / `toggleable` on the pair), so the label is read once, with its role (button, switch) and state |
 | Touch targets are at least 48 dp: Material buttons, icon buttons and clickable `Surface`s enforce it; the privacy policy link is a `TextButton`, not a small inline link | Settings › About |
 | Text scales with the system font size: sizes are in `sp` through the Material type scale, and containers use minimum heights (`heightIn(min = 48.dp)`), not fixed ones, so large fonts grow them instead of clipping | `CardHeader` |
 | Motion follows the user: the landing page's blinking signal stops with "Reduce motion" ([note 14](14-landing-page.md)); the flashlight warns before its first flash ([note 9](09-flashlight.md)) | |

@@ -46,6 +46,7 @@ The test packages mirror the main packages:
 | `KochProgressionTest` | 7 | The Koch order, per-character counts, the 18-of-20 unlock rule, the window, the last character |
 | `QuestionGeneratorTest` | 6 | Valid distinct choices, no immediate repeats, newest and missed characters weighted up, repeatable with a seed |
 | `TrainerRepositoryTest` | 4 | Fresh start, round trip, corrupt values, reset |
+| `ConfettiTest` | 3 | The confetti's physics: burst point, rise then fall, stays inside the area |
 | `TrainerViewModelTest` | 8 | Answering, scoring, streaks, unlocking, restarts, reset |
 | `MorseTimingTest` | 8 | Unit length vs WPM, bounds, gap rules, PARIS = 50 units, durations |
 | `TranslatorViewModelTest` | 12 | Live conversion, issues, swap (including dropping `�` placeholders), direction selection, clear |
@@ -71,7 +72,7 @@ The test packages mirror the main packages:
 | `ChooseUpdateModeTest` | 7 | Flexible by default, immediate for priority ≥ 4 or 30 days stale, fallbacks when a type isn't allowed |
 | `UpdatePrompterTest` | 4 | Daily check limit, 7-day snooze, newer versions not snoozed, urgent and manual ignore the snooze |
 | `UpdateControllerTest` | 10 | Offer on resume, once a day, declines snoozed, interrupted immediate resumed, ready-to-install and Later, manual up-to-date and offered, unsupported platform |
-| **Total** | **322** | |
+| **Total** | **325** | |
 
 ## Testing techniques used
 
