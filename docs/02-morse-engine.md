@@ -398,6 +398,35 @@ sealed interface TranslationIssue {
 > **Why `LinkedHashSet` for issues?** A set removes duplicates (`"é é é"` reports `é` once), and
 > the *linked* variant keeps first-seen order, so the UI lists issues in the order they appear.
 
+## Prosigns
+
+A **prosign** (procedural sign) is two or three letters sent as *one* character, with none of
+the usual gaps between them, and written with a bar over the letters: S̅O̅S̅ is `...---...`,
+not `... --- ...`. They're shown in the Reference chart (`MorseProsigns.Common`, in
+`core/morse/MorseProsigns.kt`):
+
+| Prosign | Code | Meaning | Same code as |
+| --- | --- | --- | --- |
+| SOS | `...---...` | Distress signal | |
+| AR | `.-.-.` | End of message | `+` |
+| SK | `...-.-` | End of contact | |
+| BT | `-...-` | Break, new paragraph | `=` |
+| KN | `-.--.` | Go ahead, named station only | `(` |
+| AS | `.-...` | Wait | `&` |
+| CT | `-.-.-` | Start of message | |
+| VE | `...-.` | Understood | |
+| HH | `........` | Error, correction follows | |
+| CL | `-.-..-..` | Closing down | |
+
+- **Codes are computed, not typed.** Each prosign's code is its letters' codes from
+  `MorseAlphabet.International` run together, so the two can't disagree. `MorseProsignsTest`
+  still checks every code against an independently written table, like `ExpectedMorse`.
+- **Not part of the alphabet.** `MorseAlphabet` maps one character to one code both ways, and
+  four prosigns share a code with punctuation. So the codec still decodes `.-.-.` as `+`, and
+  decoding prosigns in the translator (`...---...` → `<SOS>`) is left for later.
+  `MorseCategory.Prosign` exists for the Reference chart; `MorseMapping.category` never
+  returns it.
+
 ## The public API at a glance
 
 | Call | Result |
@@ -416,7 +445,7 @@ sealed interface TranslationIssue {
 
 | Choice | Reason |
 | --- | --- |
-| `MorseCodec` is a `class` with a constructor-injected `MorseAlphabet` | You can test or swap alphabets (e.g. add prosigns later) without global state |
+| `MorseCodec` is a `class` with a constructor-injected `MorseAlphabet` | You can test or swap alphabets without global state |
 | `MorseNormalizer` / `MorseTokenizer` are `object`s | They're pure functions with no state, so an `object` is just a namespace, not a mutable singleton |
 | Normalize → tokenize → look up, as separate steps | Each step is small, has a single job, and is tested on its own |
 | Results carry both a string and structure (`EncodeResult.message`) | The UI shows the string; future playback consumes the structure |

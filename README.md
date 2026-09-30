@@ -39,24 +39,24 @@ the KMP concepts used), see the [learning notes in `docs/`](docs/README.md).
 
 Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ Todo.
 
-**52 done · 4 in progress · 18 todo** (74 tasks)
+**54 done · 5 in progress · 16 todo** (75 tasks)
 
 | Feature | Done | In Progress | Todo |
 | --- | --- | --- | --- |
 | Project Foundation | 6 | 0 | 0 |
 | Morse Engine | 6 | 0 | 0 |
 | Translator | 8 | 0 | 0 |
-| Morse Reference | 3 | 1 | 0 |
+| Morse Reference | 4 | 0 | 0 |
 | Audio | 4 | 0 | 0 |
 | Flashlight | 4 | 0 | 2 |
 | Vibration | 3 | 0 | 0 |
 | Morse Trainer | 0 | 0 | 5 |
 | Tap Morse | 0 | 0 | 4 |
 | History | 0 | 0 | 3 |
-| Settings | 6 | 0 | 0 |
+| Settings | 7 | 0 | 0 |
 | Platform | 2 | 1 | 0 |
-| Quality | 2 | 0 | 1 |
-| Release | 8 | 2 | 3 |
+| Quality | 2 | 1 | 0 |
+| Release | 8 | 3 | 2 |
 
 #### All tasks
 
@@ -84,7 +84,7 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Translator | Share message | Share a friendly puzzle (Text → Morse) or reveal (Morse → Text) message with the store link | P2 | ✅ Done |
 | Morse Reference | Alphabet chart | Display A-Z Morse reference chart | P0 | ✅ Done |
 | Morse Reference | Numbers | Display 0-9 Morse codes | P1 | ✅ Done |
-| Morse Reference | Punctuation | Display common punctuation and prosigns | P1 | 🚧 In Progress |
+| Morse Reference | Punctuation | Display common punctuation and prosigns | P1 | ✅ Done |
 | Morse Reference | Search | Search/filter Morse characters | P2 | ✅ Done |
 | Audio | Morse audio | Convert Morse symbols into audible tones | P1 | ✅ Done |
 | Audio | WPM | Add adjustable Morse transmission speed | P1 | ✅ Done |
@@ -117,10 +117,11 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Settings | About | Add app version, privacy information, and open-source/license information | P1 | ✅ Done |
 | Settings | Reset | Reset settings to defaults, with confirmation | P3 | ✅ Done |
 | Settings | Credits | Developer credits and links | P3 | ✅ Done |
+| Settings | About privacy text | Say settings may be included in the device backup (android:allowBackup), matching the privacy policy | P1 | ✅ Done |
 | Platform | Android | Implement Android-specific torch, vibration, audio, clipboard, and sharing integrations | P0 | ✅ Done |
 | Platform | iOS | Implement iOS-specific torch, haptics, audio, clipboard, and sharing integrations | P0 | 🚧 In Progress |
 | Platform | Permissions | Add only required platform permissions and document their purpose | P0 | ✅ Done |
-| Quality | Accessibility | Add content descriptions, semantic labels, scalable text, and touch targets | P1 | ⬜ Todo |
+| Quality | Accessibility | Content descriptions, semantic labels, scalable text and touch targets (code pass done; check with TalkBack on a device) | P1 | 🚧 In Progress |
 | Quality | Error states | Handle empty, invalid, and unsupported input gracefully | P1 | ✅ Done |
 | Quality | Offline | Ensure all core functionality works without network access | P0 | ✅ Done |
 | Release | App icon | Create MorseKit launcher/app icon | P1 | 🚧 In Progress |
@@ -128,7 +129,7 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Release | Build | Generate signed Android release build and iOS archive | P1 | 🚧 In Progress |
 | Release | CI | GitHub Actions workflow: build signed APK/AAB and mapping file for GitHub releases | P1 | ✅ Done |
 | Release | Play publishing | Upload GitHub releases to Play internal testing with release notes; approved promotion to production | P1 | ✅ Done |
-| Release | Play setup | Create the Play Console app and first upload; service account and PLAY_SERVICE_ACCOUNT_JSON secret; production environment | P1 | ⬜ Todo |
+| Release | Play setup | Play Console app and closed test created (build 5 uploaded); left: service account, PLAY_SERVICE_ACCOUNT_JSON secret, production environment | P1 | 🚧 In Progress |
 | Release | Store links | Check the Play Store link in shared messages once published; add an App Store link for iOS recipients | P2 | ⬜ Todo |
 | Release | Ratings | Ask for a store rating at good moments and add a Rate MorseKit banner | P2 | ✅ Done |
 | Release | In-app updates | Android: Play In-App Updates (flexible, immediate when urgent), daily check with 7-day snooze, Check for updates in Settings | P2 | ✅ Done |

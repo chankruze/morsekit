@@ -173,21 +173,23 @@ A second feature built the same way: `ReferenceRoute` → `ReferenceScreen`, wit
 
 ```mermaid
 flowchart LR
-    A["MorseAlphabet.International<br/>(only source of codes)"] -->|"referenceEntries()"| E["List of ReferenceEntry<br/>char, code, category, name"]
+    A["MorseAlphabet.International<br/>(only source of codes)"] -->|"referenceEntries()"| E["List of ReferenceEntry<br/>symbol, code, category, name"]
+    P["MorseProsigns.Common<br/>(codes built from the alphabet)"] -->|"referenceEntries()"| E
     Q["search query"] --> F["filterReference(entries, query)"]
     E --> F
-    F -->|"toSections()"| S["ReferenceUiState.sections<br/>Letters / Numbers / Punctuation"]
+    F -->|"toSections()"| S["ReferenceUiState.sections<br/>Letters / Numbers / Punctuation / Prosigns"]
     S --> G["LazyVerticalGrid"]
 ```
 
 | Concept | Where |
 | --- | --- |
 | **No duplicated mappings.** Entries are built from `MorseAlphabet.mappings`; the feature adds only punctuation *names*. A test fails if a punctuation mark has no name, or a name has no mark | `ReferenceEntry.kt` |
-| **Search as a pure function.** It matches a single character (`a`), a code prefix (`.-`, `·−`) or part of a name (`comma`), and keeps alphabet order | `ReferenceSearch.kt` |
+| **Search as a pure function.** It matches a single character (`a`), a prosign's letters (`sos`), a code prefix (`.-`, `·−`) or part of a name or meaning (`comma`, `distress`), and keeps alphabet order | `ReferenceSearch.kt` |
+| **Prosigns.** Shown after punctuation with a bar over the letters (`drawBehind` draws the line: Compose has no overline text decoration), and their meaning on up to two lines ([note 2](02-morse-engine.md#prosigns)) | `ProsignLetters` |
 | **`LazyVerticalGrid` with `GridCells.Adaptive(96.dp)`.** As many columns as fit, so it adapts to phones, tablets and rotation. Only visible cells are composed | `ReferenceScreen.kt` |
 | **Full-width headers.** `item(span = { GridItemSpan(maxLineSpan) })` makes a section title span every column | `ReferenceGrid` |
-| **Stable `key`s.** Each cell is keyed by its character, so filtering reuses cells instead of recreating them | `items(..., key = ...)` |
-| **Accessibility.** `clearAndSetSemantics { contentDescription = "A, dot dash" }` makes each card read as one sentence, not "A" then "•−" | `ReferenceCell` |
+| **Stable `key`s.** Each cell is keyed by category and symbol, so filtering reuses cells instead of recreating them | `items(..., key = ...)` |
+| **Accessibility.** `clearAndSetSemantics { contentDescription = "A, dot dash" }` makes each card read as one sentence, not "A" then "•−"; prosigns read "Prosign S O S, Distress signal, dot dot dot, …". Section titles are headings ([note 15](15-accessibility.md)) | `ReferenceCell` |
 
 ## App shell and navigation
 
