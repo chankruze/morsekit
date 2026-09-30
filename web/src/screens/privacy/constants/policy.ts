@@ -7,7 +7,7 @@ import type {
 // behind: a new permission or a new KEY_* prefix fails the web tests until it's described here.
 
 /** Bump whenever the policy's meaning changes. */
-export const EFFECTIVE_DATE = "30 September 2026";
+export const EFFECTIVE_DATE = "1 October 2026";
 
 export const PERMISSIONS: PolicyPermission[] = [
   {
@@ -28,7 +28,7 @@ export const STORED_DATA: StoredDataKind[] = [
   },
   {
     prefix: "trainer",
-    what: "Your Morse practice in Learn: which characters you've unlocked, how often you got each one right or wrong, your recent answers, and whether the Morse is shown.",
+    what: "Your Morse practice in Learn: which characters you've unlocked, how often you got each one right or wrong, your recent answers, whether the Morse is shown, and your practice mode (listening or keying) and session length.",
   },
   {
     prefix: "update",

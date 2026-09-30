@@ -18,16 +18,18 @@ import androidx.compose.ui.unit.dp
 
 /**
  * [TapMode.Buttons][in.geekofia.morsekit.core.tap.TapMode.Buttons]: Dot and Dash add elements,
- * Next letter and Space end them. Nothing depends on timing, so there's no rush, and each button
- * is an ordinary, labelled button for screen readers.
+ * Next letter (or [endLetterLabel], e.g. the trainer's Check) and Space (hidden when [onSpace] is
+ * null) end them. Nothing depends on timing, so there's no rush, and each button is an ordinary,
+ * labelled button for screen readers.
  */
 @Composable
 fun TapButtons(
     onDot: () -> Unit,
     onDash: () -> Unit,
     onEndLetter: () -> Unit,
-    onSpace: () -> Unit,
+    onSpace: (() -> Unit)?,
     modifier: Modifier = Modifier,
+    endLetterLabel: String = "Next letter",
 ) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Row(modifier = Modifier.fillMaxWidth().weight(1f), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -36,10 +38,12 @@ fun TapButtons(
         }
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             FilledTonalButton(onClick = onEndLetter, modifier = Modifier.weight(1f).heightIn(min = 56.dp)) {
-                Text("Next letter")
+                Text(endLetterLabel)
             }
-            FilledTonalButton(onClick = onSpace, modifier = Modifier.weight(1f).heightIn(min = 56.dp)) {
-                Text("Space")
+            if (onSpace != null) {
+                FilledTonalButton(onClick = onSpace, modifier = Modifier.weight(1f).heightIn(min = 56.dp)) {
+                    Text("Space")
+                }
             }
         }
     }

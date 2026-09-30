@@ -33,11 +33,24 @@ class TrainerRepository(private val store: KeyValueStore) {
         get() = store.getBoolean(KEY_HIDE_MORSE) ?: false
         set(value) = store.putBoolean(KEY_HIDE_MORSE, value)
 
+    var mode: TrainerMode
+        get() = store.getString(KEY_MODE)?.let { name -> TrainerMode.entries.firstOrNull { it.name == name } }
+            ?: TrainerMode.Listen
+        set(value) = store.putString(KEY_MODE, value.name)
+
+    /** The last session length chosen; always one of [PracticeSession.LENGTHS]. */
+    var sessionLength: Int
+        get() = store.getInt(KEY_SESSION_LENGTH)?.takeIf { it in PracticeSession.LENGTHS }
+            ?: PracticeSession.DEFAULT_LENGTH
+        set(value) = store.putInt(KEY_SESSION_LENGTH, value)
+
     internal companion object {
         const val KEY_LEVEL = "trainer.level"
         const val KEY_STATS = "trainer.stats"
         const val KEY_RECENT = "trainer.recent"
         const val KEY_HIDE_MORSE = "trainer.hideMorse"
+        const val KEY_MODE = "trainer.mode"
+        const val KEY_SESSION_LENGTH = "trainer.sessionLength"
 
         // "K3:1;M5:0": the character, then correct:wrong. ';' and ':' aren't in KochOrder, so a
         // character like ',' or '/' can't be confused with a separator.

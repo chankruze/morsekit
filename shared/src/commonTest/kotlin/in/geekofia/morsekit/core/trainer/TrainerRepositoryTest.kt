@@ -46,4 +46,18 @@ class TrainerRepositoryTest {
         assertEquals(TrainerProgress(), repository.load())
         assertTrue(TrainerRepository(store).hideMorse)
     }
+
+    @Test
+    fun modeAndSessionLengthAreRememberedAndValidated() {
+        assertEquals(TrainerMode.Listen, repository.mode)
+        assertEquals(PracticeSession.DEFAULT_LENGTH, repository.sessionLength)
+        repository.mode = TrainerMode.Key
+        repository.sessionLength = 50
+        assertEquals(TrainerMode.Key, TrainerRepository(store).mode)
+        assertEquals(50, TrainerRepository(store).sessionLength)
+        store.putString(TrainerRepository.KEY_MODE, "Juggle")
+        store.putInt(TrainerRepository.KEY_SESSION_LENGTH, 7)
+        assertEquals(TrainerMode.Listen, repository.mode)
+        assertEquals(PracticeSession.DEFAULT_LENGTH, repository.sessionLength)
+    }
 }
