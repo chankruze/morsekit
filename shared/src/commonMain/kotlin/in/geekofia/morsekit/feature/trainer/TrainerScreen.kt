@@ -1,5 +1,10 @@
 package `in`.geekofia.morsekit.feature.trainer
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,7 +13,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -17,13 +24,11 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -31,11 +36,17 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
@@ -43,6 +54,7 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -56,12 +68,16 @@ import `in`.geekofia.morsekit.core.trainer.TrainerProgress
 import `in`.geekofia.morsekit.core.trainer.TrainerRepository
 import `in`.geekofia.morsekit.feature.playback.MorsePlaybackViewModel
 import `in`.geekofia.morsekit.platform.PlatformServices
+import `in`.geekofia.morsekit.ui.components.ConfettiBurst
 import `in`.geekofia.morsekit.ui.components.MorseDisplay
 import `in`.geekofia.morsekit.ui.components.ScreenScaffold
 import kotlinx.coroutines.delay
 import morsekit.shared.generated.resources.Res
 import morsekit.shared.generated.resources.ic_more_vert
+import morsekit.shared.generated.resources.ic_visibility
+import morsekit.shared.generated.resources.ic_visibility_off
 import morsekit.shared.generated.resources.ic_volume
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
 /** After a right answer, the next question comes by itself after this pause. */
@@ -83,9 +99,15 @@ fun TrainerRoute(
     val codec = MorseCodec()
     val play: (Char) -> Unit = { char -> playbackViewModel.play(codec.encode(char.toString()).message) }
     var confirmReset by rememberSaveable { mutableStateOf(false) }
+    val haptics = LocalHapticFeedback.current
 
     // Each new question plays once by itself; Play again replays it.
     LaunchedEffect(state.question) { play(state.question.target) }
+    LaunchedEffect(state.answer) {
+        state.answer?.let {
+            haptics.performHapticFeedback(if (it.correct) HapticFeedbackType.Confirm else HapticFeedbackType.Reject)
+        }
+    }
     LaunchedEffect(state.answer, state.justUnlocked) {
         if (state.answer?.correct == true && state.justUnlocked == null) {
             delay(NEXT_AFTER_RIGHT_MILLIS)
@@ -153,9 +175,9 @@ fun TrainerScreen(
 ) {
     Column(
         modifier = modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        LevelCard(state.progress)
+        LevelCard(state.progress, state.session)
         PromptCard(
             code = codeOf(state.question.target),
             hideMorse = state.hideMorse,
@@ -167,46 +189,42 @@ fun TrainerScreen(
     }
 }
 
+/** The level and session score on one line, the unlocked characters on another, then the bar. */
 @Composable
-private fun LevelCard(progress: TrainerProgress) {
+private fun LevelCard(progress: TrainerProgress, session: SessionScore) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
     ) {
-        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(
-                text = "Level ${progress.level} of ${KochOrder.characters.size}",
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.semantics { heading() },
-            )
-            // The unlocked characters, the newest in bold.
-            Text(
-                text = buildAnnotatedString {
-                    progress.unlocked.forEachIndexed { i, char ->
-                        if (i > 0) append("  ")
-                        if (char == progress.newest) {
-                            withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)) {
-                                append(char)
-                            }
-                        } else {
-                            append(char)
-                        }
-                    }
-                },
-                style = MaterialTheme.typography.titleLarge,
-            )
+        Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = "Level ${progress.level} of ${KochOrder.characters.size}",
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.weight(1f).semantics { heading() },
+                )
+                if (session.answered > 0) {
+                    Text(
+                        text = "${session.correct}/${session.answered} · streak ${session.streak}",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.semantics {
+                            stateDescription = "This session: ${session.correct} of ${session.answered} right, streak ${session.streak}"
+                        },
+                    )
+                }
+            }
+            UnlockedCharacters(progress)
             if (progress.isComplete) {
-                Text("All characters unlocked. Keep practising the ones you miss.", style = MaterialTheme.typography.bodyMedium)
+                Text("All characters unlocked. Keep practising the ones you miss.", style = MaterialTheme.typography.bodySmall)
             } else {
                 LinearProgressIndicator(
                     progress = { (progress.recentCorrect.toFloat() / KochProgression.UNLOCK_CORRECT).coerceAtMost(1f) },
-                    modifier = Modifier.fillMaxWidth().semantics {
-                        stateDescription = "${progress.recentCorrect} of the last ${progress.recent.size} right"
-                    },
+                    modifier = Modifier.fillMaxWidth(),
                 )
                 Text(
                     text = "${progress.recentCorrect} of the last ${progress.recent.size} right · " +
-                        "${KochProgression.UNLOCK_CORRECT} of ${KochProgression.WINDOW} unlocks the next character",
+                        "${KochProgression.UNLOCK_CORRECT}/${KochProgression.WINDOW} unlocks the next",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -215,6 +233,35 @@ private fun LevelCard(progress: TrainerProgress) {
     }
 }
 
+/**
+ * One line, whatever the level: it scrolls sideways and keeps the newest (bold) character in
+ * view, so the card doesn't grow as characters are unlocked.
+ */
+@Composable
+private fun UnlockedCharacters(progress: TrainerProgress) {
+    val scroll = rememberScrollState()
+    LaunchedEffect(progress.level) { scroll.animateScrollTo(scroll.maxValue) }
+    Text(
+        text = buildAnnotatedString {
+            progress.unlocked.forEachIndexed { i, char ->
+                if (i > 0) append("  ")
+                if (char == progress.newest) {
+                    withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)) {
+                        append(char)
+                    }
+                } else {
+                    append(char)
+                }
+            }
+        },
+        style = MaterialTheme.typography.titleMedium,
+        maxLines = 1,
+        softWrap = false,
+        modifier = Modifier.horizontalScroll(scroll),
+    )
+}
+
+/** One compact row: play, the Morse (or a hint when it's hidden), and the show/hide toggle, each labelled. */
 @Composable
 private fun PromptCard(
     code: String,
@@ -226,27 +273,48 @@ private fun PromptCard(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+        Row(
+            modifier = Modifier.fillMaxWidth().heightIn(min = 72.dp).padding(horizontal = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Box(modifier = Modifier.heightIn(min = 56.dp), contentAlignment = Alignment.Center) {
+            LabeledAction(
+                icon = Res.drawable.ic_volume,
+                label = "Play again",
+                modifier = Modifier.clickable(role = Role.Button, onClick = onPlay),
+            )
+            Box(modifier = Modifier.weight(1f).padding(horizontal = 8.dp), contentAlignment = Alignment.Center) {
                 if (hideMorse) {
-                    Text("Listen, then pick the character", style = MaterialTheme.typography.titleMedium)
+                    Text("Listen, then pick", style = MaterialTheme.typography.titleMedium)
                 } else {
-                    MorseDisplay(morse = code, style = MaterialTheme.typography.displaySmall)
+                    MorseDisplay(morse = code, style = MaterialTheme.typography.headlineMedium)
                 }
             }
-            FilledTonalButton(onClick = onPlay) {
-                Icon(painterResource(Res.drawable.ic_volume), contentDescription = null)
-                Text("Play again", modifier = Modifier.padding(start = 8.dp))
-            }
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("Show Morse", style = MaterialTheme.typography.bodyMedium)
-                Switch(checked = !hideMorse, onCheckedChange = onShowMorseChange)
-            }
+            LabeledAction(
+                icon = if (hideMorse) Res.drawable.ic_visibility_off else Res.drawable.ic_visibility,
+                label = "Show Morse",
+                modifier = Modifier.toggleable(value = !hideMorse, role = Role.Switch, onValueChange = onShowMorseChange),
+            )
         }
+    }
+}
+
+/**
+ * An icon with a small label under it, as one touch target (at least 64 × 56 dp): the caller adds
+ * `clickable` or `toggleable`, so a screen reader reads the label once, with its role and state.
+ */
+@Composable
+private fun LabeledAction(icon: DrawableResource, label: String, modifier: Modifier = Modifier) {
+    Column(
+        modifier = Modifier
+            .clip(MaterialTheme.shapes.medium)
+            .then(modifier)
+            .sizeIn(minWidth = 64.dp, minHeight = 56.dp)
+            .padding(horizontal = 8.dp, vertical = 6.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.CenterVertically),
+    ) {
+        Icon(painterResource(icon), contentDescription = null)
+        Text(label, style = MaterialTheme.typography.labelSmall, maxLines = 1)
     }
 }
 
@@ -254,12 +322,12 @@ private fun PromptCard(
 @Composable
 private fun Choices(state: TrainerUiState, onAnswer: (Char) -> Unit) {
     val answer = state.answer
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         state.question.choices.chunked(2).forEach { row ->
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 row.forEach { choice ->
                     val isTarget = choice == state.question.target
-                    val modifier = Modifier.weight(1f).heightIn(min = 72.dp)
+                    val modifier = Modifier.weight(1f).heightIn(min = 64.dp)
                     val label: @Composable () -> Unit = {
                         Text(
                             text = when {
@@ -291,35 +359,55 @@ private fun Choices(state: TrainerUiState, onAnswer: (Char) -> Unit) {
     }
 }
 
+/**
+ * One line under the choices, always the same height so nothing jumps: "Right!", or the answer
+ * with its Morse and Next beside it.
+ */
 @Composable
 private fun Feedback(state: TrainerUiState, onNext: () -> Unit) {
     val answer = state.answer
-    Column(
-        modifier = Modifier.fillMaxWidth().semantics { liveRegion = LiveRegionMode.Polite },
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+    Row(
+        modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).semantics { liveRegion = LiveRegionMode.Polite },
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         when {
             answer == null -> Unit
-            answer.correct -> Text("Right!", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+            answer.correct -> RightFeedback(streak = state.session.streak, modifier = Modifier.weight(1f))
             else -> {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("It was ${state.question.target}", style = MaterialTheme.typography.titleMedium)
-                    MorseDisplay(morse = codeOf(state.question.target), style = MaterialTheme.typography.titleMedium)
-                }
+                Text("It was ${state.question.target}", style = MaterialTheme.typography.titleMedium)
+                MorseDisplay(
+                    morse = codeOf(state.question.target),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.weight(1f),
+                )
                 Button(onClick = onNext) { Text("Next") }
             }
         }
-        val session = state.session
-        if (session.answered > 0) {
-            Text(
-                text = "This session: ${session.correct} of ${session.answered} right · streak ${session.streak}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
     }
 }
+
+/** Centered, with a short springy pop; from [STREAK_SHOWN_FROM] in a row, the streak too. */
+@Composable
+private fun RightFeedback(streak: Int, modifier: Modifier = Modifier) {
+    val scale = remember { Animatable(POP_FROM_SCALE) }
+    LaunchedEffect(Unit) {
+        scale.animateTo(1f, spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium))
+    }
+    Text(
+        text = if (streak >= STREAK_SHOWN_FROM) "Right! · $streak in a row 🔥" else "Right!",
+        style = MaterialTheme.typography.titleLarge,
+        color = MaterialTheme.colorScheme.primary,
+        textAlign = TextAlign.Center,
+        modifier = modifier.graphicsLayer {
+            scaleX = scale.value
+            scaleY = scale.value
+        },
+    )
+}
+
+private const val STREAK_SHOWN_FROM = 3
+private const val POP_FROM_SCALE = 0.6f
 
 @Composable
 private fun NewCharacterDialog(char: Char, onPlay: () -> Unit, onContinue: () -> Unit) {
@@ -327,14 +415,18 @@ private fun NewCharacterDialog(char: Char, onPlay: () -> Unit, onContinue: () ->
         onDismissRequest = onContinue,
         title = { Text("New character: $char") },
         text = {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                Text(char.toString(), style = MaterialTheme.typography.displayMedium)
-                MorseDisplay(morse = codeOf(char), style = MaterialTheme.typography.headlineMedium)
-                Text("You'll hear it often in the next questions.", style = MaterialTheme.typography.bodyMedium)
+            // The confetti is drawn over the content, but decorative: it has no semantics.
+            Box(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    Text(char.toString(), style = MaterialTheme.typography.displayMedium)
+                    MorseDisplay(morse = codeOf(char), style = MaterialTheme.typography.headlineMedium)
+                    Text("You'll hear it often in the next questions.", style = MaterialTheme.typography.bodyMedium)
+                }
+                ConfettiBurst(modifier = Modifier.matchParentSize(), seed = char.code)
             }
         },
         confirmButton = { TextButton(onClick = onContinue) { Text("Continue") } },
