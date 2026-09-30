@@ -2,10 +2,14 @@ package `in`.geekofia.morsekit.feature.settings
 
 // Static content for the About section.
 
+// Settings can also reach the user's own device backup (android:allowBackup, iCloud on iOS), so
+// the notice says so; the web privacy policy says the same.
 internal const val PRIVACY_NOTICE =
     "MorseKit works entirely on your device. It has no accounts, ads or analytics, and doesn't use " +
-        "the network. What you type stays on your device unless you copy or share it, and settings " +
-        "are stored only on this device."
+        "the network. What you type stays on your device unless you copy or share it. Settings are " +
+        "stored on this device, and in your device's backup if you've turned backup on."
+
+internal const val PRIVACY_POLICY_URL = "https://morsekit.geekofia.in/privacy/"
 
 internal data class OpenSourceLibrary(
     val name: String,

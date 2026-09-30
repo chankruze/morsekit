@@ -22,8 +22,8 @@ import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Slider
-import androidx.compose.material3.Surface
 import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -33,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.LinkAnnotation
@@ -218,6 +219,7 @@ private fun SettingsContent(
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+            PrivacyPolicyLink()
             HorizontalDivider()
             Text("Open-source libraries", style = MaterialTheme.typography.bodyLarge)
             openSourceLibraries.forEach { library ->
@@ -268,6 +270,18 @@ private fun RateBanner(storeName: String, onClick: () -> Unit) {
                 )
             }
         }
+    }
+}
+
+/**
+ * Opens the published privacy policy in the browser (the same page Play Console links to). A
+ * button rather than an inline link, so it gets a full 48 dp touch target.
+ */
+@Composable
+private fun PrivacyPolicyLink() {
+    val uriHandler = LocalUriHandler.current
+    TextButton(onClick = { uriHandler.openUri(PRIVACY_POLICY_URL) }) {
+        Text("Read the full privacy policy")
     }
 }
 
