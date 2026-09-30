@@ -15,7 +15,8 @@ npm run build     # → web/dist/
 ```
 
 - The version in the footer comes from the repo's `version.properties` at build time.
-- The Google Play button says "Coming soon" until `PLAY_PUBLISHED` in `src/constants/links.ts` is `true`.
+- Until `PLAY_PUBLISHED` in `src/constants/links.ts` is `true`, the Google Play button leads to the
+  "Join the beta" steps (Google Group `geekofia@googlegroups.com` → opt in → install).
 - Code layout follows `/structure` (`.claude/commands/structure.md`).
 - `BASE_PATH=/morsekit/ npm run build` builds for a sub-path; the deploy sets it from Pages (`/` on
   the custom domain).

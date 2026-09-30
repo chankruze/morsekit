@@ -7,7 +7,7 @@ import type {
 // behind: a new permission or a new KEY_* prefix fails the web tests until it's described here.
 
 /** Bump whenever the policy's meaning changes. */
-export const EFFECTIVE_DATE = "29 September 2026";
+export const EFFECTIVE_DATE = "30 September 2026";
 
 export const PERMISSIONS: PolicyPermission[] = [
   {

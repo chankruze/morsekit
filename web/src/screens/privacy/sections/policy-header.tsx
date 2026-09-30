@@ -9,7 +9,8 @@ export const PolicyHeaderSection = () => (
         <strong>In short:</strong> MorseKit doesn't collect, send, share or sell
         any personal data. It has no internet permission, no account, no ads and
         no analytics. Everything you type and every setting stays on your
-        device.
+        device. The only exception is optional: if you join the beta test, the
+        developer sees your email address (see Beta testing).
       </p>
     </div>
   </>

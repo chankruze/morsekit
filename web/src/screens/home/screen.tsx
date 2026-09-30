@@ -1,4 +1,5 @@
 import { HOME_TITLE } from "@/constants/document-titles";
+import { BetaSection } from "@/screens/home/sections/beta";
 import { FeaturesSection } from "@/screens/home/sections/features";
 import { HeroSection } from "@/screens/home/sections/hero";
 import { PrivacySection } from "@/screens/home/sections/privacy";
@@ -12,6 +13,7 @@ export const HomeScreen = () => (
     <ScreenshotsSection />
     <TryItSection />
     <FeaturesSection />
+    <BetaSection />
     <PrivacySection />
   </>
 );

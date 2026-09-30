@@ -1,5 +1,6 @@
 import { PRIVACY_TITLE } from "@/constants/document-titles";
 import { PrivacyLayout } from "@/screens/privacy/layout";
+import { BetaTestingSection } from "@/screens/privacy/sections/beta-testing";
 import { ChangesSection } from "@/screens/privacy/sections/changes";
 import { ChildrenSection } from "@/screens/privacy/sections/children";
 import { ContactSection } from "@/screens/privacy/sections/contact";
@@ -22,6 +23,7 @@ export const PrivacyScreen = () => (
     <PermissionsSection />
     <SharingSection />
     <GooglePlaySection />
+    <BetaTestingSection />
     <ChildrenSection />
     <WebsiteSection />
     <ChangesSection />

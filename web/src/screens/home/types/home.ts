@@ -25,3 +25,14 @@ export type SignalMark = {
   tone: Tone;
   colourClass: string;
 };
+
+export type BetaLink = {
+  label: string;
+  href: string;
+};
+
+export type BetaStep = {
+  title: string;
+  text: string;
+  links: BetaLink[];
+};
