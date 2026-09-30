@@ -45,9 +45,10 @@ The test packages mirror the main packages:
 | `TapViewModelTest` | 8 | Saved tap speed, keying with a fake clock, `heldAsDash`, screen-reader actions, Timing/Buttons modes |
 | `KochProgressionTest` | 7 | The Koch order, per-character counts, the 18-of-20 unlock rule, the window, the last character |
 | `QuestionGeneratorTest` | 6 | Valid distinct choices, no immediate repeats, newest and missed characters weighted up, repeatable with a seed |
-| `TrainerRepositoryTest` | 4 | Fresh start, round trip, corrupt values, reset |
+| `TrainerRepositoryTest` | 5 | Fresh start, round trip, corrupt values, reset, mode and session length |
+| `PracticeSessionTest` | 7 | Endless vs counted sessions, misses, unlocks, accuracy, grading keyed answers |
 | `ConfettiTest` | 3 | The confetti's physics: burst point, rise then fall, stays inside the area |
-| `TrainerViewModelTest` | 8 | Answering, scoring, streaks, unlocking, restarts, reset |
+| `TrainerViewModelTest` | 14 | Answering, unlocking, Key mode (Timing and Buttons), shared progression, modes, sessions and summaries, restarts, reset |
 | `MorseTimingTest` | 8 | Unit length vs WPM, bounds, gap rules, PARIS = 50 units, durations |
 | `TranslatorViewModelTest` | 12 | Live conversion, issues, swap (including dropping `�` placeholders), direction selection, clear |
 | `StepWpmTest` | 6 | Speed ladder covers 5–60, neighbouring steps, snapping between steps, ends, clamping, 20→60 in a few taps |
@@ -72,7 +73,7 @@ The test packages mirror the main packages:
 | `ChooseUpdateModeTest` | 7 | Flexible by default, immediate for priority ≥ 4 or 30 days stale, fallbacks when a type isn't allowed |
 | `UpdatePrompterTest` | 4 | Daily check limit, 7-day snooze, newer versions not snoozed, urgent and manual ignore the snooze |
 | `UpdateControllerTest` | 10 | Offer on resume, once a day, declines snoozed, interrupted immediate resumed, ready-to-install and Later, manual up-to-date and offered, unsupported platform |
-| **Total** | **325** | |
+| **Total** | **339** | |
 
 ## Testing techniques used
 

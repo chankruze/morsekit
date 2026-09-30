@@ -39,7 +39,7 @@ the KMP concepts used), see the [learning notes in `docs/`](docs/README.md).
 
 Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ Todo.
 
-**62 done · 5 in progress · 9 todo** (76 tasks)
+**64 done · 5 in progress · 7 todo** (76 tasks)
 
 | Feature | Done | In Progress | Todo |
 | --- | --- | --- | --- |
@@ -50,7 +50,7 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Audio | 4 | 0 | 0 |
 | Flashlight | 4 | 0 | 2 |
 | Vibration | 3 | 0 | 0 |
-| Morse Trainer | 3 | 0 | 2 |
+| Morse Trainer | 5 | 0 | 0 |
 | Tap Morse | 5 | 0 | 0 |
 | History | 0 | 0 | 3 |
 | Settings | 7 | 0 | 0 |
@@ -100,10 +100,10 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Vibration | Timing | Implement Morse timing for vibration patterns | P1 | ✅ Done |
 | Vibration | WPM | Use configurable transmission speed | P2 | ✅ Done |
 | Morse Trainer | Character mode | Show Morse and ask user to identify the character | P2 | ✅ Done |
-| Morse Trainer | Reverse mode | Show a character and key its Morse (reusing the Tap decoder: Timing or Buttons) | P2 | ⬜ Todo |
+| Morse Trainer | Reverse mode | Show a character and key its Morse (reusing the Tap decoder: Timing or Buttons) | P2 | ✅ Done |
 | Morse Trainer | Scoring | Track correct answers and accuracy | P2 | ✅ Done |
 | Morse Trainer | Progression | Gradually introduce new characters | P2 | ✅ Done |
-| Morse Trainer | Session | Add configurable practice sessions | P3 | ⬜ Todo |
+| Morse Trainer | Session | Practice sessions of 10, 20 or 50 questions with a summary (accuracy, misses, unlocks) | P3 | ✅ Done |
 | Tap Morse | Tap input | Tap to enter dots | P2 | ✅ Done |
 | Tap Morse | Long press | Long press to enter dashes | P2 | ✅ Done |
 | Tap Morse | Character detection | Convert tap sequences into characters | P2 | ✅ Done |

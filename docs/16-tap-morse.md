@@ -72,6 +72,12 @@ stateDiagram-v2
   fires. Automatic breaks resume with the next press. (Found while writing the tests; there's a
   test for it.)
 
+## Shared with the trainer: `Keyer`
+
+`Keyer` (`feature/tap/Keyer.kt`) wraps the decoder with a clock and holds the state as snapshot
+state. `TapViewModel` delegates to one, and the trainer's Key mode uses another
+([note 17](17-trainer.md)), so both key exactly the same way.
+
 ## The key: `MorseKey`
 
 | Concern | How |
