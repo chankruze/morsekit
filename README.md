@@ -143,8 +143,8 @@ Use the run configurations provided by the run widget in your IDE's toolbar. You
 - Android app: `./gradlew :androidApp:assembleDebug`
 - iOS app: open the [/iosApp](./iosApp) directory in Xcode and run it from there.
 - Landing page: `cd web && npm install && npm run dev` (see [web/README.md](web/README.md)).
-  Published at https://docs.geekofia.in/morsekit/, with the
-  [privacy policy](https://docs.geekofia.in/morsekit/privacy/).
+  Published at https://morsekit.geekofia.in/, with the
+  [privacy policy](https://morsekit.geekofia.in/privacy/).
 
 ### Versioning and release artifacts
 

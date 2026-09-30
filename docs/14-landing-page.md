@@ -1,6 +1,6 @@
 # 14. The landing page (`web/`)
 
-`web/` is the MorseKit website, published at **https://docs.geekofia.in/morsekit/** (GitHub
+`web/` is the MorseKit website, published at **https://morsekit.geekofia.in/** (GitHub
 Pages): a landing page and the **privacy policy** (`/privacy/`), built with **Vite**, **React 19** (with the React
 Compiler) and **Tailwind CSS 4**. It's a separate npm project that sits next to the app, so the
 app's layout is untouched: Gradle doesn't include it, and Android Studio excludes
@@ -34,13 +34,13 @@ hooks, magic values in `constants/`, list items wrapped in `React.memo`. Its Rea
 
 **React Router** (v8) switches between the home page and `/privacy` without a reload. GitHub
 Pages has no server-side routing, so a pure single-page app would answer a direct visit to
-`/morsekit/privacy/` with a 404. Instead, `privacy/index.html` is a real file that loads the same
+`/privacy/` with a 404. Instead, `privacy/index.html` is a real file that loads the same
 app, and the router picks the screen from the URL:
 
 | URL | Served by | Screen |
 | --- | --- | --- |
-| `/morsekit/` | `index.html` | Home |
-| `/morsekit/privacy/` (the Play Console URL) | `privacy/index.html` | Privacy policy |
+| `/` | `index.html` | Home |
+| `/privacy/` (the Play Console URL) | `privacy/index.html` | Privacy policy |
 | anything else, while navigating in the app | | redirects home |
 
 `basename` is Vite's `BASE_URL`, so the same routes work at `/` locally. React Router doesn't
@@ -98,7 +98,7 @@ scripts, so, like the app, the page makes no third-party requests.
 
 ## The privacy policy
 
-Play Console needs a public privacy policy URL: **https://docs.geekofia.in/morsekit/privacy/**.
+Play Console needs a public privacy policy URL: **https://morsekit.geekofia.in/privacy/**.
 It's its own route with a real HTML file behind it (see Routing), so the URL is stable.
 
 What it says, and where each claim comes from:
@@ -128,7 +128,7 @@ Pull requests only build and test.
 | --- | --- |
 | Lockfile check | `scripts/public-lockfile.mjs --check`: every download URL must be on `registry.npmjs.org` (see below) |
 | `npm ci`, `npm test`, `npm run lint` | A failing test (e.g. the policy is out of date) stops the deploy |
-| `configure-pages` → `BASE_PATH` | The site lives under `/morsekit/`; Vite prefixes every URL with it |
+| `configure-pages` → `BASE_PATH` | Pages says where the site lives (`/` on the custom domain); Vite prefixes every URL with it |
 | `upload-pages-artifact`, `deploy-pages` | The Pages "GitHub Actions" source: no `gh-pages` branch |
 
 > **Private npm mirrors (found on the first deploy).** npm writes each package's download URL
@@ -139,8 +139,13 @@ Pull requests only build and test.
 > to do. **After `npm install` on such a machine, run `npm run lockfile:public`.**
 
 Pages was switched on once, with Actions as the source:
-`gh api -X POST repos/chankruze/morsekit/pages -f build_type=workflow`. The account's Pages
-custom domain (`docs.geekofia.in`) applies to this project site too.
+`gh api -X POST repos/chankruze/morsekit/pages -f build_type=workflow`. Its custom domain is
+**`morsekit.geekofia.in`** (Settings › Pages), so the site is served from `/`.
+
+> **Changing the domain needs a redeploy (found when it moved).** The base path is baked into
+> the build: after `docs.geekofia.in/morsekit/` became `morsekit.geekofia.in`, the page asked for
+> `/morsekit/assets/…` and got 404s. `configure-pages` reads the current setting, so re-running
+> **Actions › Landing page › Run workflow** fixes it.
 
 ## Tests
 
@@ -152,4 +157,4 @@ custom domain (`docs.geekofia.in`) applies to this project site too.
 | `morse/utils/*.test.ts` | Encode/decode, normalization, word splitting, glyphs, round trip; tone timing (60 ms unit at 20 WPM, 1/3/7 gaps, PARIS = 50 units) |
 | `screens/home/utils/build-signal-marks.test.ts` | The hero signal gives each element its own tone, in order |
 | `screens/privacy/constants/policy.test.ts` | The policy lists exactly the manifest's permissions and every stored-data prefix |
-| `providers/app-routes.test.ts` | `/morsekit/privacy/` (with or without `/`) is the privacy route; `/morsekit/` is home |
+| `providers/app-routes.test.ts` | Under `/` and a sub-path: `privacy/` (with or without `/`) is the privacy route; the root is home |
