@@ -93,6 +93,8 @@ JVM-specific.
 | The torch is turned off in `finally`, on completion, cancellation **and** failure | `transmitWithTorch` |
 | Leaving the Translator tab stops it (`DisposableEffect.onDispose`) | `TranslatorRoute` |
 | The app going to the background stops it (`LifecycleEventEffect(ON_STOP)`) | `TranslatorRoute` |
+| …but rotation doesn't: both guards skip the stop while the Activity is only being recreated (`rememberIsChangingConfigurations()`), and the ViewModel, which survives rotation, keeps flashing | `TranslatorRoute` |
+| The screen is kept on while flashing or vibrating (`KeepScreenOn()`), so a long message isn't stopped by the screen timing out | `TranslatorRoute` |
 | Destroying the ViewModel stops it and switches the torch off | `MorseTorchViewModel.onCleared` |
 | Editing, swapping, clearing or changing direction stops it | `TranslatorRoute` |
 | A new transmission waits for the previous one to switch off first (`cancelAndJoin`), so two can never overlap | `MorseTorchViewModel.start` |
@@ -123,14 +125,25 @@ Flash is one option of the translator's **Transmit** floating button; while it r
 becomes **Stop flashing**. The first flash shows a one-time warning dialog. See
 [Translator UI](11-translator-ui.md).
 
+## Rotation and the screen timeout
+
+Two platform facts the shared code needs, small enough for `expect`/`actual` rather than a
+service (`ui/platform/ScreenEffects.kt`):
+
+| | Android | iOS |
+| --- | --- | --- |
+| `KeepScreenOn()` | `View.keepScreenOn` on the Compose view, reset when it leaves composition | `UIApplication.idleTimerDisabled`, reset likewise |
+| `rememberIsChangingConfigurations()` | `Activity.isChangingConfigurations`, the Activity found from `LocalContext` (no extra dependency) | Always `false`: iOS doesn't recreate the UI on rotation |
+
+Rotation on Android destroys and recreates the Activity: `ON_STOP` fires and the composition is
+disposed, which used to stop flashing even though the ViewModels (and the torch runner in
+`viewModelScope`) survive. During that recreation `isChangingConfigurations` is `true`, so the
+stop is skipped; the new screen shows the same Stop button because it reads the same ViewModel.
+
 ## Known limitations
 
-- **Screen timeout.** If the screen turns off during a long, slow message, the app goes to the
-  background and flashing stops (by design, see the table above). Keeping the screen on while
-  transmitting needs a platform hook and isn't done yet (backlog: *Flashlight / Screen timeout*,
-  P3, after v1).
-- **Rotation** recreates the screen, which also stops flashing (backlog: *Flashlight / Rotation*,
-  P3, after v1).
+- **Pressing the power button** still stops flashing: that's the app really going to the
+  background, which the safety rule is for. Only the automatic timeout is prevented.
 - **LED latency.** Torch LEDs take a few milliseconds to switch, which is fine for Morse that
   people read by eye.
 - **iOS** hasn't run on a device yet (no Xcode on the development machine).

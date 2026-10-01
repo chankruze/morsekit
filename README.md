@@ -39,16 +39,16 @@ the KMP concepts used), see the [learning notes in `docs/`](docs/README.md).
 
 Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ Todo.
 
-**69 done · 6 in progress · 5 todo** (80 tasks)
+**72 done · 7 in progress · 1 todo** (80 tasks)
 
 | Feature | Done | In Progress | Todo |
 | --- | --- | --- | --- |
 | Project Foundation | 6 | 0 | 0 |
 | Morse Engine | 6 | 0 | 0 |
-| Translator | 8 | 0 | 1 |
+| Translator | 9 | 0 | 0 |
 | Morse Reference | 4 | 0 | 0 |
 | Audio | 4 | 0 | 0 |
-| Flashlight | 4 | 0 | 2 |
+| Flashlight | 6 | 0 | 0 |
 | Vibration | 3 | 0 | 0 |
 | Morse Trainer | 6 | 0 | 0 |
 | Tap Morse | 5 | 0 | 0 |
@@ -56,7 +56,7 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Settings | 7 | 0 | 0 |
 | Platform | 2 | 1 | 0 |
 | Quality | 3 | 1 | 0 |
-| Release | 8 | 4 | 2 |
+| Release | 8 | 5 | 1 |
 
 #### All tasks
 
@@ -82,7 +82,7 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Translator | Clear | Clear current input/output | P0 | ✅ Done |
 | Translator | Redesign | One-screen layout: direction bar, in-card copy/share, Transmit FAB speed dial with WPM stepper | P1 | ✅ Done |
 | Translator | Share message | Share a friendly puzzle (Text → Morse) or reveal (Morse → Text) message with the store link | P2 | ✅ Done |
-| Translator | Prosign decoding | Decode prosign codes in the translator (...---... → <SOS>) | P3 | ⬜ Todo |
+| Translator | Prosign decoding | Decode prosign codes in the translator (...---... → <SOS>) and encode <SOS> back as one letter | P3 | ✅ Done |
 | Morse Reference | Alphabet chart | Display A-Z Morse reference chart | P0 | ✅ Done |
 | Morse Reference | Numbers | Display 0-9 Morse codes | P1 | ✅ Done |
 | Morse Reference | Punctuation | Display common punctuation and prosigns | P1 | ✅ Done |
@@ -95,8 +95,8 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Flashlight | Timing | Implement correct dot/dash and gap timing | P1 | ✅ Done |
 | Flashlight | WPM | Use configurable transmission speed | P1 | ✅ Done |
 | Flashlight | Safety | Add clear controls and warning for flashing light | P1 | ✅ Done |
-| Flashlight | Screen timeout | Keep the screen on while transmitting so long, slow messages aren't cut off when the screen turns off | P3 | ⬜ Todo |
-| Flashlight | Rotation | Keep flashing across screen rotation instead of stopping | P3 | ⬜ Todo |
+| Flashlight | Screen timeout | Keep the screen on while transmitting so long, slow messages aren't cut off when the screen turns off | P3 | ✅ Done |
+| Flashlight | Rotation | Keep flashing across screen rotation instead of stopping | P3 | ✅ Done |
 | Vibration | Transmission | Transmit Morse using device vibration/haptics | P1 | ✅ Done |
 | Vibration | Timing | Implement Morse timing for vibration patterns | P1 | ✅ Done |
 | Vibration | WPM | Use configurable transmission speed | P2 | ✅ Done |
@@ -141,7 +141,7 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Release | Landing page | Website (web/, Vite + React + Tailwind) with live translator and screenshots, deployed to GitHub Pages | P2 | ✅ Done |
 | Release | Privacy policy | Public privacy policy page for Play Console, checked against the app's permissions and stored data | P1 | ✅ Done |
 | Release | Beta signup | Join the closed test from the website: Google Group testers list, opt-in and install steps | P1 | ✅ Done |
-| Release | Build 6 | Bump to build 6 and upload Tap, Learn and History to the closed test | P1 | ⬜ Todo |
+| Release | Build 6 | v1.1.0 (build 6) released on GitHub and built by CI (signed APK, AAB, mapping); left: upload the AAB to the closed test | P1 | 🚧 In Progress |
 
 ### Running the apps
 

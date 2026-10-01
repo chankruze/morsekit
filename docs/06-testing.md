@@ -39,6 +39,7 @@ The test packages mirror the main packages:
 | `MorseRoundTripTest` | 6 | text → Morse → text for every character and several sentences; Morse → text → canonical Morse |
 | `MorseNormalizerTest` | 7 | Character folding and canonical `normalizeText` / `normalizeMorse` |
 | `MorseTokenizerTest` | 6 | Word/letter splitting rules in isolation |
+| `MorseProsignCodecTest` | 5 | Prosigns in the translator: `<SOS>` decoding, punctuation codes kept, one-letter encoding, unknown or unclosed brackets, round trip |
 | `MorseProsignsTest` | 3 | Prosign codes vs an independent table, the four that share a code with punctuation, meanings and unique letters |
 | `MorseNotationTest` | 5 | Display glyphs; the spoken form for screen readers (pauses between letters, "space" between words) |
 | `TapDecoderTest` | 20 | Keying by hand with fake time: dot/dash threshold, letter and word gaps, deadlines, manual edits cancelling pending breaks, backspace, clear, stopping timers, the letter preview |
@@ -75,7 +76,7 @@ The test packages mirror the main packages:
 | `ChooseUpdateModeTest` | 7 | Flexible by default, immediate for priority ≥ 4 or 30 days stale, fallbacks when a type isn't allowed |
 | `UpdatePrompterTest` | 4 | Daily check limit, 7-day snooze, newer versions not snoozed, urgent and manual ignore the snooze |
 | `UpdateControllerTest` | 10 | Offer on resume, once a day, declines snoozed, interrupted immediate resumed, ready-to-install and Later, manual up-to-date and offered, unsupported platform |
-| **Total** | **359** | |
+| **Total** | **364** | |
 
 ## Testing techniques used
 

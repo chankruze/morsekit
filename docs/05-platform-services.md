@@ -146,6 +146,7 @@ KMP offers two ways to reach platform code. The template originally used `expect
 | Construction parameters | Hard: every `actual` must match the same signature | Easy: Android takes a `Context`, iOS takes a view-controller provider |
 | Fakes in tests | Not possible: there's exactly one `actual` per platform | Trivial: `InMemoryKeyValueStore()`, `clipboard = {}` |
 | Best for | Small, parameterless platform facts or functions (e.g. current time, UUID, platform name) | Services with state, dependencies or side effects |
+| Used in MorseKit | `KeepScreenOn()` and `rememberIsChangingConfigurations()` (`ui/platform/ScreenEffects.kt`, [note 9](09-flashlight.md)) | Everything in `PlatformServices` |
 
 > **Concept: `fun interface`.** An interface with a single abstract method can be implemented with
 > a lambda: `ClipboardService { text -> ... }`, or `{}` for a no-op. The Android `@Preview` in

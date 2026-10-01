@@ -422,10 +422,14 @@ not `... --- ...`. They're shown in the Reference chart (`MorseProsigns.Common`,
   `MorseAlphabet.International` run together, so the two can't disagree. `MorseProsignsTest`
   still checks every code against an independently written table, like `ExpectedMorse`.
 - **Not part of the alphabet.** `MorseAlphabet` maps one character to one code both ways, and
-  four prosigns share a code with punctuation. So the codec still decodes `.-.-.` as `+`, and
-  decoding prosigns in the translator (`...---...` → `<SOS>`) is left for later.
-  `MorseCategory.Prosign` exists for the Reference chart; `MorseMapping.category` never
-  returns it.
+  four prosigns share a code with punctuation. `MorseCategory.Prosign` exists for the Reference
+  chart; `MorseMapping.category` never returns it.
+- **In the translator.** `MorseCodec` takes the prosigns too: a code that's no character but a
+  prosign decodes as `<SOS>` (no "unknown code" warning), and `<SOS>` in text encodes as one
+  letter, `...---...`, with no gaps, so a decoded prosign survives Swap and plays as one sign. The
+  four that share a code with punctuation decode as the punctuation (`.-.-.` is `+`, not `<AR>`):
+  the alphabet wins, so nothing that decoded before changes. `<XYZ>` or an unclosed `<SOS` is
+  ordinary text. The website's Try-it demo (a TypeScript copy of the codec) doesn't do prosigns.
 
 ## The public API at a glance
 
