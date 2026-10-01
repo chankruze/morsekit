@@ -39,6 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
@@ -47,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import `in`.geekofia.morsekit.core.history.HistoryEntry
 import `in`.geekofia.morsekit.core.history.HistoryRepository
+import `in`.geekofia.morsekit.core.model.MorseNotation
 import `in`.geekofia.morsekit.core.model.TranslationDirection
 import `in`.geekofia.morsekit.core.settings.SettingsRepository
 import `in`.geekofia.morsekit.ui.components.MorseDisplay
@@ -196,13 +198,26 @@ private fun HistoryItem(
                     .padding(start = 16.dp, top = 12.dp, bottom = 12.dp, end = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
+                val fromMorse = entry.direction == TranslationDirection.MorseToText
                 Text(
-                    text = if (entry.direction == TranslationDirection.TextToMorse) "Text → Morse" else "Morse → Text",
+                    text = if (fromMorse) "Morse → Text" else "Text → Morse",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.semantics { contentDescription = if (fromMorse) "Morse to Text" else "Text to Morse" },
                 )
-                Text(entry.input, style = MaterialTheme.typography.bodyLarge, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                if (entry.direction == TranslationDirection.TextToMorse) {
+                Text(
+                    text = entry.input,
+                    style = MaterialTheme.typography.bodyLarge,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    // Morse as "dot dash", like the translator, not as punctuation.
+                    modifier = if (fromMorse) {
+                        Modifier.semantics { contentDescription = MorseNotation.toSpokenForm(entry.input) }
+                    } else {
+                        Modifier
+                    },
+                )
+                if (!fromMorse) {
                     MorseDisplay(morse = entry.output, style = MaterialTheme.typography.bodyMedium)
                 } else {
                     Text(

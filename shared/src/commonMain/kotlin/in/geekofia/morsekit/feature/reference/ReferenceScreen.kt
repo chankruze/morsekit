@@ -142,7 +142,8 @@ private fun HeaderSearchField(query: String, onQueryChange: (String) -> Unit) {
     TextField(
         value = query,
         onValueChange = onQueryChange,
-        modifier = Modifier.fillMaxWidth().focusRequester(focusRequester),
+        // The placeholder is only an example and goes once typed, so name the field for screen readers.
+        modifier = Modifier.fillMaxWidth().focusRequester(focusRequester).semantics { contentDescription = "Search" },
         singleLine = true,
         placeholder = { Text("A, 7, .-, comma") },
         keyboardOptions = KeyboardOptions(autoCorrectEnabled = false, imeAction = ImeAction.Search),

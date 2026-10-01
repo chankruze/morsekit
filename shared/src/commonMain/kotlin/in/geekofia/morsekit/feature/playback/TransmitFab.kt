@@ -30,7 +30,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.disabled
+import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import `in`.geekofia.morsekit.ui.components.SpeedStepper
@@ -69,12 +71,21 @@ fun TransmitFab(
 
     Box(modifier = modifier.fillMaxSize()) {
         if (menuOpen) {
-            // Tap anywhere outside to close. No semantics: the FAB's close button covers accessibility.
+            // Tap anywhere outside to close. For screen readers it's a close control of its own, like
+            // a bottom sheet's scrim: covering the screen, it also hides the translator underneath,
+            // which can't be used until the options close.
             Box(
                 Modifier
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.32f))
-                    .pointerInput(Unit) { detectTapGestures { expanded = false } },
+                    .pointerInput(Unit) { detectTapGestures { expanded = false } }
+                    .semantics {
+                        contentDescription = "Close transmit options"
+                        onClick {
+                            expanded = false
+                            true
+                        }
+                    },
             )
         }
 

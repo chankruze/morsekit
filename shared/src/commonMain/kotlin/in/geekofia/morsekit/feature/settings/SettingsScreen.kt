@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
@@ -35,6 +36,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
@@ -232,7 +235,15 @@ private fun SettingsContent(
         }
 
         SectionCard(title = "History") {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            // The whole row is the switch, so it's read with its label and is easy to hit.
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.toggleable(
+                    value = settings.saveHistory,
+                    role = Role.Switch,
+                    onValueChange = onSaveHistoryChange,
+                ),
+            ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text("Save history", style = MaterialTheme.typography.bodyLarge)
                     Text(
@@ -243,7 +254,7 @@ private fun SettingsContent(
                 }
                 Switch(
                     checked = settings.saveHistory,
-                    onCheckedChange = onSaveHistoryChange,
+                    onCheckedChange = null,
                     modifier = Modifier.padding(start = 12.dp),
                 )
             }
@@ -397,7 +408,10 @@ private fun SliderSetting(
             colors = SliderDefaults.colors(
                 inactiveTrackColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.85f),
             ),
-            modifier = Modifier.semantics { stateDescription = valueText },
+            modifier = Modifier.semantics {
+                contentDescription = label
+                stateDescription = valueText
+            },
         )
         Text(
             text = supportingText,

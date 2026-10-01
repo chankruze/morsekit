@@ -23,6 +23,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import `in`.geekofia.morsekit.ui.components.MorseDisplay
 import morsekit.shared.generated.resources.Res
@@ -99,14 +101,17 @@ internal fun Choices(state: TrainerUiState, onAnswer: (Char) -> Unit) {
                 row.forEach { choice ->
                     val isTarget = choice == state.question.target
                     val modifier = Modifier.weight(1f).heightIn(min = 64.dp)
+                    // The marks are spoken as words, not "check mark" / "ballot X".
+                    val (shown, spoken) = when {
+                        answer != null && isTarget -> "✓ $choice" to "$choice, right answer"
+                        answer?.chosen == choice -> "✗ $choice" to "$choice, your answer"
+                        else -> choice.toString() to choice.toString()
+                    }
                     val label: @Composable () -> Unit = {
                         Text(
-                            text = when {
-                                answer != null && isTarget -> "✓ $choice"
-                                answer?.chosen == choice -> "✗ $choice"
-                                else -> choice.toString()
-                            },
+                            text = shown,
                             style = MaterialTheme.typography.headlineMedium,
+                            modifier = Modifier.semantics { contentDescription = spoken },
                         )
                     }
                     when {

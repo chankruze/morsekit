@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.dp
 
 /**
@@ -57,7 +58,8 @@ private fun RowScope.ElementButton(symbol: String, label: String, onClick: () ->
         modifier = Modifier.weight(1f).fillMaxHeight().heightIn(min = 96.dp),
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(symbol, style = MaterialTheme.typography.displayMedium)
+            // Read as "Dot", not "bullet, Dot": the label says it, the symbol only shows it.
+            Text(symbol, style = MaterialTheme.typography.displayMedium, modifier = Modifier.clearAndSetSemantics {})
             Text(label, style = MaterialTheme.typography.labelLarge)
         }
     }

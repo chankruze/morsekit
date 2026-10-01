@@ -4,12 +4,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import `in`.geekofia.morsekit.ui.theme.toMorseStyle
@@ -21,7 +23,8 @@ import `in`.geekofia.morsekit.ui.theme.toMorseStyle
  * doesn't rewrite dots and dashes (e.g. iOS turning `--` into `—`).
  *
  * [borderless] drops the outline, underline and background, for fields that sit inside a card
- * that already provides the frame. It then has no floating label; the card should title it.
+ * that already provides the frame. It then has no floating label; the card should title it
+ * ([label] is still what screen readers announce).
  */
 @Composable
 fun MorseTextField(
@@ -42,7 +45,8 @@ fun MorseTextField(
         TextField(
             value = value,
             onValueChange = onValueChange,
-            modifier = modifier.fillMaxWidth(),
+            // No visible label here, so screen readers get it this way; the placeholder goes once typed.
+            modifier = modifier.fillMaxWidth().semantics { contentDescription = label },
             placeholder = placeholder?.let { { Text(it) } },
             supportingText = supportingText?.let { { Text(it) } },
             isError = isError,
