@@ -54,9 +54,11 @@ import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.compose.NavigationBackHandler
 import androidx.navigationevent.compose.rememberNavigationEventState
 import `in`.geekofia.morsekit.core.audio.PlaybackStatus
+import `in`.geekofia.morsekit.core.history.HistoryRepository
 import `in`.geekofia.morsekit.core.model.TranslationDirection
 import `in`.geekofia.morsekit.core.review.ReviewPrompter
 import `in`.geekofia.morsekit.core.settings.SettingsRepository
+import `in`.geekofia.morsekit.feature.history.TranslationRequests
 import `in`.geekofia.morsekit.feature.playback.MorsePlaybackViewModel
 import `in`.geekofia.morsekit.feature.playback.MorseTorchViewModel
 import `in`.geekofia.morsekit.feature.playback.MorseVibrationViewModel
@@ -69,6 +71,7 @@ import `in`.geekofia.morsekit.ui.components.MorseTextField
 import `in`.geekofia.morsekit.ui.components.ScreenScaffold
 import kotlinx.coroutines.launch
 import morsekit.shared.generated.resources.Res
+import morsekit.shared.generated.resources.ic_history
 import morsekit.shared.generated.resources.ic_close
 import morsekit.shared.generated.resources.ic_copy
 import morsekit.shared.generated.resources.ic_share
@@ -89,6 +92,9 @@ fun TranslatorRoute(
     platformServices: PlatformServices,
     settingsRepository: SettingsRepository,
     reviewPrompter: ReviewPrompter,
+    historyRepository: HistoryRepository,
+    translationRequests: TranslationRequests,
+    onOpenHistory: () -> Unit,
     modifier: Modifier = Modifier,
     onExit: (() -> Unit)? = null,
     viewModel: TranslatorViewModel = viewModel { TranslatorViewModel() },
@@ -126,9 +132,23 @@ fun TranslatorRoute(
         playbackViewModel.stop()
         stopUnattendedOutputs()
     }
+    // History keeps what was *used* (copied, shared, sent), never half-typed text.
+    val saveToHistory = {
+        if (settings.saveHistory && state.hasOutput) historyRepository.record(state.direction, state.input, state.output)
+    }
+    // An entry picked in History: stop anything running, then show it.
+    val requested by translationRequests.pending.collectAsStateWithLifecycle()
+    LaunchedEffect(requested) {
+        val entry = requested ?: return@LaunchedEffect
+        stopTransmitting()
+        viewModel.onDirectionSelected(entry.direction)
+        viewModel.onInputChange(entry.input)
+        translationRequests.consume()
+    }
     val start: (TransmitOutput) -> Unit = { output ->
         stopTransmitting()
         stoppedByUser = false
+        saveToHistory()
         reviewPrompter.recordSuccessfulUse()
         when (output) {
             TransmitOutput.Sound -> playbackViewModel.play(state.message)
@@ -191,7 +211,16 @@ fun TranslatorRoute(
         )
     }
 
-    ScreenScaffold(title = { AppTitle() }, modifier = modifier, centerTitle = true) { contentModifier ->
+    ScreenScaffold(
+        title = { AppTitle() },
+        modifier = modifier,
+        centerTitle = true,
+        actions = {
+            IconButton(onClick = onOpenHistory) {
+                Icon(painterResource(Res.drawable.ic_history), contentDescription = "History")
+            }
+        },
+    ) { contentModifier ->
         TranslatorScreen(
             state = state,
             snackbarHostState = snackbarHostState,
@@ -199,6 +228,7 @@ fun TranslatorRoute(
             onSwap = { stopTransmitting(); viewModel.swapDirection() },
             onClear = { stopTransmitting(); viewModel.onClear() },
             onCopy = { text ->
+                saveToHistory()
                 clipboard.copyText(text)
                 if (!clipboard.showsSystemConfirmation) {
                     scope.launch {
@@ -211,6 +241,7 @@ fun TranslatorRoute(
             },
             onShare = {
                 // Counts as a use, but no prompt: the share sheet is about to open.
+                saveToHistory()
                 shareMessage(state)?.let(platformServices.share::shareText)
                 reviewPrompter.recordSuccessfulUse()
             },

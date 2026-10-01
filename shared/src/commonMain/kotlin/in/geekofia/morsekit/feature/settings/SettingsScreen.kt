@@ -24,6 +24,7 @@ import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -46,10 +47,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import `in`.geekofia.morsekit.core.history.HistoryRepository
 import `in`.geekofia.morsekit.core.settings.AppSettings
 import `in`.geekofia.morsekit.core.settings.SettingsRepository
 import `in`.geekofia.morsekit.core.settings.ThemeMode
 import `in`.geekofia.morsekit.core.timing.MorseTiming
+import `in`.geekofia.morsekit.feature.history.ClearHistoryDialog
 import `in`.geekofia.morsekit.platform.AppInfo
 import `in`.geekofia.morsekit.platform.ReviewService
 import `in`.geekofia.morsekit.ui.components.ScreenScaffold
@@ -70,12 +73,17 @@ fun SettingsRoute(
     settingsRepository: SettingsRepository,
     appInfo: AppInfo,
     reviewService: ReviewService,
+    historyRepository: HistoryRepository,
     modifier: Modifier = Modifier,
     onCheckForUpdates: (() -> Unit)? = null,
 ) {
     val settings by settingsRepository.settings.collectAsStateWithLifecycle()
+    val history by historyRepository.entries.collectAsStateWithLifecycle()
     SettingsScreen(
         settings = settings,
+        canClearHistory = history.any { !it.favorite },
+        onSaveHistoryChange = settingsRepository::setSaveHistory,
+        onClearHistory = historyRepository::clearRecent,
         appInfo = appInfo,
         onCheckForUpdates = onCheckForUpdates,
         rateStoreName = reviewService.storeName.takeIf { reviewService.canOpenStorePage },
@@ -92,6 +100,9 @@ fun SettingsRoute(
 @Composable
 fun SettingsScreen(
     settings: AppSettings,
+    canClearHistory: Boolean,
+    onSaveHistoryChange: (Boolean) -> Unit,
+    onClearHistory: () -> Unit,
     appInfo: AppInfo,
     onCheckForUpdates: (() -> Unit)?,
     rateStoreName: String?,
@@ -104,6 +115,17 @@ fun SettingsScreen(
 ) {
     var menuOpen by remember { mutableStateOf(false) }
     var confirmReset by remember { mutableStateOf(false) }
+    var confirmClearHistory by remember { mutableStateOf(false) }
+
+    if (confirmClearHistory) {
+        ClearHistoryDialog(
+            onConfirm = {
+                confirmClearHistory = false
+                onClearHistory()
+            },
+            onDismiss = { confirmClearHistory = false },
+        )
+    }
 
     if (confirmReset) {
         AlertDialog(
@@ -142,6 +164,9 @@ fun SettingsScreen(
     ) { contentModifier ->
         SettingsContent(
             settings = settings,
+                canClearHistory = canClearHistory,
+                onSaveHistoryChange = onSaveHistoryChange,
+                onClearHistory = { confirmClearHistory = true },
             appInfo = appInfo,
             onCheckForUpdates = onCheckForUpdates,
             rateStoreName = rateStoreName,
@@ -157,6 +182,9 @@ fun SettingsScreen(
 @Composable
 private fun SettingsContent(
     settings: AppSettings,
+    canClearHistory: Boolean,
+    onSaveHistoryChange: (Boolean) -> Unit,
+    onClearHistory: () -> Unit,
     appInfo: AppInfo,
     onCheckForUpdates: (() -> Unit)?,
     rateStoreName: String?,
@@ -201,6 +229,25 @@ private fun SettingsContent(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+        }
+
+        SectionCard(title = "History") {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("Save history", style = MaterialTheme.typography.bodyLarge)
+                    Text(
+                        text = "Translations you copy, share or send. Kept only on this device, never backed up.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                Switch(
+                    checked = settings.saveHistory,
+                    onCheckedChange = onSaveHistoryChange,
+                    modifier = Modifier.padding(start = 12.dp),
+                )
+            }
+            TextButton(onClick = onClearHistory, enabled = canClearHistory) { Text("Clear history") }
         }
 
         SectionCard(title = "About") {

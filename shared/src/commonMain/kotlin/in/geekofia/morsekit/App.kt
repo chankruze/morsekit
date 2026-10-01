@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.luminance
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
+import `in`.geekofia.morsekit.feature.history.HistoryRoute
 import `in`.geekofia.morsekit.feature.reference.ReferenceRoute
 import `in`.geekofia.morsekit.feature.settings.SettingsRoute
 import `in`.geekofia.morsekit.feature.tap.TapRoute
@@ -28,6 +29,7 @@ import `in`.geekofia.morsekit.feature.trainer.TrainerRoute
 import `in`.geekofia.morsekit.feature.translator.TranslatorRoute
 import `in`.geekofia.morsekit.feature.update.UpdateDialogs
 import `in`.geekofia.morsekit.navigation.AppBackStack
+import `in`.geekofia.morsekit.navigation.DetailScreen
 import `in`.geekofia.morsekit.navigation.TopLevelDestination
 import `in`.geekofia.morsekit.navigation.rememberTabStateNavEntryDecorator
 import `in`.geekofia.morsekit.ui.theme.MorseKitTheme
@@ -97,6 +99,9 @@ fun App(
                                 platformServices = container.platformServices,
                                 settingsRepository = container.settingsRepository,
                                 reviewPrompter = container.reviewPrompter,
+                                historyRepository = container.historyRepository,
+                                translationRequests = container.translationRequests,
+                                onOpenHistory = { backStack.open(DetailScreen.History) },
                                 onExit = onExit,
                             )
                             TopLevelDestination.Tap -> TapRoute(
@@ -115,9 +120,23 @@ fun App(
                                 settingsRepository = container.settingsRepository,
                                 appInfo = container.platformServices.appInfo,
                                 reviewService = container.platformServices.review,
+                                historyRepository = container.historyRepository,
                                 onCheckForUpdates = container.updateController
                                     .takeIf { it.isSupported }
                                     ?.let { controller -> controller::checkNow },
+                            )
+                        }
+                    }
+                    entry<DetailScreen>(clazzContentKey = { it.contentKey }) { detail ->
+                        when (detail) {
+                            DetailScreen.History -> HistoryRoute(
+                                historyRepository = container.historyRepository,
+                                settingsRepository = container.settingsRepository,
+                                onOpen = { entry ->
+                                    container.translationRequests.open(entry)
+                                    backStack.goBack()
+                                },
+                                onBack = { backStack.goBack() },
                             )
                         }
                     }

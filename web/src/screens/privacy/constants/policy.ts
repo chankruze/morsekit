@@ -23,6 +23,10 @@ export const STORED_DATA: StoredDataKind[] = [
     what: "Your settings: theme, Morse speeds (for playing and for tapping), how you tap (timing or buttons), tone pitch, and whether you've seen the flashlight warning.",
   },
   {
+    prefix: "history",
+    what: "History, if Save history is on: translations you copied, shared or sent (what you typed and what it became), newest first, and which ones you starred.",
+  },
+  {
     prefix: "review",
     what: "When to suggest rating the app: how many times you've used it successfully, and when it was first used and last asked.",
   },
