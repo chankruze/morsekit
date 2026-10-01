@@ -25,6 +25,7 @@ screen; tapping an entry puts it back in the translator.
 | The newest **50** non-favourites are kept; **favourites** are never dropped | Bounded storage, but starred messages are safe |
 | **Clear history** removes everything except favourites; a favourite is removed with Delete | A clear-all can't wipe what you chose to keep |
 | **Save history** (Settings › History, on by default) turns saving off; existing entries stay until cleared | Your choice; Reset to defaults doesn't turn it back on |
+| The **☆** in the translator's output card saves the translation as a favourite (★), even with Save history off; tapping ★ un-stars it (it stays in History) | An explicit "keep this", rather than a second way to do what saving-on-use already does |
 
 The engine is `core/history`: `HistoryRepository` (a `StateFlow` of entries, newest first) and
 `HistoryCodec`.
@@ -52,6 +53,20 @@ shouldn't. So History has its **own store** (`PlatformServices.historyStore`):
 The iOS store compiles against the real Foundation APIs but hasn't run on a device yet (no
 Xcode on the build machine).
 
+**Checking it on Android** (debug build, about two minutes): change a setting you'll recognise
+(e.g. Dark theme) and make some history, then
+
+```bash
+adb shell bmgr enabled                                # "Backup Manager currently enabled"
+adb shell bmgr backupnow in.geekofia.morsekit.debug   # back the app up now
+adb shell pm clear in.geekofia.morsekit.debug         # wipe its data, as on a new phone
+adb shell bmgr restore in.geekofia.morsekit.debug     # restore from that backup
+```
+
+Open MorseKit: the theme should be back (the backup worked) and History empty (it was
+excluded). If backupnow reports backup is disabled, turn on the phone's backup (System ›
+Backup) first.
+
 ## Opening an entry in the translator
 
 History and the translator are separate screens with their own view models. History leaves the
@@ -73,6 +88,6 @@ policy's guard test failed until the `history` data was described ([note 14](14-
 
 | Test | Covers |
 | --- | --- |
-| `HistoryRepositoryTest` (10) | Newest first, blank not saved, re-use moves to the top and keeps the favourite, directions kept apart, the 50 limit with favourites kept, delete and clear, restore (Undo) in place, awkward text across a restart, corrupt data, the codec round trip |
+| `HistoryRepositoryTest` (12) | Newest first, blank not saved, re-use moves to the top and keeps the favourite, directions kept apart, the 50 limit with favourites kept, delete and clear, restore (Undo) in place, awkward text across a restart, corrupt data, the codec round trip, starring (no duplicates; un-starring keeps the entry), find |
 | `AppBackStackDetailTest` (6) | A detail screen on top of its tab, back closes it first, kept while another tab is selected, re-selecting the tab closes it, save and restore, unknown saved names, detail content keys |
 | `SettingsRepositoryTest` | Save history's default and persistence; Reset keeps it |

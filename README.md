@@ -39,24 +39,24 @@ the KMP concepts used), see the [learning notes in `docs/`](docs/README.md).
 
 Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ Todo.
 
-**67 done · 5 in progress · 4 todo** (76 tasks)
+**67 done · 6 in progress · 7 todo** (80 tasks)
 
 | Feature | Done | In Progress | Todo |
 | --- | --- | --- | --- |
 | Project Foundation | 6 | 0 | 0 |
 | Morse Engine | 6 | 0 | 0 |
-| Translator | 8 | 0 | 0 |
+| Translator | 8 | 0 | 1 |
 | Morse Reference | 4 | 0 | 0 |
 | Audio | 4 | 0 | 0 |
 | Flashlight | 4 | 0 | 2 |
 | Vibration | 3 | 0 | 0 |
-| Morse Trainer | 5 | 0 | 0 |
+| Morse Trainer | 5 | 0 | 1 |
 | Tap Morse | 5 | 0 | 0 |
 | History | 3 | 0 | 0 |
 | Settings | 7 | 0 | 0 |
 | Platform | 2 | 1 | 0 |
-| Quality | 2 | 1 | 0 |
-| Release | 8 | 3 | 2 |
+| Quality | 2 | 1 | 1 |
+| Release | 8 | 4 | 2 |
 
 #### All tasks
 
@@ -82,6 +82,7 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Translator | Clear | Clear current input/output | P0 | ✅ Done |
 | Translator | Redesign | One-screen layout: direction bar, in-card copy/share, Transmit FAB speed dial with WPM stepper | P1 | ✅ Done |
 | Translator | Share message | Share a friendly puzzle (Text → Morse) or reveal (Morse → Text) message with the store link | P2 | ✅ Done |
+| Translator | Prosign decoding | Decode prosign codes in the translator (...---... → <SOS>) | P3 | ⬜ Todo |
 | Morse Reference | Alphabet chart | Display A-Z Morse reference chart | P0 | ✅ Done |
 | Morse Reference | Numbers | Display 0-9 Morse codes | P1 | ✅ Done |
 | Morse Reference | Punctuation | Display common punctuation and prosigns | P1 | ✅ Done |
@@ -104,11 +105,12 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Morse Trainer | Scoring | Track correct answers and accuracy | P2 | ✅ Done |
 | Morse Trainer | Progression | Gradually introduce new characters | P2 | ✅ Done |
 | Morse Trainer | Session | Practice sessions of 10, 20 or 50 questions with a summary (accuracy, misses, unlocks) | P3 | ✅ Done |
+| Morse Trainer | Koch order check | Compare the Koch order with LCWO's (lcwo.net isn't reachable from the build machine) | P2 | ⬜ Todo |
 | Tap Morse | Tap input | Tap to enter dots | P2 | ✅ Done |
 | Tap Morse | Long press | Long press to enter dashes | P2 | ✅ Done |
 | Tap Morse | Character detection | Convert tap sequences into characters | P2 | ✅ Done |
 | Tap Morse | Haptic feedback | Provide feedback while tapping | P3 | ✅ Done |
-| Tap Morse | Button mode | Dot, Dash, Next letter and Space buttons with a Timing | Buttons switch, plus a live letter preview | P2 | ✅ Done |
+| Tap Morse | Button mode | Dot, Dash, Next letter and Space buttons with a Timing \| Buttons switch, plus a live letter preview | P2 | ✅ Done |
 | History | Recent translations | Keep translations that were used (copied, shared, sent), locally and out of backups, with a Save history switch | P2 | ✅ Done |
 | History | Favorites | Allow users to favorite frequently used messages | P3 | ✅ Done |
 | History | Delete | Delete individual or all history items | P3 | ✅ Done |
@@ -125,9 +127,10 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Quality | Accessibility | Content descriptions, semantic labels, scalable text and touch targets (code pass done; check with TalkBack on a device) | P1 | 🚧 In Progress |
 | Quality | Error states | Handle empty, invalid, and unsupported input gracefully | P1 | ✅ Done |
 | Quality | Offline | Ensure all core functionality works without network access | P0 | ✅ Done |
+| Quality | Backup check | Tap, Learn and History tested on a phone; left: confirm History is excluded from Android backup (bmgr backupnow, pm clear, bmgr restore: settings return, History doesn't) | P1 | ⬜ Todo |
 | Release | App icon | Create MorseKit launcher/app icon | P1 | 🚧 In Progress |
-| Release | Store assets | Prepare Play Store/App Store screenshots and description | P2 | ⬜ Todo |
-| Release | Build | Generate signed Android release build and iOS archive | P1 | 🚧 In Progress |
+| Release | Store assets | Screenshots taken (four are on the website); Play listing text and App Store assets left | P2 | 🚧 In Progress |
+| Release | Build | Signed Android release builds and CI done; iOS archive left (needs Xcode) | P1 | 🚧 In Progress |
 | Release | CI | GitHub Actions workflow: build signed APK/AAB and mapping file for GitHub releases | P1 | ✅ Done |
 | Release | Play publishing | Upload GitHub releases to Play internal testing with release notes; approved promotion to production | P1 | ✅ Done |
 | Release | Play setup | Play Console app and closed test created (build 5 uploaded); left: service account, PLAY_SERVICE_ACCOUNT_JSON secret, production environment | P1 | 🚧 In Progress |
@@ -138,6 +141,7 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Release | Landing page | Website (web/, Vite + React + Tailwind) with live translator and screenshots, deployed to GitHub Pages | P2 | ✅ Done |
 | Release | Privacy policy | Public privacy policy page for Play Console, checked against the app's permissions and stored data | P1 | ✅ Done |
 | Release | Beta signup | Join the closed test from the website: Google Group testers list, opt-in and install steps | P1 | ✅ Done |
+| Release | Build 6 | Bump to build 6 and upload Tap, Learn and History to the closed test | P1 | ⬜ Todo |
 
 ### Running the apps
 

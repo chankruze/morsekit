@@ -27,9 +27,9 @@ in the middle, a clear button on the input, and action icons inside the result c
 │ ┌──────────────────────────┐ │
 │ │ Morse                    │ │   OutputCard (primaryContainer)
 │ │ •••• • •−•• •−•• −−−     │ │
-│ │                   ⧉   ⤴  │ │   copy, share
+│ │               ☆   ⧉   ⤴  │ │   favourite, copy, share
 │ └──────────────────────────┘ │
-│                         (◉)  │   TransmitFab
+│                         (📢) │   TransmitFab
 └──────────────────────────────┘
 ```
 
@@ -40,7 +40,7 @@ stateDiagram-v2
     [*] --> Hidden
     Hidden --> Collapsed: there is a message
     Collapsed --> Hidden: message cleared
-    Collapsed --> Expanded: tap ◉
+    Collapsed --> Expanded: tap 📢
     Expanded --> Collapsed: tap ✕ or outside
     Expanded --> Running: pick Sound / Flash / Vibrate
     Running --> Collapsed: tap Stop, or the message ends
@@ -49,7 +49,7 @@ stateDiagram-v2
 | State | Looks like |
 | --- | --- |
 | Hidden | Nothing: there's nothing to send |
-| Collapsed | ◉ FAB |
+| Collapsed | 📢 FAB (a megaphone: "send out") |
 | Expanded | Dimmed backdrop, **− 20 WPM +** stepper, then Sound / Flash / Vibrate (label + small FAB each) |
 | Running | Red extended FAB: **■ Stop sound**, **Stop flashing** or **Stop vibrating** |
 
@@ -103,6 +103,12 @@ All icons are Material Design paths saved as vector XML in `composeResources/dra
 (`ic_close`, `ic_copy`, `ic_share`, `ic_stop`, `ic_volume`, `ic_flashlight`, `ic_vibration`,
 `ic_transmit`, `ic_add`, `ic_remove`), plus the existing `ic_translate` arrows for swap. No icon
 library was added.
+
+> **The Transmit icon.** It was a dot with radiating waves, which some testers read as Wi-Fi or
+> a hotspot. It's now Material's **campaign** megaphone, which says "send
+> this out". The file is still `ic_transmit.xml`, so every use changed at once.
+
+> **☆ in the output card** keeps the translation in History as a favourite ([note 18](18-history.md)).
 
 ## Share text
 

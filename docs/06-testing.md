@@ -65,7 +65,7 @@ The test packages mirror the main packages:
 | `VibrationPatternTest` | 9 | Segments, gaps, alternation, speed scaling, no millisecond drift at 13 WPM, duration, limits |
 | `VibrationTransmitterTest` (androidHostTest) | 4 | Play and wait without clipping the end, cancellation stops it, failure still cancels, empty pattern |
 | `TransmissionRunnerTest` (androidHostTest) | 5 | Running state, stop runs cleanup, a new run waits for the previous cleanup, stale finishes ignored |
-| `HistoryRepositoryTest` | 10 | Saving on use, de-duplication, the 50 limit with favourites kept, delete, clear, Undo, awkward text, corrupt data, the codec |
+| `HistoryRepositoryTest` | 12 | Saving on use, de-duplication, the 50 limit with favourites kept, delete, clear, Undo, awkward text, corrupt data, the codec |
 | `AppBackStackDetailTest` | 6 | Detail screens on a tab: back, tab switching, re-selecting, save/restore, content keys |
 | `AppBackStackTest` | 8 | Start tab, other tabs above it, back to start then exit, no history between other tabs, in-app back iff more than one entry, save/restore |
 | `ShareMessageTest` | 7 | Exact puzzle and reveal texts, canonical Morse in the reveal, both Morse lines decode back, nothing to share, the install call to action, store link |
@@ -75,7 +75,7 @@ The test packages mirror the main packages:
 | `ChooseUpdateModeTest` | 7 | Flexible by default, immediate for priority ≥ 4 or 30 days stale, fallbacks when a type isn't allowed |
 | `UpdatePrompterTest` | 4 | Daily check limit, 7-day snooze, newer versions not snoozed, urgent and manual ignore the snooze |
 | `UpdateControllerTest` | 10 | Offer on resume, once a day, declines snoozed, interrupted immediate resumed, ready-to-install and Later, manual up-to-date and offered, unsupported platform |
-| **Total** | **357** | |
+| **Total** | **359** | |
 
 ## Testing techniques used
 
