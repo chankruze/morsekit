@@ -42,7 +42,7 @@ class TranslatorUiStateTest {
     fun inputWithNothingTranslatableIsInvalid() {
         assertEquals(TranslationStatus.Invalid, textToMorse("### 😀").status)
         assertEquals(TranslationStatus.Invalid, morseToText("hello").status)
-        assertEquals(TranslationStatus.Invalid, morseToText("........ -x-").status)
+        assertEquals(TranslationStatus.Invalid, morseToText("......... -x-").status)
     }
 
     @Test

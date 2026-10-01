@@ -84,9 +84,10 @@ class MorseDecodeTest {
 
     @Test
     fun reportsUnknownCodes() {
-        val result = codec.decode("... ........ ...")
+        // Nine dots: no character and no prosign (eight dots is the prosign HH).
+        val result = codec.decode("... ......... ...")
         assertEquals("S${REPLACEMENT_CHAR}S", result.text)
-        assertEquals(listOf(UnknownCode("........")), result.issues)
+        assertEquals(listOf(UnknownCode(".........")), result.issues)
         assertFalse(result.isValid)
     }
 
