@@ -71,6 +71,8 @@ import `in`.geekofia.morsekit.platform.PlatformServices
 import `in`.geekofia.morsekit.ui.components.MorseDisplay
 import `in`.geekofia.morsekit.ui.components.MorseTextField
 import `in`.geekofia.morsekit.ui.components.ScreenScaffold
+import `in`.geekofia.morsekit.ui.platform.KeepScreenOn
+import `in`.geekofia.morsekit.ui.platform.rememberIsChangingConfigurations
 import kotlinx.coroutines.launch
 import morsekit.shared.generated.resources.Res
 import morsekit.shared.generated.resources.ic_close
@@ -89,7 +91,8 @@ import org.jetbrains.compose.resources.painterResource
  * Only one output transmits at a time. Transmission stops whenever the content changes, so it
  * never sends a stale message. The flashlight and vibration also stop when this screen leaves
  * composition (another tab) or the app goes to the background, so they can never keep running
- * unattended.
+ * unattended. Rotation doesn't count as leaving, and the screen is kept on while they run, so a
+ * long message isn't cut off by the screen timing out.
  */
 @Composable
 fun TranslatorRoute(
@@ -176,9 +179,15 @@ fun TranslatorRoute(
         previousOutput = activeOutput
     }
 
+    // Leaving the screen (another tab, the app in the background) stops the flashlight and vibration,
+    // so they never run unattended. Rotation isn't leaving: the ViewModels survive it, so they
+    // keep going.
+    val isChangingConfigurations = rememberIsChangingConfigurations()
     DisposableEffect(torchViewModel, vibrationViewModel) {
-        onDispose { stopUnattendedOutputs() }
+        onDispose { if (!isChangingConfigurations()) stopUnattendedOutputs() }
     }
+    // A long, slow message mustn't be cut off because the screen timed out (which would stop it).
+    if (activeOutput == TransmitOutput.Flash || activeOutput == TransmitOutput.Vibrate) KeepScreenOn()
 
     // The translator is the start screen, so back here would leave the app: ask for a second press.
     // Only where the host can exit (Android); iOS has no back button to confirm.
@@ -196,7 +205,7 @@ fun TranslatorRoute(
             }
         },
     )
-    LifecycleEventEffect(Lifecycle.Event.ON_STOP) { stopUnattendedOutputs() }
+    LifecycleEventEffect(Lifecycle.Event.ON_STOP) { if (!isChangingConfigurations()) stopUnattendedOutputs() }
 
     val transmitError = playbackViewModel.errorMessage ?: torchViewModel.errorMessage ?: vibrationViewModel.errorMessage
     LaunchedEffect(transmitError) {
