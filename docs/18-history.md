@@ -53,19 +53,48 @@ shouldn't. So History has its **own store** (`PlatformServices.historyStore`):
 The iOS store compiles against the real Foundation APIs but hasn't run on a device yet (no
 Xcode on the build machine).
 
-**Checking it on Android** (debug build, about two minutes): change a setting you'll recognise
-(e.g. Dark theme) and make some history, then
+### Checked on a device (Android 16, OnePlus, 1 October 2026)
+
+| | Before | After restore |
+| --- | --- | --- |
+| Settings (Dark theme, 800 Hz, 10 WPM, Buttons) | ✅ | ✅ restored |
+| Trainer level | 4 | ✅ 4, restored |
+| History (2 entries) | ✅ | ❌ not restored: the file was never in the backup |
+
+So `data_extraction_rules.xml`'s **cloud-backup** rule works. Not exercised: device-to-device
+transfer (the same rule, under `<device-transfer>`) and Android 11 and below
+(`backup_rules.xml`).
+
+How it was done (debug build, so `run-as` can read the app's files):
 
 ```bash
-adb shell bmgr enabled                                # "Backup Manager currently enabled"
-adb shell bmgr backupnow in.geekofia.morsekit.debug   # back the app up now
-adb shell pm clear in.geekofia.morsekit.debug         # wipe its data, as on a new phone
-adb shell bmgr restore in.geekofia.morsekit.debug     # restore from that backup
+P=in.geekofia.morsekit.debug
+adb shell bmgr enabled                                         # was "disabled" on the test phone
+adb shell bmgr transport com.android.localtransport/.LocalTransport   # on-device backup, nothing uploaded
+adb shell bmgr enable true
+adb shell bmgr backupnow $P                                    # see notes: the app must not be force-stopped
+adb shell am force-stop $P
+adb shell run-as $P rm shared_prefs/morsekit.xml shared_prefs/morsekit_history.xml
+adb shell bmgr list sets                                       # e.g. "1 : Local disk image"
+adb shell bmgr restore 1 $P
+adb shell run-as $P ls shared_prefs                            # morsekit.xml only: History excluded
+# put the phone back as it was, e.g.:
+adb shell bmgr transport com.google.android.gms/.backup.BackupTransportService
+adb shell bmgr enable false
+adb shell bmgr wipe com.android.localtransport/.LocalTransport $P
 ```
 
-Open MorseKit: the theme should be back (the backup worked) and History empty (it was
-excluded). If backupnow reports backup is disabled, turn on the phone's backup (System ›
-Backup) first.
+What didn't work as first written, and why:
+
+| Step | Problem | Instead |
+| --- | --- | --- |
+| `bmgr backupnow` right after `am force-stop` | "Backup is not allowed": force-stopped apps aren't eligible | Open the app once, then go Home |
+| `pm clear` | Blocked on OxygenOS (`CLEAR_APP_USER_DATA` denied to the shell) | Delete the preference files with `run-as` (debug builds) |
+| `bmgr restore <package>` | No longer supported on Android 16 | `bmgr restore <token> <package>`, token from `bmgr list sets` |
+
+**The separators in XML.** SharedPreferences stores History's control-character separators as
+`&#30;` and `&#31;`, which strict XML 1.0 parsers reject. Android's parser accepts them: after a
+force-stop and relaunch, no read errors were logged and History showed both entries.
 
 ## Opening an entry in the translator
 

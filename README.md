@@ -39,7 +39,7 @@ the KMP concepts used), see the [learning notes in `docs/`](docs/README.md).
 
 Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ Todo.
 
-**67 done · 6 in progress · 7 todo** (80 tasks)
+**68 done · 6 in progress · 6 todo** (80 tasks)
 
 | Feature | Done | In Progress | Todo |
 | --- | --- | --- | --- |
@@ -55,7 +55,7 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | History | 3 | 0 | 0 |
 | Settings | 7 | 0 | 0 |
 | Platform | 2 | 1 | 0 |
-| Quality | 2 | 1 | 1 |
+| Quality | 3 | 1 | 0 |
 | Release | 8 | 4 | 2 |
 
 #### All tasks
@@ -127,7 +127,7 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Quality | Accessibility | Content descriptions, semantic labels, scalable text and touch targets (code pass done; check with TalkBack on a device) | P1 | 🚧 In Progress |
 | Quality | Error states | Handle empty, invalid, and unsupported input gracefully | P1 | ✅ Done |
 | Quality | Offline | Ensure all core functionality works without network access | P0 | ✅ Done |
-| Quality | Backup check | Tap, Learn and History tested on a phone; left: confirm History is excluded from Android backup (bmgr backupnow, pm clear, bmgr restore: settings return, History doesn't) | P1 | ⬜ Todo |
+| Quality | Backup check | History confirmed excluded from Android backup (Android 16 test: settings and trainer level restored, History not); Tap, Learn and History tested on a phone | P1 | ✅ Done |
 | Release | App icon | Create MorseKit launcher/app icon | P1 | 🚧 In Progress |
 | Release | Store assets | Screenshots taken (four are on the website); Play listing text and App Store assets left | P2 | 🚧 In Progress |
 | Release | Build | Signed Android release builds and CI done; iOS archive left (needs Xcode) | P1 | 🚧 In Progress |
