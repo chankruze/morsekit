@@ -141,7 +141,7 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Release | Landing page | Website (web/, Vite + React + Tailwind) with live translator and screenshots, deployed to GitHub Pages | P2 | ✅ Done |
 | Release | Privacy policy | Public privacy policy page for Play Console, checked against the app's permissions and stored data | P1 | ✅ Done |
 | Release | Beta signup | Join the closed test from the website: Google Group testers list, opt-in and install steps | P1 | ✅ Done |
-| Release | Build 6 | v1.1.0 (build 6) released on GitHub and built by CI (signed APK, AAB, mapping); left: upload the AAB to the closed test | P1 | 🚧 In Progress |
+| Release | Closed test upload | v1.1.1 (build 7, which includes build 6's Tap, Learn and History) released on GitHub and built by CI; left: upload its AAB to the closed test | P1 | 🚧 In Progress |
 
 ### Running the apps
 
