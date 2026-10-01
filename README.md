@@ -129,7 +129,7 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Quality | Offline | Ensure all core functionality works without network access | P0 | ✅ Done |
 | Quality | Backup check | History confirmed excluded from Android backup (Android 16 test: settings and trainer level restored, History not); Tap, Learn and History tested on a phone | P1 | ✅ Done |
 | Release | App icon | Create MorseKit launcher/app icon | P1 | 🚧 In Progress |
-| Release | Store assets | Screenshots taken (four are on the website); Play listing text drafted (store/play/en-US); left: paste it into the Play Console, App Store assets | P2 | 🚧 In Progress |
+| Release | Store assets | Screenshots taken (four are on the website); Play listing text in the Play Console (source: store/play/en-US); left: App Store assets | P2 | 🚧 In Progress |
 | Release | Build | Signed Android release builds and CI done; iOS archive left (needs Xcode) | P1 | 🚧 In Progress |
 | Release | CI | GitHub Actions workflow: build signed APK/AAB and mapping file for GitHub releases | P1 | ✅ Done |
 | Release | Play publishing | Upload GitHub releases to Play internal testing with release notes; approved promotion to production | P1 | ✅ Done |
