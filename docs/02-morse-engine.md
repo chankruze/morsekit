@@ -429,7 +429,8 @@ not `... --- ...`. They're shown in the Reference chart (`MorseProsigns.Common`,
   letter, `...---...`, with no gaps, so a decoded prosign survives Swap and plays as one sign. The
   four that share a code with punctuation decode as the punctuation (`.-.-.` is `+`, not `<AR>`):
   the alphabet wins, so nothing that decoded before changes. `<XYZ>` or an unclosed `<SOS` is
-  ordinary text. The website's Try-it demo (a TypeScript copy of the codec) doesn't do prosigns.
+  ordinary text. The website's Try-it demo (a TypeScript copy of the codec) follows the same rules
+  ([note 14](14-landing-page.md)).
 
 ## The public API at a glance
 

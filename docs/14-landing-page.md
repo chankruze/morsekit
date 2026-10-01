@@ -58,6 +58,7 @@ trailing slash.
 | Version | `version.properties` | `vite.config.ts` reads `VERSION_NAME` at build time |
 | Alphabet | `core/morse/MorseAlphabet.kt` | `morse/constants/alphabet.test.ts` parses the Kotlin file and fails if the tables differ |
 | Codec rules | `MorseCodec`, `MorseNormalizer`, `MorseTokenizer` | Same behaviour, same tests: skipped/`�` characters, `•−_` accepted, word breaks on `/`, `\|`, newline or two spaces |
+| Prosigns | `core/morse/MorseProsigns.kt` | `morse/constants/prosigns.test.ts` parses the Kotlin list; codes are built from the alphabet, and `...---...` ⇄ `<SOS>` works as in the app (codes shared with punctuation stay punctuation) |
 | Timing | `core/timing`, [note 8](08-audio-playback.md) | PARIS units (dot 1, dash 3, gaps 1/3/7), 600 Hz, 5 ms fades |
 | Icons | `composeResources/drawable/ic_*.xml` | `components/icon.tsx` has the same path data |
 | Logo, font | `ic_launcher-playstore.png`, `space_grotesk.ttf` | Copied once (rounded logo made with ImageMagick, as in [note 11](11-translator-ui.md)) |
@@ -179,12 +180,13 @@ Pages was switched on once, with Actions as the source:
 
 ## Tests
 
-`npm test` runs vitest (30 tests), each file next to the code it covers:
+`npm test` runs vitest (38 tests), each file next to the code it covers:
 
 | File | Covers |
 | --- | --- |
 | `morse/constants/alphabet.test.ts` | The table equals the Kotlin alphabet (54 characters), no duplicate codes |
-| `morse/utils/*.test.ts` | Encode/decode, normalization, word splitting, glyphs, round trip; tone timing (60 ms unit at 20 WPM, 1/3/7 gaps, PARIS = 50 units) |
+| `morse/constants/prosigns.test.ts` | The prosigns equal the app's list, in order; their codes; the four shared with punctuation left out of decoding |
+| `morse/utils/*.test.ts` | Encode/decode (including prosigns), normalization, word splitting, glyphs, round trip; tone timing (60 ms unit at 20 WPM, 1/3/7 gaps, PARIS = 50 units) |
 | `screens/home/utils/build-signal-marks.test.ts` | The hero signal gives each element its own tone, in order |
 | `screens/privacy/constants/policy.test.ts` | The policy lists exactly the manifest's permissions and every stored-data prefix |
 | `constants/links.test.ts` | The Play links use the app's `applicationId`; the group page matches the group address |
