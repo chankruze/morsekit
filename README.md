@@ -39,7 +39,7 @@ the KMP concepts used), see the [learning notes in `docs/`](docs/README.md).
 
 Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ Todo.
 
-**72 done · 7 in progress · 1 todo** (80 tasks)
+**73 done · 6 in progress · 1 todo** (80 tasks)
 
 | Feature | Done | In Progress | Todo |
 | --- | --- | --- | --- |
@@ -55,7 +55,7 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | History | 3 | 0 | 0 |
 | Settings | 7 | 0 | 0 |
 | Platform | 2 | 1 | 0 |
-| Quality | 3 | 1 | 0 |
+| Quality | 4 | 0 | 0 |
 | Release | 8 | 5 | 1 |
 
 #### All tasks
@@ -124,7 +124,7 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Platform | Android | Implement Android-specific torch, vibration, audio, clipboard, and sharing integrations | P0 | ✅ Done |
 | Platform | iOS | Implement iOS-specific torch, haptics, audio, clipboard, and sharing integrations | P0 | 🚧 In Progress |
 | Platform | Permissions | Add only required platform permissions and document their purpose | P0 | ✅ Done |
-| Quality | Accessibility | Content descriptions, semantic labels, scalable text and touch targets (code pass done; check with TalkBack on a device) | P1 | 🚧 In Progress |
+| Quality | Accessibility | Content descriptions, semantic labels, scalable text and touch targets; checked on a device over adb, 7 fixes (docs/15) | P1 | ✅ Done |
 | Quality | Error states | Handle empty, invalid, and unsupported input gracefully | P1 | ✅ Done |
 | Quality | Offline | Ensure all core functionality works without network access | P0 | ✅ Done |
 | Quality | Backup check | History confirmed excluded from Android backup (Android 16 test: settings and trainer level restored, History not); Tap, Learn and History tested on a phone | P1 | ✅ Done |
