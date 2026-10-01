@@ -14,9 +14,26 @@ describe("decodeMorse", () => {
   });
 
   it("replaces and reports unknown or malformed letters", () => {
-    const result = decodeMorse("... ........ ..x");
+    // Nine dots: no character and no prosign (eight dots is the prosign HH).
+    const result = decodeMorse("... ......... ..x");
     expect(result.text).toBe(`S${REPLACEMENT_CHAR}${REPLACEMENT_CHAR}`);
-    expect(result.unreadable).toEqual(["........", "..x"]);
+    expect(result.unreadable).toEqual([".........", "..x"]);
+  });
+
+  it("writes prosign codes in angle brackets, like the app", () => {
+    const result = decodeMorse("... ...---... / ........");
+    expect(result.text).toBe("S<SOS> <HH>");
+    expect(result.unreadable).toEqual([]);
+  });
+
+  it("keeps punctuation for the prosigns that share its code", () => {
+    expect(decodeMorse(".-.-. -...- -.--. .-...").text).toBe("+=(&");
+  });
+
+  it("round-trips prosigns", () => {
+    expect(decodeMorse(encodeText("SEND <SOS> NOW").morse).text).toBe(
+      "SEND <SOS> NOW",
+    );
   });
 
   it("round-trips everything the alphabet supports", () => {

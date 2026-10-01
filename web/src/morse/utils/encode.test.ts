@@ -25,4 +25,23 @@ describe("encodeText", () => {
   it("gives empty output for empty input", () => {
     expect(encodeText("")).toEqual({ morse: "", unsupported: [] });
   });
+
+  it("encodes a prosign in angle brackets as one letter", () => {
+    expect(encodeText("<SOS>")).toEqual({
+      morse: "...---...",
+      unsupported: [],
+    });
+    expect(encodeText("<sos> K").morse).toBe("...---... / -.-");
+  });
+
+  it("treats an unknown or unclosed bracket as ordinary text", () => {
+    expect(encodeText("<XYZ>")).toEqual({
+      morse: "-..- -.-- --..",
+      unsupported: ["<", ">"],
+    });
+    expect(encodeText("<SOS")).toEqual({
+      morse: "... --- ...",
+      unsupported: ["<"],
+    });
+  });
 });
