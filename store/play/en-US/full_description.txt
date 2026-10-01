@@ -1,0 +1,32 @@
+MorseKit is a complete Morse code toolkit: translate it, send it, tap it and learn it. Everything works offline, with no ads, no account and no tracking.
+
+TRANSLATE AS YOU TYPE
+• Type text and see the Morse appear, or type dots and dashes and read the text
+• Swap direction, copy or share in one tap
+• Prosigns too: ...---... reads as <SOS>, and typing <SOS> sends it as one signal
+
+SEND IT THREE WAYS
+• Sound: clean, click-free tones from 5 to 60 words per minute, at a pitch you choose (400 to 1000 Hz)
+• Flashlight: precisely timed flashes, with a warning before the first one; keeps going if you rotate the phone, and the screen stays on while it signals
+• Vibration: Morse you can read by touch
+
+TAP IT
+• Key Morse with one finger: tap for a dot, hold for a dash, and watch it turn into text
+• Prefer no timing? Switch to Dot and Dash buttons
+
+LEARN IT WITH THE KOCH METHOD
+• Start with two characters at full speed, the way many Morse courses teach
+• Unlock the next character after 18 right answers in your last 20, through all 41
+• Listen and pick the character, or see a character and key its Morse
+• Practise endlessly, or take a session of 10, 20 or 50 questions with a score at the end
+
+REFERENCE AND HISTORY
+• A searchable chart of every letter, number, punctuation mark and common prosign
+• History keeps the translations you copy, share or send; star the ones you want to keep. You can turn it off
+
+MADE FOR EVERYONE
+• Works with TalkBack: Morse is read as "dot dash", and every control is labelled
+• Light and dark themes, and text that grows with your font size
+
+PRIVATE BY DESIGN
+MorseKit has no internet permission, so your messages never leave your phone. Its only permission is vibration, used to send Morse by vibration. History stays on this device and is never backed up.
