@@ -25,6 +25,7 @@ open the file and follow along.
 | 15 | [Accessibility](15-accessibility.md) | Morse spoken as dots and dashes, headings, announced values, one stop per action, 48 dp targets, font scaling, how to test with TalkBack |
 | 16 | [Tap Morse](16-tap-morse.md) | Keying by hand in Timing or Buttons mode: a pure decoder with fake time, thresholds from a tap speed, deadlines instead of polling, haptics, a letter preview, screen-reader actions |
 | 17 | [Morse trainer](17-trainer.md) | The Koch method in Listen and Key modes: an order, an unlock rule, weighted questions, sessions with a summary, defensive persistence, a view model without coroutines |
+| 18 | [History](18-history.md) | Saving translations on use, favourites, a JSON-free codec, a store kept out of backups on both platforms, the first detail screen |
 
 ## The whole app on one page
 

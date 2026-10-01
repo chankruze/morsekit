@@ -56,7 +56,7 @@ The test packages mirror the main packages:
 | `ReferenceEntryTest` | 10 | Chart built from the alphabet in order, codes vs the independent table, A–Z/0–9/punctuation coverage, every punctuation mark has a name, prosign entries, accessibility labels (prosign letters spelled out) |
 | `ReferenceSearchTest` | 15 | Character, code-prefix (incl. `·−`) and name search, ambiguous `.`/`-`, ordering, no matches; prosigns by letters, meaning and code (HH is eight dots) |
 | `ReferenceViewModelTest` | 6 | Initial sections (including Prosigns), filtering hides empty sections, clearing restores all 64 |
-| `SettingsRepositoryTest` | 14 | Defaults, immediate updates, persistence across instances, independent keys, clamping, corrupt stored values, the one-time flash warning, reset to defaults (keeps the acknowledgement), `AppSettings` invariants, the tap speed and mode |
+| `SettingsRepositoryTest` | 16 | Defaults, immediate updates, persistence across instances, independent keys, clamping, corrupt stored values, the one-time flash warning, reset to defaults (keeps the acknowledgement), `AppSettings` invariants, the tap speed and mode, Save history (kept by Reset) |
 | `ToneScheduleTest` | 7 | Units → frames at 16 kHz, gaps, speed scaling, no rounding drift at 13 WPM |
 | `MorseAudioRendererTest` | 10 | Length and duration, exact silence, amplitude, fade in/out, measured pitch, speed, limits |
 | `MorseAudioPlayerTest` | 8 | Play/stop, completion, replay, restart while playing, stop while idle, stale completions (fake output) |
@@ -65,6 +65,8 @@ The test packages mirror the main packages:
 | `VibrationPatternTest` | 9 | Segments, gaps, alternation, speed scaling, no millisecond drift at 13 WPM, duration, limits |
 | `VibrationTransmitterTest` (androidHostTest) | 4 | Play and wait without clipping the end, cancellation stops it, failure still cancels, empty pattern |
 | `TransmissionRunnerTest` (androidHostTest) | 5 | Running state, stop runs cleanup, a new run waits for the previous cleanup, stale finishes ignored |
+| `HistoryRepositoryTest` | 10 | Saving on use, de-duplication, the 50 limit with favourites kept, delete, clear, Undo, awkward text, corrupt data, the codec |
+| `AppBackStackDetailTest` | 6 | Detail screens on a tab: back, tab switching, re-selecting, save/restore, content keys |
 | `AppBackStackTest` | 8 | Start tab, other tabs above it, back to start then exit, no history between other tabs, in-app back iff more than one entry, save/restore |
 | `ShareMessageTest` | 7 | Exact puzzle and reveal texts, canonical Morse in the reveal, both Morse lines decode back, nothing to share, the install call to action, store link |
 | `AboutContentTest` | 2 | Credit links, the bundled font credited with its licence |
@@ -73,7 +75,7 @@ The test packages mirror the main packages:
 | `ChooseUpdateModeTest` | 7 | Flexible by default, immediate for priority ≥ 4 or 30 days stale, fallbacks when a type isn't allowed |
 | `UpdatePrompterTest` | 4 | Daily check limit, 7-day snooze, newer versions not snoozed, urgent and manual ignore the snooze |
 | `UpdateControllerTest` | 10 | Offer on resume, once a day, declines snoozed, interrupted immediate resumed, ready-to-install and Later, manual up-to-date and offered, unsupported platform |
-| **Total** | **339** | |
+| **Total** | **357** | |
 
 ## Testing techniques used
 

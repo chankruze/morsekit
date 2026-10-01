@@ -39,7 +39,7 @@ the KMP concepts used), see the [learning notes in `docs/`](docs/README.md).
 
 Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ Todo.
 
-**64 done · 5 in progress · 7 todo** (76 tasks)
+**67 done · 5 in progress · 4 todo** (76 tasks)
 
 | Feature | Done | In Progress | Todo |
 | --- | --- | --- | --- |
@@ -52,7 +52,7 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Vibration | 3 | 0 | 0 |
 | Morse Trainer | 5 | 0 | 0 |
 | Tap Morse | 5 | 0 | 0 |
-| History | 0 | 0 | 3 |
+| History | 3 | 0 | 0 |
 | Settings | 7 | 0 | 0 |
 | Platform | 2 | 1 | 0 |
 | Quality | 2 | 1 | 0 |
@@ -109,9 +109,9 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Tap Morse | Character detection | Convert tap sequences into characters | P2 | ✅ Done |
 | Tap Morse | Haptic feedback | Provide feedback while tapping | P3 | ✅ Done |
 | Tap Morse | Button mode | Dot, Dash, Next letter and Space buttons with a Timing | Buttons switch, plus a live letter preview | P2 | ✅ Done |
-| History | Recent translations | Persist recent translations locally | P2 | ⬜ Todo |
-| History | Favorites | Allow users to favorite frequently used messages | P3 | ⬜ Todo |
-| History | Delete | Delete individual or all history items | P3 | ⬜ Todo |
+| History | Recent translations | Keep translations that were used (copied, shared, sent), locally and out of backups, with a Save history switch | P2 | ✅ Done |
+| History | Favorites | Allow users to favorite frequently used messages | P3 | ✅ Done |
+| History | Delete | Delete individual or all history items | P3 | ✅ Done |
 | Settings | Theme | Light, dark, and system theme selection | P1 | ✅ Done |
 | Settings | WPM | Configure default Morse transmission speed | P1 | ✅ Done |
 | Settings | Audio | Configure default tone settings | P2 | ✅ Done |

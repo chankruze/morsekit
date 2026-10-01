@@ -89,15 +89,25 @@ NavigationBackHandler(
 A handler registered deeper in the UI takes priority over `NavDisplay`'s, so back closes the
 search before any tab navigation happens.
 
-## Adding a detail screen later
+## Detail screens
 
-1. Introduce a route type for the back stack (e.g. `sealed interface Route` with the tabs and
-   `data class HistoryEntry(val id: Long)`), and give each tab its own stack in `AppBackStack`,
-   with back popping it first.
-2. Save routes with arguments: the kotlinx-serialization plugin plus Navigation 3's saved back
-   stack, or extend `AppBackStack.Saver`.
-3. Make the decorator remove state for popped detail screens (keep it for tabs).
-4. Add an `entry<HistoryEntry> { … }` to the `entryProvider` in `App.kt`.
+History ([note 18](18-history.md)) is the first screen opened *from* a tab rather than from the
+bottom bar. `AppBackStack` keeps one optional `DetailScreen` per tab:
+
+| Rule | Behaviour |
+| --- | --- |
+| Open | `open(DetailScreen.History)` puts it on top of the current tab |
+| Back | Closes the current tab's detail screen first, then the usual tab rules |
+| Switching tabs | Each tab keeps its detail screen: Translator › History, then Learn, then back returns to History |
+| Re-selecting the current tab | Closes its detail screen (back to the tab's root) |
+| `entries` | The start tab and its detail, then the current tab and its detail: a mix of `TopLevelDestination` and `DetailScreen` keys |
+| Saving | `Tap|Translator=History`: the current tab, then each tab's detail; unknown names are dropped |
+
+**State.** The decorator keeps tabs' saved state when they leave the back stack (see above) but
+removes a detail screen's when it closes, so History opens fresh. Navigation 3's `onPop` receives
+the entry's *content key*, not the route (its default is an internal `Pair` of the key's text and
+class), so detail entries get an explicit one: `entry<DetailScreen>(clazzContentKey = { it.contentKey })`
+gives `"detail:History"`, and `onPop` removes state only for keys with that prefix.
 
 ## How the version was chosen
 
