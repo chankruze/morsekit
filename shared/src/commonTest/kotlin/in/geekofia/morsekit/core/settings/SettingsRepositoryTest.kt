@@ -142,4 +142,21 @@ class SettingsRepositoryTest {
         store.putString(SettingsRepository.KEY_TAP_MODE, "Telepathy")
         assertEquals(TapMode.Timing, repository().settings.value.tapMode)
     }
+
+    @Test
+    fun historyIsSavedByDefaultAndTheChoiceIsRemembered() {
+        assertEquals(true, repository().settings.value.saveHistory)
+        repository().setSaveHistory(false)
+        assertEquals(false, repository().settings.value.saveHistory)
+    }
+
+    @Test
+    fun resetKeepsTheSaveHistoryChoice() {
+        val repository = repository()
+        repository.setSaveHistory(false)
+        repository.setWordsPerMinute(35)
+        repository.resetToDefaults()
+        assertEquals(false, repository.settings.value.saveHistory)
+        assertEquals(MorseTiming.DEFAULT_WPM, repository.settings.value.wordsPerMinute)
+    }
 }

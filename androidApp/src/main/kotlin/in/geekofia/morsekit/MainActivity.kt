@@ -70,6 +70,7 @@ fun AppAndroidPreview() {
         clipboard = {},
         share = {},
         keyValueStore = InMemoryKeyValueStore(),
+        historyStore = InMemoryKeyValueStore(),
         appInfo = AppInfo(versionName = "preview", buildNumber = "0"),
         audioPlayer = NoOpPcmAudioPlayer(),
         torch = NoTorchController(),

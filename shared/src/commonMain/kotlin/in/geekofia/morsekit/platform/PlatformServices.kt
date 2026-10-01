@@ -25,6 +25,8 @@ class PlatformServices(
     val clipboard: ClipboardService,
     val share: ShareService,
     val keyValueStore: KeyValueStore,
+    /** For History only: kept out of device backups on both platforms (see docs/18-history.md). */
+    val historyStore: KeyValueStore,
     val appInfo: AppInfo,
     val audioPlayer: PcmAudioPlayer,
     val torch: TorchController,

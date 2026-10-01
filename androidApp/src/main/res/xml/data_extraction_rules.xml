@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 12+ backup and device transfer. Settings and trainer progress are included; History
+     (morsekit_history, typed messages) never leaves the phone. Keep in sync with backup_rules.xml. -->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="sharedpref" path="morsekit_history.xml" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="sharedpref" path="morsekit_history.xml" />
+    </device-transfer>
+</data-extraction-rules>

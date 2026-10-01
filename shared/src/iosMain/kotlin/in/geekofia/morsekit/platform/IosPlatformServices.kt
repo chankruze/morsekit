@@ -16,6 +16,7 @@ fun iosPlatformServices(presenter: () -> UIViewController?): PlatformServices =
         clipboard = IosClipboardService(),
         share = IosShareService(presenter),
         keyValueStore = IosKeyValueStore(),
+        historyStore = IosBackupExcludedStore("History"),
         appInfo = iosAppInfo(),
         audioPlayer = IosPcmAudioPlayer(),
         torch = IosTorchController(),

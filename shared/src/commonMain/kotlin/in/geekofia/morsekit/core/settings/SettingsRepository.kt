@@ -33,14 +33,18 @@ class SettingsRepository(private val store: KeyValueStore) {
 
     fun setTapMode(mode: TapMode) = update { it.copy(tapMode = mode) }
 
+    fun setSaveHistory(save: Boolean) = update { it.copy(saveHistory = save) }
+
     fun acknowledgeFlashWarning() = update { it.copy(flashWarningAcknowledged = true) }
 
     /**
-     * Restores the user-facing settings (theme, speeds, tone) to their defaults. The flash-warning
-     * acknowledgement isn't a setting shown on screen, so it's kept: resetting shouldn't make the
-     * user accept the warning again.
+     * Restores the user-facing settings (theme, speeds, tone) to their defaults. Two things are kept:
+     * the flash-warning acknowledgement (resetting shouldn't make the user accept it again) and
+     * Save history (a privacy choice shouldn't be turned back on as a side effect).
      */
-    fun resetToDefaults() = update { AppSettings(flashWarningAcknowledged = it.flashWarningAcknowledged) }
+    fun resetToDefaults() = update {
+        AppSettings(flashWarningAcknowledged = it.flashWarningAcknowledged, saveHistory = it.saveHistory)
+    }
 
     private fun update(transform: (AppSettings) -> AppSettings) {
         val updated = state.updateAndGet(transform)
@@ -50,6 +54,7 @@ class SettingsRepository(private val store: KeyValueStore) {
         store.putBoolean(KEY_FLASH_WARNING_ACKNOWLEDGED, updated.flashWarningAcknowledged)
         store.putInt(KEY_TAP_WPM, updated.tapWordsPerMinute)
         store.putString(KEY_TAP_MODE, updated.tapMode.name)
+        store.putBoolean(KEY_SAVE_HISTORY, updated.saveHistory)
     }
 
     /** Missing, unknown or out-of-range stored values fall back to defaults or are clamped. */
@@ -67,6 +72,7 @@ class SettingsRepository(private val store: KeyValueStore) {
             tapMode = store.getString(KEY_TAP_MODE)
                 ?.let { name -> TapMode.entries.firstOrNull { it.name == name } }
                 ?: defaults.tapMode,
+            saveHistory = store.getBoolean(KEY_SAVE_HISTORY) ?: defaults.saveHistory,
         )
     }
 
@@ -81,5 +87,6 @@ class SettingsRepository(private val store: KeyValueStore) {
         const val KEY_FLASH_WARNING_ACKNOWLEDGED = "settings.flashWarningAcknowledged"
         const val KEY_TAP_WPM = "settings.tapWordsPerMinute"
         const val KEY_TAP_MODE = "settings.tapMode"
+        const val KEY_SAVE_HISTORY = "settings.saveHistory"
     }
 }

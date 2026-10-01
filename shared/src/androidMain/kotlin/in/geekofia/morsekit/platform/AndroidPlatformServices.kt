@@ -18,7 +18,9 @@ fun androidPlatformServices(context: Context, currentActivity: () -> Activity?):
     return PlatformServices(
         clipboard = AndroidClipboardService(appContext),
         share = AndroidShareService(appContext),
-        keyValueStore = AndroidKeyValueStore(appContext),
+        keyValueStore = AndroidKeyValueStore(appContext, "morsekit"),
+        // Its own file, so the backup rules can exclude it (res/xml/*backup*/data_extraction_rules).
+        historyStore = AndroidKeyValueStore(appContext, HISTORY_PREFERENCES),
         appInfo = androidAppInfo(appContext),
         audioPlayer = AndroidPcmAudioPlayer(),
         torch = AndroidTorchController(appContext),
@@ -28,8 +30,11 @@ fun androidPlatformServices(context: Context, currentActivity: () -> Activity?):
     )
 }
 
-private class AndroidKeyValueStore(context: Context) : KeyValueStore {
-    private val preferences = context.getSharedPreferences("morsekit", Context.MODE_PRIVATE)
+/** Must match the file excluded in androidApp's backup_rules.xml and data_extraction_rules.xml. */
+private const val HISTORY_PREFERENCES = "morsekit_history"
+
+private class AndroidKeyValueStore(context: Context, name: String) : KeyValueStore {
+    private val preferences = context.getSharedPreferences(name, Context.MODE_PRIVATE)
 
     override fun getString(key: String): String? = preferences.getString(key, null)
 

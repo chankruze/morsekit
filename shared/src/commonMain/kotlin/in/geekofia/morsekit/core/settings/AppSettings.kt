@@ -16,6 +16,8 @@ data class AppSettings(
     /** Speed for keying on the Tap screen; slower than playback by default (see [TapTiming]). */
     val tapWordsPerMinute: Int = TapTiming.DEFAULT_WPM,
     val tapMode: TapMode = TapMode.Timing,
+    /** Whether used translations are kept in History ([in.geekofia.morsekit.core.history.HistoryRepository]). */
+    val saveHistory: Boolean = true,
 ) {
     init {
         require(wordsPerMinute in MorseTiming.MIN_WPM..MorseTiming.MAX_WPM) { "WPM out of range: $wordsPerMinute" }
