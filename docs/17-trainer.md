@@ -47,10 +47,11 @@ All pure Kotlin, tested without a UI.
 | `QuestionGenerator` | Picks the next character, weighted: `1 + 3 × error rate`, plus 2 for the newest character; never the same one twice in a row once three are unlocked. Up to four shuffled choices from the unlocked set. The random source is injected, so tests are repeatable |
 | `TrainerRepository` | Saves progress under `trainer.*` keys. Missing, corrupt or out-of-range values fall back to a fresh start, never a crash |
 
-> **The order isn't typed from the alphabet.** An earlier draft of the order had 40 characters;
-> the test that checks for 41 unique characters, all 26 letters and all 10 digits caught it. The
-> order was written from memory (lcwo.net isn't reachable from the build machine), so it's worth
-> comparing with LCWO's once.
+> **Checked against LCWO's source.** An early draft of the order had 40 characters; the test that
+> checks for 41 unique characters, all 26 letters and all 10 digits caught it. The final order
+> was then compared with `$kochchar` in LCWO's own source (`inc/functions.php`, GitHub mirror
+> `dj1yfk/lcwo`, file last changed 26 August 2026): all 41 characters match, in order. (The
+> course page itself needs a login.)
 
 ### Why these rules
 

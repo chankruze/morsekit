@@ -39,7 +39,7 @@ the KMP concepts used), see the [learning notes in `docs/`](docs/README.md).
 
 Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ Todo.
 
-**68 done · 6 in progress · 6 todo** (80 tasks)
+**69 done · 6 in progress · 5 todo** (80 tasks)
 
 | Feature | Done | In Progress | Todo |
 | --- | --- | --- | --- |
@@ -50,7 +50,7 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Audio | 4 | 0 | 0 |
 | Flashlight | 4 | 0 | 2 |
 | Vibration | 3 | 0 | 0 |
-| Morse Trainer | 5 | 0 | 1 |
+| Morse Trainer | 6 | 0 | 0 |
 | Tap Morse | 5 | 0 | 0 |
 | History | 3 | 0 | 0 |
 | Settings | 7 | 0 | 0 |
@@ -105,7 +105,7 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Morse Trainer | Scoring | Track correct answers and accuracy | P2 | ✅ Done |
 | Morse Trainer | Progression | Gradually introduce new characters | P2 | ✅ Done |
 | Morse Trainer | Session | Practice sessions of 10, 20 or 50 questions with a summary (accuracy, misses, unlocks) | P3 | ✅ Done |
-| Morse Trainer | Koch order check | Compare the Koch order with LCWO's (lcwo.net isn't reachable from the build machine) | P2 | ⬜ Todo |
+| Morse Trainer | Koch order check | Koch order matches LCWO's ($kochchar in its source, all 41 characters in order) | P2 | ✅ Done |
 | Tap Morse | Tap input | Tap to enter dots | P2 | ✅ Done |
 | Tap Morse | Long press | Long press to enter dashes | P2 | ✅ Done |
 | Tap Morse | Character detection | Convert tap sequences into characters | P2 | ✅ Done |
