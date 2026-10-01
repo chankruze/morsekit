@@ -39,7 +39,7 @@ the KMP concepts used), see the [learning notes in `docs/`](docs/README.md).
 
 Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ Todo.
 
-**73 done · 6 in progress · 1 todo** (80 tasks)
+**74 done · 5 in progress · 1 todo** (80 tasks)
 
 | Feature | Done | In Progress | Todo |
 | --- | --- | --- | --- |
@@ -56,7 +56,7 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Settings | 7 | 0 | 0 |
 | Platform | 2 | 1 | 0 |
 | Quality | 4 | 0 | 0 |
-| Release | 8 | 5 | 1 |
+| Release | 9 | 4 | 1 |
 
 #### All tasks
 
@@ -133,7 +133,7 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Release | Build | Signed Android release builds and CI done; iOS archive left (needs Xcode) | P1 | 🚧 In Progress |
 | Release | CI | GitHub Actions workflow: build signed APK/AAB and mapping file for GitHub releases | P1 | ✅ Done |
 | Release | Play publishing | Upload GitHub releases to Play internal testing with release notes; approved promotion to production | P1 | ✅ Done |
-| Release | Play setup | Play Console app and closed test created (build 5 uploaded); left: service account, PLAY_SERVICE_ACCOUNT_JSON secret, production environment | P1 | 🚧 In Progress |
+| Release | Play setup | Play Console app and closed test created (build 8 uploaded); left: service account, PLAY_SERVICE_ACCOUNT_JSON secret, production environment | P1 | 🚧 In Progress |
 | Release | Store links | Check the Play Store link in shared messages once published; add an App Store link for iOS recipients | P2 | ⬜ Todo |
 | Release | Ratings | Ask for a store rating at good moments and add a Rate MorseKit banner | P2 | ✅ Done |
 | Release | In-app updates | Android: Play In-App Updates (flexible, immediate when urgent), daily check with 7-day snooze, Check for updates in Settings | P2 | ✅ Done |
@@ -141,7 +141,7 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Release | Landing page | Website (web/, Vite + React + Tailwind) with live translator and screenshots, deployed to GitHub Pages | P2 | ✅ Done |
 | Release | Privacy policy | Public privacy policy page for Play Console, checked against the app's permissions and stored data | P1 | ✅ Done |
 | Release | Beta signup | Join the closed test from the website: Google Group testers list, opt-in and install steps | P1 | ✅ Done |
-| Release | Closed test upload | v1.1.2 (build 8, which includes builds 6 and 7) released on GitHub and built by CI; left: upload its AAB to the closed test | P1 | 🚧 In Progress |
+| Release | Closed test upload | v1.1.2 (build 8, which includes builds 6 and 7) uploaded to the closed test | P1 | ✅ Done |
 
 ### Running the apps
 
