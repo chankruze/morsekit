@@ -24,7 +24,7 @@ export const STORED_DATA: StoredDataKind[] = [
   },
   {
     prefix: "history",
-    what: "History, if Save history is on: translations you copied, shared or sent (what you typed and what it became), newest first, and which ones you starred.",
+    what: "History: translations you copied, shared or sent (while Save history is on) and any you starred, with what you typed and what it became.",
   },
   {
     prefix: "review",

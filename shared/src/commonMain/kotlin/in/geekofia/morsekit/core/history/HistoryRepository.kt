@@ -26,7 +26,7 @@ class HistoryRepository(
     fun record(direction: TranslationDirection, input: String, output: String) {
         if (input.isBlank() || output.isBlank()) return
         update { entries ->
-            val existing = entries.firstOrNull { it.direction == direction && it.input.trim() == input.trim() }
+            val existing = entries.find(direction, input)
             val entry = HistoryEntry(
                 id = existing?.id ?: ((entries.maxOfOrNull { it.id } ?: 0) + 1),
                 direction = direction,
@@ -37,6 +37,15 @@ class HistoryRepository(
             )
             trim(listOf(entry) + entries.filter { it.id != entry.id })
         }
+    }
+
+    /**
+     * Saves the translation and stars it (the translator's ☆). An explicit choice, so it works
+     * even when automatic saving (Save history) is off.
+     */
+    fun star(direction: TranslationDirection, input: String, output: String) {
+        record(direction, input, output)
+        entries.value.find(direction, input)?.let { setFavorite(it.id, true) }
     }
 
     fun setFavorite(id: Long, favorite: Boolean) = update { entries ->
@@ -67,3 +76,7 @@ class HistoryRepository(
         const val MAX_RECENT = 50
     }
 }
+
+/** The entry for this translation (same direction, same trimmed input), if there is one. */
+fun List<HistoryEntry>.find(direction: TranslationDirection, input: String): HistoryEntry? =
+    firstOrNull { it.direction == direction && it.input.trim() == input.trim() }

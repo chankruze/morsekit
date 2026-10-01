@@ -119,4 +119,26 @@ class HistoryRepositoryTest {
         repo.restore(b)
         assertEquals(3, repo.entries.value.size, "restoring twice doesn't duplicate")
     }
+
+    @Test
+    fun starringSavesAndFavouritesWithoutDuplicates() {
+        val repo = repository()
+        repo.star(TextToMorse, "SOS", "... --- ...")
+        val starred = repo.entries.value.single()
+        assertTrue(starred.favorite)
+        repo.record(TextToMorse, "SOS ", "... --- ...")
+        repo.star(TextToMorse, " SOS", "... --- ...")
+        assertEquals(listOf(starred.id), repo.entries.value.map { it.id })
+        repo.setFavorite(starred.id, false)
+        assertEquals(false, repo.entries.value.find(TextToMorse, "SOS")?.favorite, "un-starred, still in history")
+    }
+
+    @Test
+    fun findMatchesDirectionAndTrimmedInput() {
+        val repo = repository()
+        repo.record(TextToMorse, "HI", ".... ..")
+        assertEquals("HI", repo.entries.value.find(TextToMorse, " HI ")?.input)
+        assertEquals(null, repo.entries.value.find(MorseToText, "HI"))
+        assertEquals(null, repo.entries.value.find(TextToMorse, "HELLO"))
+    }
 }

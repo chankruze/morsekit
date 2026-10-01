@@ -16,10 +16,11 @@ export const OnDeviceSection = () => (
     <p>
       What you type is never sent anywhere. History is on by default: a
       translation is saved when you copy, share or send it (never while you're
-      typing), so you can find it again. You can turn Save history off, delete
-      entries, or clear it in Settings or History. None of this data identifies
-      you, and it's deleted when you clear MorseKit's storage or uninstall the
-      app.
+      typing), so you can find it again, and starring one (☆) saves it as a
+      favourite even when automatic saving is off. You can turn Save history
+      off, delete entries, or clear it in Settings or History. None of this data
+      identifies you, and it's deleted when you clear MorseKit's storage or
+      uninstall the app.
     </p>
     <p>
       If you've turned on your device's backup (for example, Android backup to

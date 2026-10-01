@@ -22,6 +22,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDuration
@@ -55,6 +56,7 @@ import androidx.navigationevent.compose.NavigationBackHandler
 import androidx.navigationevent.compose.rememberNavigationEventState
 import `in`.geekofia.morsekit.core.audio.PlaybackStatus
 import `in`.geekofia.morsekit.core.history.HistoryRepository
+import `in`.geekofia.morsekit.core.history.find
 import `in`.geekofia.morsekit.core.model.TranslationDirection
 import `in`.geekofia.morsekit.core.review.ReviewPrompter
 import `in`.geekofia.morsekit.core.settings.SettingsRepository
@@ -71,10 +73,12 @@ import `in`.geekofia.morsekit.ui.components.MorseTextField
 import `in`.geekofia.morsekit.ui.components.ScreenScaffold
 import kotlinx.coroutines.launch
 import morsekit.shared.generated.resources.Res
-import morsekit.shared.generated.resources.ic_history
 import morsekit.shared.generated.resources.ic_close
 import morsekit.shared.generated.resources.ic_copy
+import morsekit.shared.generated.resources.ic_history
 import morsekit.shared.generated.resources.ic_share
+import morsekit.shared.generated.resources.ic_star
+import morsekit.shared.generated.resources.ic_star_border
 import morsekit.shared.generated.resources.ic_translate
 import morsekit.shared.generated.resources.morsekit_logo
 import org.jetbrains.compose.resources.painterResource
@@ -132,6 +136,8 @@ fun TranslatorRoute(
         playbackViewModel.stop()
         stopUnattendedOutputs()
     }
+    val history by historyRepository.entries.collectAsStateWithLifecycle()
+    val starredEntry = history.find(state.direction, state.input)?.takeIf { it.favorite }
     // History keeps what was *used* (copied, shared, sent), never half-typed text.
     val saveToHistory = {
         if (settings.saveHistory && state.hasOutput) historyRepository.record(state.direction, state.input, state.output)
@@ -227,6 +233,14 @@ fun TranslatorRoute(
             onInputChange = { stopTransmitting(); viewModel.onInputChange(it) },
             onSwap = { stopTransmitting(); viewModel.swapDirection() },
             onClear = { stopTransmitting(); viewModel.onClear() },
+            isStarred = starredEntry != null,
+            onStarChange = { star ->
+                if (star) {
+                    historyRepository.star(state.direction, state.input, state.output)
+                } else {
+                    starredEntry?.let { historyRepository.setFavorite(it.id, false) }
+                }
+            },
             onCopy = { text ->
                 saveToHistory()
                 clipboard.copyText(text)
@@ -288,6 +302,8 @@ fun TranslatorScreen(
     onCopy: (String) -> Unit,
     onShare: () -> Unit,
     modifier: Modifier = Modifier,
+    isStarred: Boolean = false,
+    onStarChange: (Boolean) -> Unit = {},
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     transmitFab: @Composable () -> Unit = {},
 ) {
@@ -310,7 +326,14 @@ fun TranslatorScreen(
                 onInputChange = onInputChange,
                 onClear = onClear,
             )
-            OutputCard(state = state, isMorseInput = isMorseInput, onCopy = onCopy, onShare = onShare)
+            OutputCard(
+                state = state,
+                isMorseInput = isMorseInput,
+                isStarred = isStarred,
+                onStarChange = onStarChange,
+                onCopy = onCopy,
+                onShare = onShare,
+            )
             // Keeps the last card's actions clear of the floating Transmit button.
             Spacer(Modifier.height(FAB_CLEARANCE))
         }
@@ -411,6 +434,8 @@ private fun InputCard(
 private fun OutputCard(
     state: TranslatorUiState,
     isMorseInput: Boolean,
+    isStarred: Boolean,
+    onStarChange: (Boolean) -> Unit,
     onCopy: (String) -> Unit,
     onShare: () -> Unit,
 ) {
@@ -428,6 +453,13 @@ private fun OutputCard(
             modifier = Modifier.fillMaxWidth().padding(end = 4.dp, bottom = 4.dp),
             horizontalArrangement = Arrangement.End,
         ) {
+            // ☆ keeps this translation in History as a favourite (★ when it already is).
+            IconToggleButton(checked = isStarred, onCheckedChange = onStarChange, enabled = state.hasOutput) {
+                Icon(
+                    painter = painterResource(if (isStarred) Res.drawable.ic_star else Res.drawable.ic_star_border),
+                    contentDescription = "Favourite",
+                )
+            }
             IconButton(onClick = { onCopy(state.output) }, enabled = state.hasOutput) {
                 Icon(painterResource(Res.drawable.ic_copy), contentDescription = "Copy")
             }
