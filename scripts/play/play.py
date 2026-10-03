@@ -27,6 +27,8 @@ import urllib.parse
 import urllib.request
 
 PACKAGE = "in.geekofia.morsekit"
+# The closed test, where MorseKit's testers are. Play Console's first closed track is "alpha".
+DEFAULT_TRACK = "alpha"
 SCOPE = "https://www.googleapis.com/auth/androidpublisher"
 API_ROOT = "https://androidpublisher.googleapis.com"
 NOTES_LANGUAGE = "en-US"
@@ -265,12 +267,12 @@ def main(argv=None):
     up.add_argument("--mapping")
     up.add_argument("--notes-file", help="Markdown release notes (e.g. the GitHub release body)")
     up.add_argument("--release-name", required=True)
-    up.add_argument("--track", default="internal")
+    up.add_argument("--track", default=DEFAULT_TRACK)
     up.add_argument("--dry-run", action="store_true")
 
     pr = commands.add_parser("promote", help="Copy a release from one track to another")
     pr.add_argument("--version-code", type=int, help="Default: the newest release on --from")
-    pr.add_argument("--from", dest="source", default="internal")
+    pr.add_argument("--from", dest="source", default=DEFAULT_TRACK)
     pr.add_argument("--to", dest="target", default="production")
     pr.add_argument("--rollout", type=float, default=100, help="Percent of users; below 100 is staged")
     pr.add_argument("--priority", type=int, default=0, help="In-app update priority, 0-5")

@@ -1,8 +1,9 @@
 # Builds the signed release APK, AAB and R8 mapping file.
 #
 # - Publishing a GitHub release attaches them to that release and uploads the AAB to Google
-#   Play's internal testing track, with the release body as "What's new". Promoting to
-#   production is a separate, approved step: play-promote.yml.
+#   Play's closed test (the track in the PLAY_TRACK repository variable, default `alpha`), with
+#   the release body as "What's new". Promoting to production is a separate, approved step:
+#   play-promote.yml.
 # - Running it by hand (Actions > Android release > Run workflow) keeps them as workflow
 #   artifacts only, and asks Play to validate the upload without publishing it.
 #
@@ -126,12 +127,13 @@ jobs:
 
       # scripts/play/play.py talks to the Play Developer API directly (no third-party action
       # sees the key). Manual runs only validate; nothing is published.
-      - name: Upload to Google Play (internal testing)
+      - name: Upload to Google Play (closed test)
         env:
           PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
           BASE: ${{ steps.version.outputs.base }}
           RELEASE_NAME: ${{ steps.version.outputs.name }} (${{ steps.version.outputs.code }})
           NOTES: ${{ github.event.release.body }}
+          TRACK: ${{ vars.PLAY_TRACK || 'alpha' }}
           DRY_RUN: ${{ github.event_name != 'release' }}
         run: |
           if [ -z "$PLAY_SERVICE_ACCOUNT_JSON" ]; then
@@ -139,7 +141,7 @@ jobs:
           fi
           printf '%s' "$NOTES" > "$RUNNER_TEMP/notes.md"
           args=(--aab "dist/$BASE.aab" --mapping "dist/$BASE-mapping.txt"
-                --notes-file "$RUNNER_TEMP/notes.md" --release-name "$RELEASE_NAME" --track internal)
+                --notes-file "$RUNNER_TEMP/notes.md" --release-name "$RELEASE_NAME" --track "$TRACK")
           if [ "$DRY_RUN" = true ]; then args+=(--dry-run); fi
           python3 scripts/play/play.py upload "${args[@]}"
 

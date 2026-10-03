@@ -200,13 +200,13 @@ class PlayApiTest(unittest.TestCase):
         with self.assertRaisesRegex(self.play.PlayError, "/token: HTTP 401"):
             self.play.access_token(json.dumps(account))
 
-    def test_upload_sends_bundle_mapping_and_notes_to_internal_then_commits(self):
+    def test_upload_sends_bundle_mapping_and_notes_to_the_closed_test_then_commits(self):
         aab, mapping, notes = self.files()
         self.run_play("upload", "--aab", aab, "--mapping", mapping, "--notes-file", notes,
                       "--release-name", "1.0.0 (5)")
         s = FakePlay.state
         self.assertEqual((s["bundle"], s["mapping"]), (b"AAB", b"MAP"))
-        self.assertEqual(s["put"]["internal"], {"track": "internal", "releases": [{
+        self.assertEqual(s["put"]["alpha"], {"track": "alpha", "releases": [{
             "name": "1.0.0 (5)", "versionCodes": ["5"], "status": "completed",
             "releaseNotes": [{"language": "en-US", "text": "• New: check for updates"}],
         }]})
@@ -220,9 +220,9 @@ class PlayApiTest(unittest.TestCase):
         self.assertEqual(self.calls()[-1][0], "DELETE")
         self.assertNotIn("commit", str(self.calls()))
 
-    def test_promote_copies_the_newest_internal_release_to_production(self):
+    def test_promote_copies_the_newest_closed_test_release_to_production(self):
         notes = [{"language": "en-US", "text": "New stuff"}]
-        FakePlay.state["tracks"]["internal"] = [
+        FakePlay.state["tracks"]["alpha"] = [
             {"name": "1.0.0 (4)", "versionCodes": ["4"], "status": "completed"},
             {"name": "1.0.1 (6)", "versionCodes": ["6"], "status": "completed", "releaseNotes": notes},
         ]
@@ -234,7 +234,7 @@ class PlayApiTest(unittest.TestCase):
         self.assertIn("commit", self.calls()[-1][1])
 
     def test_promote_a_chosen_version_as_a_staged_urgent_rollout(self):
-        FakePlay.state["tracks"]["internal"] = [
+        FakePlay.state["tracks"]["alpha"] = [
             {"name": "a", "versionCodes": ["4"], "status": "completed"},
             {"name": "b", "versionCodes": ["6"], "status": "completed"},
         ]
@@ -245,7 +245,7 @@ class PlayApiTest(unittest.TestCase):
         }])
 
     def test_promote_fails_clearly_and_discards_the_edit(self):
-        FakePlay.state["tracks"]["internal"] = [{"name": "a", "versionCodes": ["4"], "status": "completed"}]
+        FakePlay.state["tracks"]["alpha"] = [{"name": "a", "versionCodes": ["4"], "status": "completed"}]
         for args, message in (
             (["--version-code", "9"], "no version code 9"),
             (["--rollout", "0"], "--rollout must be above 0"),
