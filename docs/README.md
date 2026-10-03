@@ -20,7 +20,7 @@ open the file and follow along.
 | 10 | [Vibration transmission](10-vibration.md) | Native vibration patterns, millisecond rounding without drift, the shared `TransmissionRunner`, Core Haptics, permissions |
 | 11 | [Translator UI](11-translator-ui.md) | The redesign: direction bar, in-card actions, the Transmit FAB speed dial, one-time flash warning, per-screen headers and insets, the app icon |
 | 12 | [Navigation](12-navigation.md) | Navigation 3 with a back stack you own, Material back rules, keeping tab state, `navigationevent` back handlers |
-| 13 | [Release builds and Google Play](13-ci-release.md) | GitHub Actions builds signed APK/AAB for a release, uploads to Play internal testing, approved promotion to production, a dependency-free Play API client |
+| 13 | [Release builds and Google Play](13-ci-release.md) | GitHub Actions builds signed APK/AAB for a release, uploads to Play's closed test, approved promotion to production, a dependency-free Play API client |
 | 14 | [Landing page](14-landing-page.md) | The `web/` site: Vite, React and Tailwind next to the app, a TypeScript port of the engine kept in sync by tests, Web Audio timing |
 | 15 | [Accessibility](15-accessibility.md) | Morse spoken as dots and dashes, headings, announced values, one stop per action, 48 dp targets, font scaling, how to test with TalkBack |
 | 16 | [Tap Morse](16-tap-morse.md) | Keying by hand in Timing or Buttons mode: a pure decoder with fake time, thresholds from a tap speed, deadlines instead of polling, haptics, a letter preview, screen-reader actions |

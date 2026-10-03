@@ -4,15 +4,15 @@ Two workflows take a release from a GitHub tag to Google Play without a laptop i
 
 | Workflow | Trigger | Does |
 | --- | --- | --- |
-| `android-release.yml` | **Publish a GitHub release** | Builds the signed APK, AAB and R8 mapping file, attaches them to the release, uploads the AAB to Play's **internal testing** track |
+| `android-release.yml` | **Publish a GitHub release** | Builds the signed APK, AAB and R8 mapping file, attaches them to the release, uploads the AAB to Play's **closed test** |
 | | **Run workflow** (manual) | Same build, kept as workflow artifacts; Play only **validates** the upload (nothing is published) |
-| `play-promote.yml` | **Run workflow** (manual, approved) | Copies a release from internal testing to **production** and sends it for review |
+| `play-promote.yml` | **Run workflow** (manual, approved) | Copies a release from the closed test to **production** and sends it for review |
 
 ```mermaid
 flowchart LR
     R["GitHub release<br/>v1.0.1"] --> B["android-release.yml<br/>build, sign, verify"]
     B --> A["Release assets<br/>APK · AAB · mapping"]
-    B --> I["Play: internal testing<br/>(no review, minutes)"]
+    B --> I["Play: closed test<br/>(testers, after a short review)"]
     I -->|"you test on a phone"| P["play-promote.yml<br/>approve in GitHub"]
     P --> Q["Play: production<br/>sent for review"]
 ```
@@ -39,7 +39,7 @@ flowchart TB
     G --> H["Verify both are signed"]
     H --> I["Upload workflow artifacts"]
     I --> J{"Release event?"}
-    J -->|yes| K["gh release upload<br/>then Play: internal"]
+    J -->|yes| K["gh release upload<br/>then Play: closed test"]
     J -->|manual| V["Play: validate only"]
     K --> L["Delete keystore and properties (always)"]
     V --> L
@@ -62,15 +62,24 @@ flowchart TB
 
 ## Google Play
 
-### Tracks, and why internal first
+### Tracks, and why the closed test first
 
 | Track | Review | Who gets it |
 | --- | --- | --- |
 | Internal testing | None; available in minutes | Up to 100 testers you list in Play Console |
+| Closed testing | Google's review, usually short | Testers you invite, e.g. a Google Group (MorseKit's testers, see the website's Beta section) |
 | Production | Google's review (hours to days) | Everyone, or a percentage with a staged rollout |
 
-Every GitHub release goes to **internal testing** automatically. After installing it from Play
-and trying it, you promote the **same build** (same version code, no rebuild) to production.
+Every GitHub release goes to the **closed test** automatically, where MorseKit's testers already
+are; it's also the track a new personal developer account must run before production. After
+installing it from Play and trying it, you promote the **same build** (same version code, no
+rebuild) to production.
+
+The track is the repository variable **`PLAY_TRACK`** (GitHub › Settings › Secrets and variables
+› Actions › Variables), used by both workflows; unset, it's `alpha`, the API name of Play
+Console's first closed track. A closed track you created yourself has its own name: set
+`PLAY_TRACK` to it (with a wrong name, Play rejects the upload and nothing is published). `internal`
+also works, for builds without review.
 
 ### Release notes
 
@@ -99,7 +108,7 @@ Actions › **Promote to production** › Run workflow:
 
 | Input | Default | Meaning |
 | --- | --- | --- |
-| Version code | newest on internal | Which internal release to promote |
+| Version code | newest on the closed test | Which closed-test release to promote |
 | Rollout | `100` | Percent of users. Below 100 is a staged rollout; run again with a higher number (same version code) to widen it, and `100` finishes it |
 | In-app update priority | `0` | Play's 0–5 priority, read by MorseKit's in-app updates: **4–5 make the app ask for an immediate update** (`AvailableUpdate.isUrgent`, [note 5](05-platform-services.md)). Use it for serious bugs only |
 | Dry run | off | Play validates the change, then it's discarded |
@@ -127,7 +136,7 @@ sequenceDiagram
     G-->>S: access token (1 hour)
     S->>P: POST edits → id
     S->>P: upload AAB, upload mapping.txt
-    S->>P: PUT tracks/internal {release, notes}
+    S->>P: PUT tracks/alpha {release, notes}
     S->>P: POST edits/id:commit (or :validate, then DELETE)
 ```
 
@@ -198,8 +207,8 @@ gh release create v1.0.1 --title "MorseKit 1.0.1" --notes "- Check for updates i
 ```
 
 1. Publishing starts `android-release.yml`: the assets appear on the release and the build
-   reaches internal testers a few minutes later. A draft release doesn't trigger it until it's
-   published.
+   reaches the closed test's testers once Google's review passes (usually quickly). A draft
+   release doesn't trigger it until it's published.
 2. Install it from Play on a phone (a tester account) and check it.
 3. Run **Promote to production**, approve it, and wait for Google's review.
 
@@ -212,7 +221,7 @@ gh release create v1.0.1 --title "MorseKit 1.0.1" --notes "- Check for updates i
 | Choice | Why |
 | --- | --- |
 | `release: published` | Releasing is a deliberate act; building on every push to `main` would spend minutes on builds nobody downloads |
-| Internal first, promote the same build | What reaches review is exactly what was tested; no rebuild in between |
+| Closed test first, promote the same build | What reaches production review is exactly what testers used; no rebuild in between |
 | `gh release upload --clobber` | Re-running the job replaces the files instead of failing on duplicates |
 | JDK 21 (Zulu) | Matches `gradle/gradle-daemon-jvm.properties`, so Gradle doesn't download a second JDK |
 | `gradle/actions/setup-gradle` | Caches Gradle and dependencies between runs |

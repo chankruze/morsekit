@@ -132,7 +132,7 @@ Progress on the MorseKit backlog. Status: ✅ Done · 🚧 In Progress · ⬜ To
 | Release | Store assets | Screenshots taken (four are on the website); Play listing text in the Play Console (source: store/play/en-US); left: App Store assets | P2 | 🚧 In Progress |
 | Release | Build | Signed Android release builds and CI done; iOS archive left (needs Xcode) | P1 | 🚧 In Progress |
 | Release | CI | GitHub Actions workflow: build signed APK/AAB and mapping file for GitHub releases | P1 | ✅ Done |
-| Release | Play publishing | Upload GitHub releases to Play internal testing with release notes; approved promotion to production | P1 | ✅ Done |
+| Release | Play publishing | Upload GitHub releases to Play's closed test with release notes; approved promotion to production | P1 | ✅ Done |
 | Release | Play setup | Play Console app and closed test created (build 8 uploaded); left: service account, PLAY_SERVICE_ACCOUNT_JSON secret, production environment | P1 | 🚧 In Progress |
 | Release | Store links | Check the Play Store link in shared messages once published; add an App Store link for iOS recipients | P2 | ⬜ Todo |
 | Release | Ratings | Ask for a store rating at good moments and add a Rate MorseKit banner | P2 | ✅ Done |
@@ -167,7 +167,7 @@ See [docs/07-versioning-and-builds.md](docs/07-versioning-and-builds.md) for det
 
 Publishing a GitHub release runs [`android-release.yml`](.github/workflows/android-release.yml),
 which attaches the signed APK, AAB and R8 mapping file to the release and uploads the AAB to
-Google Play's internal testing track. [`play-promote.yml`](.github/workflows/play-promote.yml)
+Google Play's closed test. [`play-promote.yml`](.github/workflows/play-promote.yml)
 then promotes it to production after your approval. See
 [docs/13-ci-release.md](docs/13-ci-release.md) for the one-time setup.
 
